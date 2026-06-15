@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BTC Cycle Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --card: #111118;
+    --card2: #16161f;
+    --border: #1e1e2e;
+    --orange: #f7931a;
+    --orange-dim: rgba(247,147,26,0.12);
+    --green: #00d084;
+    --red: #ff4560;
+    --yellow: #ffd700;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --accent: #7c3aed;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(180deg, #0f0f1a 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--orange);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: #fff;
+  }
+  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; }
+  .header-price { text-align: right; }
+  .btc-price { font-size: 22px; font-weight: 800; color: var(--orange); }
+  .btc-change { font-size: 12px; font-weight: 600; margin-top: 2px; }
+  .positive { color: var(--green); }
+  .negative { color: var(--red); }
+
+  /* LAYOUT */
+  .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+  /* PHASE BANNER */
+  .phase-banner {
+    margin: 16px 0;
+    background: var(--orange-dim);
+    border: 1px solid rgba(247,147,26,0.3);
+    border-radius: 16px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .phase-banner::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(247,147,26,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .phase-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--orange); text-transform: uppercase; }
+  .phase-name { font-size: 24px; font-weight: 900; margin: 4px 0 2px; letter-spacing: -0.5px; }
+  .phase-desc { font-size: 13px; color: var(--muted); }
+  .phase-day { position: absolute; top: 18px; right: 20px; text-align: right; }
+  .phase-day-num { font-size: 36px; font-weight: 900; color: var(--orange); line-height: 1; }
+  .phase-day-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* PROGRESS BAR */
+  .progress-section { margin: 16px 0; }
+  .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+  .progress-track {
+    height: 8px; background: var(--card2);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f7931a 0%, #ffd700 100%);
+    border-radius: 99px;
+    transition: width 1s ease;
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 14px; height: 14px;
+    background: #ffd700;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255,215,0,0.8);
+  }
+  .progress-phases { display: flex; justify-content: space-between; margin-top: 6px; }
+  .progress-phases span { font-size: 9px; color: var(--muted); text-align: center; }
+
+  /* COUNTDOWN */
+  .countdown-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .countdown-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .countdown-unit {
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .countdown-num { font-size: 28px; font-weight: 900; color: var(--orange); line-height: 1; }
+  .countdown-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+  .stat-value { font-size: 20px; font-weight: 800; margin-top: 4px; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* CYCLE SCORE */
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .score-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .score-num { font-size: 28px; font-weight: 900; }
+  .score-bar-track { height: 10px; background: var(--card2); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+  .score-bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease; }
+  .score-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); }
+  .score-action {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* PROJECTIONS */
+  .proj-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .proj-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .proj-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .proj-row:last-child { border-bottom: none; }
+  .proj-scenario { display: flex; align-items: center; gap: 8px; }
+  .proj-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .proj-label { font-size: 13px; font-weight: 600; }
+  .proj-date { font-size: 11px; color: var(--muted); }
+  .proj-price { font-size: 16px; font-weight: 800; }
+
+  /* CHART */
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .chart-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .chart-wrap { position: relative; height: 200px; }
+
+  /* SIGNALS */
+  .signals-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .signal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .signal-row:last-child { border-bottom: none; }
+  .signal-name { font-size: 13px; }
+  .signal-val { font-size: 13px; font-weight: 700; }
+  .signal-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-buy { background: rgba(0,208,132,0.15); color: var(--green); }
+  .badge-hold { background: rgba(255,215,0,0.15); color: var(--yellow); }
+  .badge-sell { background: rgba(255,69,96,0.15); color: var(--red); }
+  .badge-watch { background: rgba(124,58,237,0.15); color: #a78bfa; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(10,10,15,0.95);
+    border-top: 1px solid var(--border);
+    display: flex;
+    backdrop-filter: blur(20px);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1;
+    padding: 12px 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .nav-item.active { opacity: 1; }
+  .nav-icon { font-size: 22px; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--text); }
+  .nav-item.active .nav-label { color: var(--orange); }
+
+  /* PULSE ANIMATION */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+    animation: pulse 2s infinite;
+  }
+  .live-label { font-size: 10px; color: var(--green); }
+
+  /* LOADING */
+  .loading { color: var(--muted); font-size: 13px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* PORTFOLIO PAGE */
+  .portfolio-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .portfolio-value { font-size: 42px; font-weight: 900; }
+  .portfolio-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .dca-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .dca-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .dca-row:last-child { border-bottom: none; }
+
+  /* ALERTS PAGE */
+  .alert-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .alert-icon { font-size: 24px; }
+  .alert-title { font-size: 14px; font-weight: 700; }
+  .alert-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--green);
+    border-radius: 99px;
+    position: relative;
+    margin-left: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px; right: 2px;
+    transition: transform 0.2s;
+  }
+  .toggle.off { background: var(--card2); }
+  .toggle.off::after { transform: translateX(-20px); }
+
+  .section-header { font-size: 16px; font-weight: 800; margin: 20px 0 4px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">₿</div>
+    <div>
+      <div class="logo-text">Cycle Tracker</div>
+      <div class="logo-sub"><span class="live-dot"></span><span class="live-label">LIVE</span></div>
+    </div>
+  </div>
+  <div class="header-price">
+    <div class="btc-price" id="btcPrice"><span class="spinner"></span></div>
+    <div class="btc-change" id="btcChange">&nbsp;</div>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="container">
+
+  <!-- PAGE: HOME -->
+  <div class="page active" id="page-home">
+
+    <!-- Phase Banner -->
+    <div class="phase-banner">
+      <div class="phase-label">Current Phase</div>
+      <div class="phase-name" id="phaseName">—</div>
+      <div class="phase-desc" id="phaseDesc">Loading...</div>
+      <div class="phase-day">
+        <div class="phase-day-num" id="cycleDay">—</div>
+        <div class="phase-day-label">Day in Cycle</div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <span>Halving · Apr 19, 2024</span>
+        <span>Projected ATH · Jan 24, 2027</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="progress-phases">
+        <span>Accum</span>
+        <span>Re-Awaken</span>
+        <span>Momentum</span>
+        <span>Parabolic</span>
+        <span>Blow-Off</span>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-card">
+      <div class="countdown-title">⏱ Time to Projected ATH (Jan 24, 2027)</div>
+      <div class="countdown-grid">
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdDays">—</div>
+          <div class="countdown-label">Days</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdHours">—</div>
+          <div class="countdown-label">Hours</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdMinutes">—</div>
+          <div class="countdown-label">Mins</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdSeconds">—</div>
+          <div class="countdown-label">Secs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Arc 1 Progress</div>
+        <div class="stat-value" id="arcPct" style="color:var(--orange)">—</div>
+        <div class="stat-sub" id="arcDaysLeft">— days to ATH</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Days Since Halving</div>
+        <div class="stat-value" id="halvingDays" style="color:var(--text)">—</div>
+        <div class="stat-sub">of 1070 total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Bear Bottom Est.</div>
+        <div class="stat-value" style="color:var(--red)">Jan 2028</div>
+        <div class="stat-sub">~$28K–$42K</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Next Halving Est.</div>
+        <div class="stat-value" style="color:var(--accent)">Apr 2028</div>
+        <div class="stat-sub">Cycle resets</div>
+      </div>
+    </div>
+
+    <!-- Cycle Score -->
+    <div class="score-card">
+      <div class="score-header">
+        <div class="score-title">Cycle Score</div>
+        <div class="score-num" id="scoreNum" style="color:var(--yellow)">72</div>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="scoreBar" style="width:72%; background: linear-gradient(90deg,#00d084,#ffd700,#ff4560);"></div>
+      </div>
+      <div class="score-labels">
+        <span>Buy Zone (0–40)</span>
+        <span>Hold (41–60)</span>
+        <span>Exit Zone (61–100)</span>
+      </div>
+      <div class="score-action" id="scoreAction" style="background:rgba(255,215,0,0.1); color:var(--yellow);">
+        ⚠ Overvalued — Consider taking partial profits
+      </div>
+    </div>
+
+    <!-- Projections -->
+    <div class="proj-card">
+      <div class="proj-title">ATH Price Projections</div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--red)"></div>
+          <div>
+            <div class="proj-label">Bear Case</div>
+            <div class="proj-date">If cycle underperforms</div>
+          </div>
+        </div>
+        <div class="proj-price" style="color:var(--red)">$140,000</div>
+      </div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--orange)"></div>
+          <div>
+            <div class="proj-label">Base Case</div>
+            <div class="proj-date">Historical average</div>
+          </div>
+        </div>
+        <div class="proj-price" style="color:var(--orange)">$200,000</div>
+      </div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="proj-label">Bull Case</div>
+            <div class="proj-date">If institutions go hard</div>
+          </div>
+        </div>
+        <div class="proj-price" style="color:var(--green)">$350,000</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-title">Price Projection Curve — 2024 Cycle</div>
+      <div class="chart-wrap">
+        <canvas id="projChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Signals -->
+    <div class="signals-card">
+      <div class="proj-title">On-Chain Signals</div>
+      <div class="signal-row">
+        <div class="signal-name">Fear & Greed</div>
+        <div class="signal-val">72 / 100</div>
+        <div class="signal-badge badge-hold">GREED</div>
+      </div>
+      <div class="signal-row">
+        <div class="signal-name">MVRV Z-Score</div>
+        <div class="signal-val">2.1</div>
+        <div class="signal-badge badge-hold">HOLD</div>
+      </div>
+      <div class="signal-row">
+        <div class="signal-name">SOPR</div>
+        <div class="signal-val">1.04</div>
+        <div class="signal-badge badge-hold">HOLD</div>
+      </div>
+      <div class="signal-row">
+        <div class="signal-name">Puell Multiple</div>
+        <div class="signal-val">1.8</div>
+        <div class="signal-badge badge-watch">WATCH</div>
+      </div>
+      <div class="signal-row">
+        <div class="signal-name">Exchange Outflows</div>
+        <div class="signal-val">+4,200 BTC</div>
+        <div class="signal-badge badge-buy">BULLISH</div>
+      </div>
+      <div class="signal-row">
+        <div class="signal-name">Pi Cycle Top</div>
+        <div class="signal-val">Not Triggered</div>
+        <div class="signal-badge badge-buy">SAFE</div>
+      </div>
+    </div>
+
+  </div><!-- end page-home -->
+
+  <!-- PAGE: CHART -->
+  <div class="page" id="page-chart">
+    <div class="section-header">Full Cycle Timeline</div>
+    <div class="chart-card" style="margin-top:8px">
+      <div class="chart-title">Bear / Base / Bull — 2024 Halving Cycle</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="bigChart"></canvas>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-title">Key Date Milestones</div>
+      <div class="proj-row">
+        <div><div class="proj-label">Halving</div><div class="proj-date">Apr 19, 2024</div></div>
+        <div class="proj-price" style="color:var(--text)">$62,000</div>
+      </div>
+      <div class="proj-row">
+        <div><div class="proj-label">Momentum Phase</div><div class="proj-date">Apr 19, 2025</div></div>
+        <div class="proj-price" style="color:var(--orange)">$120,000</div>
+      </div>
+      <div class="proj-row">
+        <div><div class="proj-label">Parabolic Phase</div><div class="proj-date">Oct 11, 2025</div></div>
+        <div class="proj-price" style="color:var(--orange)">$165,000</div>
+      </div>
+      <div class="proj-row">
+        <div><div class="proj-label">Blow-Off Begins</div><div class="proj-date">Mar 10, 2026</div></div>
+        <div class="proj-price" style="color:var(--yellow)">$233,000</div>
+      </div>
+      <div class="proj-row">
+        <div><div class="proj-label" style="color:var(--green)">🎯 Projected ATH</div><div class="proj-date">Jan 24, 2027</div></div>
+        <div class="proj-price" style="color:var(--green)">$200,000</div>
+      </div>
+      <div class="proj-row">
+        <div><div class="proj-label" style="color:var(--red)">Bear Bottom</div><div class="proj-date">Jan 23, 2028</div></div>
+        <div class="proj-price" style="color:var(--red)">$42,000</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PORTFOLIO -->
+  <div class="page" id="page-portfolio">
+    <div class="portfolio-hero">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Portfolio Value</div>
+      <div class="portfolio-value" id="portValue">$0.00</div>
+      <div class="portfolio-sub">Based on live BTC price</div>
+      <div style="margin-top:16px;display:flex;gap:12px;justify-content:center">
+        <div>
+          <div style="font-size:11px;color:var(--muted)">Your BTC</div>
+          <input id="btcInput" type="number" step="0.001" placeholder="0.00" value="0.1"
+            style="background:rgba(255,255,255,0.08);border:1px solid var(--border);color:white;padding:8px 12px;border-radius:8px;font-size:16px;font-weight:700;width:120px;text-align:center;margin-top:4px"
+            oninput="updatePortfolio()">
+        </div>
+      </div>
+    </div>
+
+    <div class="dca-card">
+      <div class="proj-title">If You Hold to Projected ATH</div>
+      <div class="dca-row">
+        <div>Bear Case ($140K)</div>
+        <div style="font-weight:700;color:var(--red)" id="portBear">$0</div>
+      </div>
+      <div class="dca-row">
+        <div>Base Case ($200K)</div>
+        <div style="font-weight:700;color:var(--orange)" id="portBase">$0</div>
+      </div>
+      <div class="dca-row">
+        <div>Bull Case ($350K)</div>
+        <div style="font-weight:700;color:var(--green)" id="portBull">$0</div>
+      </div>
+    </div>
+
+    <div class="dca-card">
+      <div class="proj-title">DCA Recommendation — Current Phase</div>
+      <div class="dca-row">
+        <div>Current Phase</div>
+        <div style="font-weight:700;color:var(--orange)" id="dcaPhase">—</div>
+      </div>
+      <div class="dca-row">
+        <div>DCA Action</div>
+        <div style="font-weight:700;color:var(--yellow)" id="dcaAction">—</div>
+      </div>
+      <div class="dca-row">
+        <div>Risk Level</div>
+        <div style="font-weight:700" id="dcaRisk">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: ALERTS -->
+  <div class="page" id="page-alerts">
+    <div class="section-header">Smart Alerts</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Autopilot notifications based on cycle signals</div>
+
+    <div class="alert-item">
+      <div class="alert-icon">🎯</div>
+      <div>
+        <div class="alert-title">ATH Zone Alert</div>
+        <div class="alert-desc">Notify me when we enter Day 1000+ (Top Warning)</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">📈</div>
+      <div>
+        <div class="alert-title">Cycle Score &gt; 85</div>
+        <div class="alert-desc">Extreme greed — sell signal approaching</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">🟢</div>
+      <div>
+        <div class="alert-title">Pi Cycle Top Triggered</div>
+        <div class="alert-desc">Historical ATH indicator — exit immediately</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">💰</div>
+      <div>
+        <div class="alert-title">Bear Bottom Zone</div>
+        <div class="alert-desc">Notify when Arc 2 Day 280+ (Stealth Buy Zone)</div>
+      </div>
+      <div class="toggle off"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">🐋</div>
+      <div>
+        <div class="alert-title">Whale Exchange Inflow</div>
+        <div class="alert-desc">Large BTC moving to exchanges (sell pressure)</div>
+      </div>
+      <div class="toggle off"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">📉</div>
+      <div>
+        <div class="alert-title">Price Below $100K</div>
+        <div class="alert-desc">Support level broken — cycle check needed</div>
+      </div>
+      <div class="toggle off"></div>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="showPage('home',this)">
+    <span class="nav-icon">₿</span>
+    <span class="nav-label">Cycle</span>
+  </div>
+  <div class="nav-item" onclick="showPage('chart',this)">
+    <span class="nav-icon">📈</span>
+    <span class="nav-label">Chart</span>
+  </div>
+  <div class="nav-item" onclick="showPage('portfolio',this)">
+    <span class="nav-icon">💼</span>
+    <span class="nav-label">Portfolio</span>
+  </div>
+  <div class="nav-item" onclick="showPage('alerts',this)">
+    <span class="nav-icon">🔔</span>
+    <span class="nav-label">Alerts</span>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────
+const HALVING = new Date('2024-04-19T00:00:00Z');
+const ATH_DATE = new Date('2027-01-24T00:00:00Z');
+const BEAR_DATE = new Date('2028-01-23T00:00:00Z');
+const ARC1_DAYS = 1070;
+
+const PHASES = [
+  { name: 'Accumulation',    start: 0,   end: 180,  desc: 'Whales buying quietly. Best entry window.',         dca: 'BUY AGGRESSIVELY',  risk: 'Low',    riskColor: '#00d084' },
+  { name: 'Re-Awakening',    start: 181, end: 365,  desc: 'Media returns. Retail starts noticing.',            dca: 'BUY REGULARLY',     risk: 'Low',    riskColor: '#00d084' },
+  { name: 'Momentum Build',  start: 366, end: 540,  desc: 'Old ATH broken. Price discovery begins.',           dca: 'BUY LESS, HOLD',    risk: 'Medium', riskColor: '#ffd700' },
+  { name: 'Parabolic Advance', start: 541, end: 780, desc: 'Exponential move. FOMO is here.',                  dca: 'STOP BUYING, HOLD', risk: 'High',   riskColor: '#ffd700' },
+  { name: 'Blow-Off Top',    start: 781, end: 1070, desc: 'Euphoria. Everyone talks Bitcoin. START SELLING.',  dca: 'SELL IN LADDERS',   risk: 'EXIT',   riskColor: '#ff4560' },
+];
+
+// ── PROJECTION DATA ──────────────────────────────────────────
+const PROJ_DATA = [
+  { month: 'Apr 24', bear: 62000, base: 62000, bull: 62000 },
+  { month: 'Jul 24', bear: 55000, base: 67000, bull: 82000 },
+  { month: 'Oct 24', bear: 65000, base: 76000, bull: 96000 },
+  { month: 'Jan 25', bear: 80000, base: 98000, bull: 130000 },
+  { month: 'Apr 25', bear: 95000, base: 120000, bull: 175000 },
+  { month: 'Jul 25', bear: 110000, base: 145000, bull: 222000 },
+  { month: 'Oct 25', bear: 120000, base: 165000, bull: 272000 },
+  { month: 'Jan 26', bear: 126000, base: 192000, bull: 332000 },
+  { month: 'Apr 26', bear: 132000, base: 222000, bull: 390000 },
+  { month: 'Jul 26', bear: 130000, base: 252000, bull: 448000 },
+  { month: 'Oct 26', bear: 122000, base: 270000, bull: 495000 },
+  { month: 'Jan 27', bear: 140000, base: 200000, bull: 350000 },
+  { month: 'Apr 27', bear: 100000, base: 130000, bull: 230000 },
+  { month: 'Jul 27', bear: 65000,  base: 80000,  bull: 140000 },
+  { month: 'Oct 27', bear: 42000,  base: 55000,  bull: 95000 },
+  { month: 'Jan 28', bear: 28000,  base: 42000,  bull: 70000 },
+];
+
+// ── STATE ────────────────────────────────────────────────────
+let livePrice = null;
+let projChart = null;
+let bigChart = null;
+
+// ── CYCLE CALC ───────────────────────────────────────────────
+function getCycleDay() {
+  const now = new Date();
+  return Math.floor((now - HALVING) / 86400000);
+}
+
+function getPhase(day) {
+  for (const p of PHASES) {
+    if (day >= p.start && day <= p.end) return p;
+  }
+  return PHASES[PHASES.length - 1];
+}
+
+function getCycleScore(day) {
+  const pct = day / ARC1_DAYS;
+  // Rises from ~20 at day 0 to ~90 at day 1070
+  return Math.min(95, Math.round(20 + pct * 75));
+}
+
+// ── COUNTDOWN ────────────────────────────────────────────────
+function updateCountdown() {
+  const now = new Date();
+  const diff = ATH_DATE - now;
+  if (diff <= 0) {
+    ['cdDays','cdHours','cdMinutes','cdSeconds'].forEach(id => document.getElementById(id).textContent = '0');
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cdDays').textContent = days;
+  document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cdMinutes').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cdSeconds').textContent = String(secs).padStart(2,'0');
+}
+
+// ── CYCLE UI ─────────────────────────────────────────────────
+function updateCycleUI() {
+  const day = getCycleDay();
+  const phase = getPhase(day);
+  const score = getCycleScore(day);
+  const pct = Math.min(100, (day / ARC1_DAYS * 100)).toFixed(1);
+  const daysLeft = Math.max(0, ARC1_DAYS - day);
+
+  document.getElementById('phaseName').textContent = phase.name;
+  document.getElementById('phaseDesc').textContent = phase.desc;
+  document.getElementById('cycleDay').textContent = day;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('arcPct').textContent = pct + '%';
+  document.getElementById('arcDaysLeft').textContent = daysLeft + ' days to ATH';
+  document.getElementById('halvingDays').textContent = day;
+
+  // Score
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreBar').style.width = score + '%';
+
+  let actionText, actionBg, actionColor;
+  if (score < 40) { actionText = '🟢 Undervalued — BUY ZONE'; actionBg = 'rgba(0,208,132,0.1)'; actionColor = 'var(--green)'; }
+  else if (score < 61) { actionText = '🟡 Fair Value — HOLD'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
+  else if (score < 81) { actionText = '⚠ Overvalued — Consider taking partial profits'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
+  else { actionText = '🔴 EXTREME — SELL. Cycle top imminent.'; actionBg = 'rgba(255,69,96,0.1)'; actionColor = 'var(--red)'; }
+
+  const scoreEl = document.getElementById('scoreAction');
+  scoreEl.textContent = actionText;
+  scoreEl.style.background = actionBg;
+  scoreEl.style.color = actionColor;
+
+  // Portfolio DCA
+  document.getElementById('dcaPhase').textContent = phase.name;
+  document.getElementById('dcaAction').textContent = phase.dca;
+  const riskEl = document.getElementById('dcaRisk');
+  riskEl.textContent = phase.risk;
+  riskEl.style.color = phase.riskColor;
+}
+
+// ── PRICE FETCH ──────────────────────────────────────────────
+async function fetchPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
+    const d = await r.json();
+    livePrice = d.bitcoin.usd;
+    const change = d.bitcoin.usd_24h_change;
+
+    document.getElementById('btcPrice').textContent = '$' + livePrice.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    const changeEl = document.getElementById('btcChange');
+    changeEl.textContent = (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change).toFixed(2) + '% 24h';
+    changeEl.className = 'btc-change ' + (change >= 0 ? 'positive' : 'negative');
+
+    updatePortfolio();
+  } catch(e) {
+    document.getElementById('btcPrice').textContent = '$—';
+  }
+}
+
+// ── PORTFOLIO ────────────────────────────────────────────────
+function updatePortfolio() {
+  const btc = parseFloat(document.getElementById('btcInput')?.value || 0);
+  if (!livePrice || !btc) return;
+  const val = btc * livePrice;
+  document.getElementById('portValue').textContent = '$' + val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('portBear').textContent = '$' + (btc * 140000).toLocaleString();
+  document.getElementById('portBase').textContent = '$' + (btc * 200000).toLocaleString();
+  document.getElementById('portBull').textContent = '$' + (btc * 350000).toLocaleString();
+}
+
+// ── CHARTS ───────────────────────────────────────────────────
+function buildSmallChart() {
+  const ctx = document.getElementById('projChart').getContext('2d');
+  projChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: PROJ_DATA.map(d => d.month),
+      datasets: [
+        { label: 'Bull', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+        { label: 'Base', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.05)', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
+        { label: 'Bear', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#6b6b80', font: { size: 9 }, maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#6b6b80', font: { size: 9 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+function buildBigChart() {
+  const ctx = document.getElementById('bigChart').getContext('2d');
+  bigChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: PROJ_DATA.map(d => d.month),
+      datasets: [
+        { label: 'Bull', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
+        { label: 'Base', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.08)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#f7931a', tension: 0.4, fill: false },
+        { label: 'Bear', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#e8e8f0', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#6b6b80', font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#6b6b80', font: { size: 9 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+// ── NAV ──────────────────────────────────────────────────────
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'portfolio') updatePortfolio();
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+updateCycleUI();
+buildSmallChart();
+buildBigChart();
+fetchPrice();
+updateCountdown();
+
+setInterval(updateCountdown, 1000);
+setInterval(fetchPrice, 60000);
+</script>
+</body>
+</html>
