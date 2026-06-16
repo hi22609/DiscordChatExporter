@@ -470,6 +470,36 @@
   .toggle.off::after { transform: translateX(-20px); }
 
   .section-header { font-size: 16px; font-weight: 800; margin: 20px 0 4px; }
+
+  /* VS USD CALCULATOR */
+  .vs-hero {
+    background: linear-gradient(135deg, rgba(255,69,96,0.12), rgba(10,10,15,0));
+    border: 1px solid rgba(255,69,96,0.25);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 12px 0;
+  }
+  .vs-headline { font-size: 24px; font-weight: 900; color: var(--red); letter-spacing: -0.5px; margin-bottom: 8px; }
+  .vs-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .fact-strip { display: flex; gap: 10px; overflow-x: auto; margin: 4px 0 12px; padding-bottom: 4px; }
+  .fact-strip::-webkit-scrollbar { display: none; }
+  .fact-card { flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; width: 148px; }
+  .fact-stat { font-size: 28px; font-weight: 900; color: var(--red); margin-bottom: 4px; line-height: 1; }
+  .fact-stat.btc-stat { color: var(--orange); }
+  .fact-label { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .compare-card { border-radius: 14px; padding: 14px; border: 1px solid; }
+  .compare-card.usd-card { background: rgba(255,69,96,0.05); border-color: rgba(255,69,96,0.2); }
+  .compare-card.btc-card { background: rgba(247,147,26,0.07); border-color: rgba(247,147,26,0.25); }
+  .compare-currency { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .compare-amount { font-size: 18px; font-weight: 900; margin-bottom: 2px; word-break: break-all; }
+  .compare-detail { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+  .year-table { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 12px; }
+  .year-table-row { display: grid; grid-template-columns: 55px 1fr 1fr; padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: center; }
+  .year-table-row:last-child { border-bottom: none; }
+  .year-table-head { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: var(--card2); }
+  .year-table-year { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .vs-badge { display: inline-block; background: rgba(0,208,132,0.12); border-radius: 99px; padding: 3px 10px; font-size: 13px; font-weight: 800; color: var(--green); margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -796,6 +826,7 @@
       <div class="calc-tab" onclick="showCalcTab('sell',this)">Sell / P&amp;L</div>
       <div class="calc-tab" onclick="showCalcTab('long',this)">Long</div>
       <div class="calc-tab" onclick="showCalcTab('short',this)">Short</div>
+      <div class="calc-tab" onclick="showCalcTab('usd',this)" style="background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.3);color:var(--red)">₿ vs $USD</div>
     </div>
 
     <!-- DCA CALCULATOR -->
@@ -1081,6 +1112,135 @@
             <div id="shortPnlTable"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- VS USD CALCULATOR -->
+    <div class="calc-panel" id="calc-usd">
+
+      <!-- Hero -->
+      <div class="vs-hero">
+        <div class="vs-headline">☠ YOUR DOLLAR IS DYING</div>
+        <div class="vs-sub">
+          The US dollar has lost <strong style="color:var(--red)">96% of its purchasing power</strong> since the Federal Reserve was created in 1913. Since 2020 alone, the government printed more than <strong style="color:var(--red)">40% of all dollars ever made</strong> — and your savings paid the price. Meanwhile Bitcoin has a hard cap of <strong style="color:var(--orange)">21 million coins</strong>. No printer. No inflation. No corruption.
+        </div>
+      </div>
+
+      <!-- Shocking Facts -->
+      <div class="fact-strip">
+        <div class="fact-card">
+          <div class="fact-stat">-96%</div>
+          <div class="fact-label">Dollar's value lost since the Fed was created (1913)</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-stat">-23%</div>
+          <div class="fact-label">Purchasing power lost since 2020 alone</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-stat">40%</div>
+          <div class="fact-label">Of all dollars ever printed — created 2020–2023</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-stat">3.5%</div>
+          <div class="fact-label">Average annual inflation quietly stealing from you</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-stat btc-stat">21M</div>
+          <div class="fact-label">Bitcoin supply cap. Governments cannot print more.</div>
+        </div>
+        <div class="fact-card">
+          <div class="fact-stat btc-stat">+1,600%</div>
+          <div class="fact-label">Bitcoin's avg 4-year return vs dollar's avg -14%</div>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="proj-card" style="margin-top:0">
+        <div class="proj-title">The $5/Week Experiment</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Stop letting inflation eat your money. Run the math yourself.</div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Weekly Amount</span>
+            <span id="vsWeeklyLabel" style="color:var(--orange);font-weight:800">$5 / week</span>
+          </div>
+          <input class="leverage-slider" type="range" id="vsWeekly" min="1" max="500" value="5" step="1" oninput="calcVsUSD()">
+        </div>
+        <div class="field-group" style="margin-bottom:4px">
+          <div class="field-label">
+            <span>Time Horizon</span>
+            <span id="vsYearsLabel" style="font-weight:800;color:var(--text)">3 years</span>
+          </div>
+          <input class="leverage-slider" type="range" id="vsYears" min="1" max="6" value="3" step="1" oninput="calcVsUSD()">
+        </div>
+
+        <div style="text-align:center;font-size:13px;color:var(--muted);padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:12px">
+          <span id="vsSubline"><span style="color:var(--orange);font-weight:800">$5/week</span> into Bitcoin vs <span style="color:var(--red);font-weight:800">$5/week</span> in dollars for <strong style="color:var(--text)">3 years</strong></span>
+        </div>
+
+        <!-- Compare Grid -->
+        <div class="compare-grid">
+          <!-- USD side -->
+          <div class="compare-card usd-card">
+            <div class="compare-currency" style="color:var(--red)">💸 US Dollar</div>
+            <div class="compare-amount" id="vsUsdReal" style="color:var(--red)">—</div>
+            <div class="compare-detail">Real purchasing power after inflation</div>
+            <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:2px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:10px;color:var(--muted)">Saved (nominal)</span>
+                <span style="font-size:11px;font-weight:700;color:var(--text)" id="vsUsdNominal">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:10px;color:var(--muted)">Inflation stole</span>
+                <span style="font-size:11px;font-weight:700;color:var(--red)" id="vsUsdLost">—</span>
+              </div>
+            </div>
+            <div style="margin-top:10px;background:rgba(255,69,96,0.1);border-radius:8px;padding:6px 8px;text-align:center">
+              <span style="font-size:13px;color:var(--red);font-weight:800" id="vsUsdPctLost">—</span>
+              <span style="font-size:10px;color:var(--muted)"> destroyed</span>
+            </div>
+          </div>
+
+          <!-- BTC side -->
+          <div class="compare-card btc-card">
+            <div class="compare-currency" style="color:var(--orange)">₿ Bitcoin</div>
+            <div class="compare-amount" id="vsBtcBase" style="color:var(--green)">—</div>
+            <div class="compare-detail">Base case at next cycle ATH (~$400K)</div>
+            <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:2px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:10px;color:var(--muted)">BTC stacked</span>
+                <span style="font-size:11px;font-weight:700;color:var(--orange)" id="vsBtcAmt">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:10px;color:var(--muted)">Bear / Bull</span>
+                <span style="font-size:11px;font-weight:700;color:var(--muted)"><span id="vsBtcBear">—</span> / <span id="vsBtcBull">—</span></span>
+              </div>
+            </div>
+            <div style="margin-top:10px;background:rgba(0,208,132,0.1);border-radius:8px;padding:6px 8px;text-align:center">
+              <span style="font-size:16px;color:var(--green);font-weight:900" id="vsMultiplier">—</span>
+              <span style="font-size:10px;color:var(--muted)"> vs what you put in</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Year-by-year table -->
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Year-by-Year Breakdown</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">USD purchasing power erodes. Bitcoin compounds. This is what it looks like in real time.</div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">USD value = savings inflation-adjusted. BTC value = stack × projected price at that date.</div>
+        <div class="year-table">
+          <div class="year-table-row year-table-head">
+            <div>Year</div>
+            <div>💸 USD real</div>
+            <div>₿ BTC value</div>
+          </div>
+          <div id="vsYearTable"></div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--muted);text-align:center;padding:12px 0 8px;line-height:1.6">
+        Inflation assumed 3.5%/yr (long-term US historical average). BTC projections use the bottom-anchored 1070/364 cycle model (bear/base/bull scenarios). This is educational math, not financial advice.
       </div>
     </div>
 
@@ -1660,6 +1820,105 @@ function calcShort() {
 }
 
 // ── CALC TAB SWITCHING ──────────────────────────────────────
+// ── CALCULATOR: BTC vs USD ──────────────────────────────────
+const USD_INFLATION = 0.035; // 3.5% long-term US historical average
+
+function calcVsUSD() {
+  const weekly = parseFloat(document.getElementById('vsWeekly').value) || 5;
+  const years  = parseInt(document.getElementById('vsYears').value) || 3;
+
+  // Slider labels
+  document.getElementById('vsWeeklyLabel').textContent = '$' + weekly.toLocaleString() + ' / week';
+  document.getElementById('vsYearsLabel').textContent   = years + ' year' + (years !== 1 ? 's' : '');
+
+  // Sub-headline
+  document.getElementById('vsSubline').innerHTML =
+    '<span style="color:var(--orange);font-weight:800">$' + weekly.toLocaleString() + '/week</span> into Bitcoin vs ' +
+    '<span style="color:var(--red);font-weight:800">$' + weekly.toLocaleString() + '/week</span> in dollars for ' +
+    '<strong style="color:var(--text)">' + years + ' year' + (years !== 1 ? 's' : '') + '</strong>';
+
+  // ── USD PATH ───────────────────────────────────────────────────
+  const totalNominal   = weekly * 52 * years;
+  // Each dollar saved depreciates continuously; conservative: apply total inflation to lump sum
+  const realPower      = totalNominal * Math.pow(1 - USD_INFLATION, years);
+  const inflationStole = totalNominal - realPower;
+
+  document.getElementById('vsUsdNominal').textContent  = fmtUSD(totalNominal);
+  document.getElementById('vsUsdReal').textContent      = fmtUSD(realPower);
+  document.getElementById('vsUsdLost').textContent      = '-' + fmtUSD(inflationStole);
+  document.getElementById('vsUsdPctLost').textContent   = (inflationStole / totalNominal * 100).toFixed(1) + '% purchasing power destroyed';
+
+  // ── BTC PATH ───────────────────────────────────────────────────
+  const weeksTotal = Math.round(years * 52);
+  const now = Date.now();
+  let totalBtc = 0;
+  for (let w = 0; w < weeksTotal; w++) {
+    const d = new Date(now + w * 7 * DAY_MS);
+    const price = projectedPriceOn(d, 'base');
+    totalBtc += weekly / price;
+  }
+
+  const btcBear = totalBtc * ATH_TARGETS.bear;
+  const btcBase = totalBtc * ATH_TARGETS.base;
+  const btcBull = totalBtc * ATH_TARGETS.bull;
+  const multiplier = (btcBase / totalNominal);
+
+  document.getElementById('vsBtcAmt').textContent  = totalBtc.toFixed(6) + ' BTC';
+  document.getElementById('vsBtcBase').textContent  = fmtUSD(btcBase);
+  document.getElementById('vsBtcBear').textContent  = fmtUSD(btcBear);
+  document.getElementById('vsBtcBull').textContent  = fmtUSD(btcBull);
+  document.getElementById('vsMultiplier').textContent = multiplier.toFixed(1) + 'x your money back (base case)';
+
+  // ── YEAR-BY-YEAR TABLE ──────────────────────────────────────────
+  const tableEl = document.getElementById('vsYearTable');
+  tableEl.innerHTML = '';
+  for (let y = 1; y <= Math.min(years, 6); y++) {
+    const yNominal = weekly * 52 * y;
+    const yReal    = yNominal * Math.pow(1 - USD_INFLATION, y);
+
+    // Accumulate BTC through this year
+    let yBtc = 0;
+    const yWeeks = Math.round(y * 52);
+    for (let w = 0; w < yWeeks; w++) {
+      const d = new Date(now + w * 7 * DAY_MS);
+      yBtc += weekly / projectedPriceOn(d, 'base');
+    }
+    // BTC value = stack × projected price at end of that year (what you could sell it for then)
+    const yDate     = new Date(now + y * 365.25 * DAY_MS);
+    const yBtcPrice = projectedPriceOn(yDate, 'base');
+    const yBtcVal   = yBtc * yBtcPrice;
+
+    const usdWon = yBtcVal > yReal;
+    tableEl.innerHTML += `
+      <div class="year-table-row" style="${usdWon ? '' : ''}">
+        <div class="year-table-year">Yr ${y}</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--red)">${fmtUSD(yReal)}</div>
+          <div style="font-size:10px;color:var(--muted)">${fmtUSD(yNominal)} saved</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:${usdWon ? 'var(--green)' : 'var(--orange)'}">${fmtUSD(yBtcVal)}</div>
+          <div style="font-size:10px;color:var(--muted)">${yBtc.toFixed(5)} BTC</div>
+        </div>
+      </div>`;
+  }
+
+  // Final summary row
+  const winPct = ((btcBase - totalNominal) / totalNominal * 100).toFixed(0);
+  tableEl.innerHTML += `
+    <div class="year-table-row" style="background:rgba(0,208,132,0.06)">
+      <div class="year-table-year" style="color:var(--green);font-weight:800">ATH</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--red)">${fmtUSD(realPower)}</div>
+        <div style="font-size:10px;color:var(--muted)">purchasing power left</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:800;color:var(--green)">${fmtUSD(btcBase)}</div>
+        <div style="font-size:10px;color:var(--green)">+${winPct}% vs what you put in</div>
+      </div>
+    </div>`;
+}
+
 function showCalcTab(name, el) {
   document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
@@ -1674,7 +1933,7 @@ function showPage(name, el) {
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
   if (name === 'portfolio') updatePortfolio();
-  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcLong(); calcShort(); }
+  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcLong(); calcShort(); calcVsUSD(); }
 }
 
 // ── INIT ─────────────────────────────────────────────────────
@@ -1688,6 +1947,7 @@ calcBuy();
 calcSell();
 calcLong();
 calcShort();
+calcVsUSD();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
