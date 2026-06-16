@@ -243,6 +243,116 @@
   .badge-sell { background: rgba(255,69,96,0.15); color: var(--red); }
   .badge-watch { background: rgba(124,58,237,0.15); color: #a78bfa; }
 
+  /* CALCULATOR */
+  .calc-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin: 16px 0 4px;
+    padding-bottom: 4px;
+  }
+  .calc-tabs::-webkit-scrollbar { display: none; }
+  .calc-tab {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 99px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .calc-tab.active { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+  .calc-panel { display: none; }
+  .calc-panel.active { display: block; }
+
+  .field-group { margin-bottom: 14px; }
+  .field-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .field-input-wrap { position: relative; }
+  .field-prefix {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 15px; font-weight: 700;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px 12px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--orange); }
+  .field-input.no-prefix { padding-left: 14px; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field-group { flex: 1; }
+
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+  }
+  .toggle-btn.active-long { background: rgba(0,208,132,0.15); border-color: var(--green); color: var(--green); }
+  .toggle-btn.active-short { background: rgba(255,69,96,0.15); border-color: var(--red); color: var(--red); }
+
+  .leverage-slider-wrap { margin-bottom: 14px; }
+  .leverage-value { text-align: center; font-size: 24px; font-weight: 900; color: var(--orange); margin-bottom: 8px; }
+  .leverage-slider { width: 100%; height: 6px; -webkit-appearance: none; background: var(--card2); border-radius: 99px; outline: none; }
+  .leverage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    background: var(--orange);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(247,147,26,0.6);
+  }
+
+  .result-card {
+    background: linear-gradient(135deg, rgba(247,147,26,0.08), rgba(124,58,237,0.05));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 4px;
+  }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { font-size: 12px; color: var(--muted); }
+  .result-value { font-size: 15px; font-weight: 800; color: var(--text); }
+  .result-value.big { font-size: 22px; }
+  .result-hero {
+    text-align: center;
+    padding: 14px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .result-hero-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .result-hero-value { font-size: 32px; font-weight: 900; margin-top: 4px; }
+  .liq-warning {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .pnl-table { margin-top: 10px; }
+  .pnl-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+  .pnl-row:last-child { border-bottom: none; }
+  .pnl-price { color: var(--muted); }
+  .pnl-val { font-weight: 700; }
+
   /* BOTTOM NAV */
   .bottom-nav {
     position: fixed;
@@ -647,6 +757,307 @@
     </div>
   </div>
 
+  <!-- PAGE: CALCULATOR -->
+  <div class="page" id="page-calc">
+    <div class="section-header">Calculator</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Live math against the current BTC price</div>
+
+    <div class="calc-tabs">
+      <div class="calc-tab active" onclick="showCalcTab('dca',this)">DCA</div>
+      <div class="calc-tab" onclick="showCalcTab('buy',this)">Buy</div>
+      <div class="calc-tab" onclick="showCalcTab('sell',this)">Sell / P&amp;L</div>
+      <div class="calc-tab" onclick="showCalcTab('long',this)">Long</div>
+      <div class="calc-tab" onclick="showCalcTab('short',this)">Short</div>
+    </div>
+
+    <!-- DCA CALCULATOR -->
+    <div class="calc-panel active" id="calc-dca">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Dollar-Cost Average Projection</div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Amount per Period</div>
+            <div class="field-input-wrap">
+              <span class="field-prefix">$</span>
+              <input class="field-input" type="number" id="dcaAmount" value="50" oninput="calcDCA()">
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Frequency</div>
+            <select class="field-input no-prefix" id="dcaFreq" onchange="calcDCA()" style="padding-left:14px">
+              <option value="7">Weekly</option>
+              <option value="14">Bi-weekly</option>
+              <option value="30" selected>Monthly</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Duration</span>
+            <span id="dcaDurationLabel">52 weeks</span>
+          </div>
+          <input class="leverage-slider" type="range" id="dcaDuration" min="1" max="156" value="52" oninput="calcDCA()">
+        </div>
+
+        <div class="result-card" id="dcaResult">
+          <div class="result-hero">
+            <div class="result-hero-label">Total BTC Accumulated</div>
+            <div class="result-hero-value" style="color:var(--orange)" id="dcaBtcTotal">0.00000000</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Total Invested</div>
+            <div class="result-value" id="dcaInvested">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Average Cost Basis</div>
+            <div class="result-value" id="dcaAvgCost">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Bear ATH ($140K)</div>
+            <div class="result-value" style="color:var(--red)" id="dcaValBear">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Base ATH ($200K)</div>
+            <div class="result-value" style="color:var(--orange)" id="dcaValBase">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Bull ATH ($350K)</div>
+            <div class="result-value" style="color:var(--green)" id="dcaValBull">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUY CALCULATOR -->
+    <div class="calc-panel" id="calc-buy">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Buy Calculator</div>
+
+        <div class="field-group">
+          <div class="field-label">USD Amount</div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="buyAmount" value="1000" oninput="calcBuy()">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Exchange Fee</div>
+          <div class="field-input-wrap">
+            <input class="field-input no-prefix" type="number" id="buyFee" value="0.5" step="0.1" oninput="calcBuy()">
+            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;font-weight:700">%</span>
+          </div>
+        </div>
+
+        <div class="result-card" id="buyResult">
+          <div class="result-hero">
+            <div class="result-hero-label">BTC You'll Receive</div>
+            <div class="result-hero-value" style="color:var(--orange)" id="buyBtcAmount">0.00000000</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Fee Paid</div>
+            <div class="result-value" style="color:var(--red)" id="buyFeeAmount">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Effective Price Paid</div>
+            <div class="result-value" id="buyEffPrice">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Bear ATH ($140K)</div>
+            <div class="result-value" style="color:var(--red)" id="buyValBear">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Base ATH ($200K)</div>
+            <div class="result-value" style="color:var(--orange)" id="buyValBase">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Value at Bull ATH ($350K)</div>
+            <div class="result-value" style="color:var(--green)" id="buyValBull">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELL / PROFIT CALCULATOR -->
+    <div class="calc-panel" id="calc-sell">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Sell / Profit Calculator</div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">BTC Amount</div>
+            <input class="field-input no-prefix" type="number" id="sellBtc" value="0.1" step="0.001" oninput="calcSell()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Your Entry Price</div>
+            <div class="field-input-wrap">
+              <span class="field-prefix">$</span>
+              <input class="field-input" type="number" id="sellEntry" value="62000" oninput="calcSell()">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Exit Price</span>
+            <span style="cursor:pointer;color:var(--orange)" onclick="useLivePriceForSell()">Use Live Price</span>
+          </div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="sellExit" value="95000" oninput="calcSell()">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Exchange Fee %</div>
+            <input class="field-input no-prefix" type="number" id="sellFee" value="0.5" step="0.1" oninput="calcSell()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Tax Rate %</div>
+            <input class="field-input no-prefix" type="number" id="sellTax" value="15" step="1" oninput="calcSell()">
+          </div>
+        </div>
+
+        <div class="result-card" id="sellResult">
+          <div class="result-hero">
+            <div class="result-hero-label">Net Profit (After Fees &amp; Tax)</div>
+            <div class="result-hero-value" id="sellNetProfit">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Gross Proceeds</div>
+            <div class="result-value" id="sellGross">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Fee Paid</div>
+            <div class="result-value" style="color:var(--red)" id="sellFeeAmt">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Gross Profit / Loss</div>
+            <div class="result-value" id="sellGrossProfit">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Estimated Tax</div>
+            <div class="result-value" style="color:var(--red)" id="sellTaxAmt">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">ROI</div>
+            <div class="result-value" id="sellROI">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LONG CALCULATOR -->
+    <div class="calc-panel" id="calc-long">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Long Position Calculator</div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Entry Price</span>
+            <span style="cursor:pointer;color:var(--orange)" onclick="useLivePriceFor('long')">Use Live Price</span>
+          </div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="longEntry" value="95000" oninput="calcLong()">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Position Size (Notional)</div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="longSize" value="5000" oninput="calcLong()">
+          </div>
+        </div>
+
+        <div class="leverage-slider-wrap">
+          <div class="field-label"><span>Leverage</span></div>
+          <div class="leverage-value" id="longLevValue">10×</div>
+          <input class="leverage-slider" type="range" id="longLev" min="1" max="100" value="10" oninput="calcLong()">
+        </div>
+
+        <div class="result-card" id="longResult">
+          <div class="result-hero">
+            <div class="result-hero-label">Liquidation Price</div>
+            <div class="result-hero-value" style="color:var(--red)" id="longLiqPrice">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Margin Required</div>
+            <div class="result-value" id="longMargin">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Distance to Liquidation</div>
+            <div class="result-value" id="longLiqDist">0%</div>
+          </div>
+          <div class="liq-warning" id="longLiqWarning">—</div>
+
+          <div class="pnl-table">
+            <div class="proj-title" style="margin-bottom:6px;margin-top:6px">P&amp;L at Target Prices</div>
+            <div id="longPnlTable"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHORT CALCULATOR -->
+    <div class="calc-panel" id="calc-short">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">Short Position Calculator</div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Entry Price</span>
+            <span style="cursor:pointer;color:var(--orange)" onclick="useLivePriceFor('short')">Use Live Price</span>
+          </div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="shortEntry" value="95000" oninput="calcShort()">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Position Size (Notional)</div>
+          <div class="field-input-wrap">
+            <span class="field-prefix">$</span>
+            <input class="field-input" type="number" id="shortSize" value="5000" oninput="calcShort()">
+          </div>
+        </div>
+
+        <div class="leverage-slider-wrap">
+          <div class="field-label"><span>Leverage</span></div>
+          <div class="leverage-value" id="shortLevValue">10×</div>
+          <input class="leverage-slider" type="range" id="shortLev" min="1" max="100" value="10" oninput="calcShort()">
+        </div>
+
+        <div class="result-card" id="shortResult">
+          <div class="result-hero">
+            <div class="result-hero-label">Liquidation Price</div>
+            <div class="result-hero-value" style="color:var(--red)" id="shortLiqPrice">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Margin Required</div>
+            <div class="result-value" id="shortMargin">$0</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Distance to Liquidation</div>
+            <div class="result-value" id="shortLiqDist">0%</div>
+          </div>
+          <div class="liq-warning" id="shortLiqWarning">—</div>
+
+          <div class="pnl-table">
+            <div class="proj-title" style="margin-bottom:6px;margin-top:6px">P&amp;L at Target Prices</div>
+            <div id="shortPnlTable"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end page-calc -->
+
   <!-- PAGE: ALERTS -->
   <div class="page" id="page-alerts">
     <div class="section-header">Smart Alerts</div>
@@ -713,6 +1124,10 @@
   <div class="nav-item" onclick="showPage('chart',this)">
     <span class="nav-icon">📈</span>
     <span class="nav-label">Chart</span>
+  </div>
+  <div class="nav-item" onclick="showPage('calc',this)">
+    <span class="nav-icon">🧮</span>
+    <span class="nav-label">Calc</span>
   </div>
   <div class="nav-item" onclick="showPage('portfolio',this)">
     <span class="nav-icon">💼</span>
@@ -854,6 +1269,7 @@ async function fetchPrice() {
     changeEl.className = 'btc-change ' + (change >= 0 ? 'positive' : 'negative');
 
     updatePortfolio();
+    calcBuy();
   } catch(e) {
     document.getElementById('btcPrice').textContent = '$—';
   }
@@ -917,6 +1333,207 @@ function buildBigChart() {
   });
 }
 
+// ── PROJECTED PRICE MODEL (shared by all calculators) ─────────
+function getProjectedPrice(day, scenario) {
+  const halvingPrice = 62000;
+  const multipliers = { bear: 2.26, base: 3.23, bull: 5.65 };
+  const m = multipliers[scenario];
+  if (day <= ARC1_DAYS) {
+    const sig = 1 / (1 + Math.exp(-(day - 600) / 130));
+    return Math.round(halvingPrice * (1 + (m - 1) * sig));
+  }
+  const ath = halvingPrice * m;
+  const arc2Day = day - ARC1_DAYS;
+  const drawdowns = { bear: 0.77, base: 0.79, bull: 0.80 };
+  const dd = drawdowns[scenario];
+  const decay = 1 - dd * (1 - Math.exp(-arc2Day / 85));
+  return Math.round(ath * decay);
+}
+
+function fmtUSD(n, decimals) {
+  decimals = decimals === undefined ? 0 : decimals;
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function fmtBTC(n) {
+  return n.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 });
+}
+
+// ── CALCULATOR: DCA ─────────────────────────────────────────
+function calcDCA() {
+  const amount = parseFloat(document.getElementById('dcaAmount').value) || 0;
+  const freq = parseInt(document.getElementById('dcaFreq').value) || 30;
+  const weeks = parseInt(document.getElementById('dcaDuration').value) || 52;
+  document.getElementById('dcaDurationLabel').textContent = weeks + ' weeks (~' + (weeks/4.345).toFixed(1) + ' mo)';
+
+  const totalDays = weeks * 7;
+  const periods = Math.max(1, Math.floor(totalDays / freq));
+  const startDay = getCycleDay();
+
+  let totalBtc = 0;
+  for (let i = 0; i < periods; i++) {
+    const day = startDay + i * freq;
+    const price = getProjectedPrice(day, 'base');
+    totalBtc += amount / price;
+  }
+  const totalInvested = periods * amount;
+  const avgCost = totalInvested / totalBtc;
+
+  document.getElementById('dcaBtcTotal').textContent = fmtBTC(totalBtc) + ' BTC';
+  document.getElementById('dcaInvested').textContent = fmtUSD(totalInvested);
+  document.getElementById('dcaAvgCost').textContent = fmtUSD(avgCost) + ' / BTC';
+  document.getElementById('dcaValBear').textContent = fmtUSD(totalBtc * 140000);
+  document.getElementById('dcaValBase').textContent = fmtUSD(totalBtc * 200000);
+  document.getElementById('dcaValBull').textContent = fmtUSD(totalBtc * 350000);
+}
+
+// ── CALCULATOR: BUY ─────────────────────────────────────────
+function calcBuy() {
+  const amount = parseFloat(document.getElementById('buyAmount').value) || 0;
+  const feePct = (parseFloat(document.getElementById('buyFee').value) || 0) / 100;
+  const price = livePrice || 95000;
+
+  const feeAmt = amount * feePct;
+  const netAmount = amount - feeAmt;
+  const btc = netAmount / price;
+  const effPrice = btc > 0 ? amount / btc : 0;
+
+  document.getElementById('buyBtcAmount').textContent = fmtBTC(btc) + ' BTC';
+  document.getElementById('buyFeeAmount').textContent = fmtUSD(feeAmt, 2);
+  document.getElementById('buyEffPrice').textContent = fmtUSD(effPrice, 2);
+  document.getElementById('buyValBear').textContent = fmtUSD(btc * 140000);
+  document.getElementById('buyValBase').textContent = fmtUSD(btc * 200000);
+  document.getElementById('buyValBull').textContent = fmtUSD(btc * 350000);
+}
+
+function useLivePriceForSell() {
+  if (livePrice) {
+    document.getElementById('sellExit').value = Math.round(livePrice);
+    calcSell();
+  }
+}
+
+// ── CALCULATOR: SELL / PROFIT ──────────────────────────────
+function calcSell() {
+  const btcAmt = parseFloat(document.getElementById('sellBtc').value) || 0;
+  const entry = parseFloat(document.getElementById('sellEntry').value) || 0;
+  const exit = parseFloat(document.getElementById('sellExit').value) || 0;
+  const feePct = (parseFloat(document.getElementById('sellFee').value) || 0) / 100;
+  const taxPct = (parseFloat(document.getElementById('sellTax').value) || 0) / 100;
+
+  const gross = btcAmt * exit;
+  const feeAmt = gross * feePct;
+  const netProceeds = gross - feeAmt;
+  const costBasis = btcAmt * entry;
+  const grossProfit = netProceeds - costBasis;
+  const taxAmt = grossProfit > 0 ? grossProfit * taxPct : 0;
+  const netProfit = grossProfit - taxAmt;
+  const roi = costBasis > 0 ? (grossProfit / costBasis) * 100 : 0;
+
+  const profitColor = netProfit >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('sellNetProfit').textContent = (netProfit >= 0 ? '+' : '') + fmtUSD(netProfit, 2);
+  document.getElementById('sellNetProfit').style.color = profitColor;
+  document.getElementById('sellGross').textContent = fmtUSD(gross, 2);
+  document.getElementById('sellFeeAmt').textContent = fmtUSD(feeAmt, 2);
+  document.getElementById('sellGrossProfit').textContent = (grossProfit >= 0 ? '+' : '') + fmtUSD(grossProfit, 2);
+  document.getElementById('sellGrossProfit').style.color = grossProfit >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('sellTaxAmt').textContent = fmtUSD(taxAmt, 2);
+  document.getElementById('sellROI').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+  document.getElementById('sellROI').style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+// ── CALCULATOR: LONG / SHORT (shared logic) ────────────────
+const MMR = 0.005; // maintenance margin rate
+
+function useLivePriceFor(type) {
+  if (!livePrice) return;
+  document.getElementById(type + 'Entry').value = Math.round(livePrice);
+  if (type === 'long') calcLong(); else calcShort();
+}
+
+function buildPnlTable(containerId, entry, size, lev, isLong) {
+  const pcts = [-0.30, -0.20, -0.10, -0.05, 0.05, 0.10, 0.20, 0.30, 0.50];
+  const container = document.getElementById(containerId);
+  container.innerHTML = pcts.map(pct => {
+    const targetPrice = entry * (1 + pct);
+    const priceDelta = isLong ? pct : -pct;
+    const pnl = size * priceDelta;
+    const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    return `<div class="pnl-row">
+      <span class="pnl-price">${fmtUSD(targetPrice)} (${pct >= 0 ? '+' : ''}${(pct*100).toFixed(0)}%)</span>
+      <span class="pnl-val" style="color:${pnlColor}">${pnl >= 0 ? '+' : ''}${fmtUSD(pnl, 0)}</span>
+    </div>`;
+  }).join('');
+}
+
+function calcLong() {
+  const entry = parseFloat(document.getElementById('longEntry').value) || 0;
+  const size = parseFloat(document.getElementById('longSize').value) || 0;
+  const lev = parseInt(document.getElementById('longLev').value) || 1;
+  document.getElementById('longLevValue').textContent = lev + '×';
+
+  const margin = size / lev;
+  const liqPrice = entry * (1 - 1/lev + MMR);
+  const liqDist = ((entry - liqPrice) / entry) * 100;
+
+  document.getElementById('longLiqPrice').textContent = fmtUSD(liqPrice, 0);
+  document.getElementById('longMargin').textContent = fmtUSD(margin, 2);
+  document.getElementById('longLiqDist').textContent = '-' + liqDist.toFixed(2) + '%';
+
+  const warnEl = document.getElementById('longLiqWarning');
+  if (liqDist < 5) {
+    warnEl.textContent = '🔴 EXTREME RISK — a ' + liqDist.toFixed(1) + '% drop liquidates this position';
+    warnEl.style.background = 'rgba(255,69,96,0.15)'; warnEl.style.color = 'var(--red)';
+  } else if (liqDist < 15) {
+    warnEl.textContent = '⚠ HIGH RISK — liquidation ' + liqDist.toFixed(1) + '% below entry';
+    warnEl.style.background = 'rgba(255,215,0,0.12)'; warnEl.style.color = 'var(--yellow)';
+  } else {
+    warnEl.textContent = '🟢 Liquidation buffer: ' + liqDist.toFixed(1) + '% — reasonably safe';
+    warnEl.style.background = 'rgba(0,208,132,0.12)'; warnEl.style.color = 'var(--green)';
+  }
+
+  buildPnlTable('longPnlTable', entry, size, lev, true);
+}
+
+function calcShort() {
+  const entry = parseFloat(document.getElementById('shortEntry').value) || 0;
+  const size = parseFloat(document.getElementById('shortSize').value) || 0;
+  const lev = parseInt(document.getElementById('shortLev').value) || 1;
+  document.getElementById('shortLevValue').textContent = lev + '×';
+
+  const margin = size / lev;
+  const liqPrice = entry * (1 + 1/lev - MMR);
+  const liqDist = ((liqPrice - entry) / entry) * 100;
+
+  document.getElementById('shortLiqPrice').textContent = fmtUSD(liqPrice, 0);
+  document.getElementById('shortMargin').textContent = fmtUSD(margin, 2);
+  document.getElementById('shortLiqDist').textContent = '+' + liqDist.toFixed(2) + '%';
+
+  const warnEl = document.getElementById('shortLiqWarning');
+  if (liqDist < 5) {
+    warnEl.textContent = '🔴 EXTREME RISK — a ' + liqDist.toFixed(1) + '% rise liquidates this position';
+    warnEl.style.background = 'rgba(255,69,96,0.15)'; warnEl.style.color = 'var(--red)';
+  } else if (liqDist < 15) {
+    warnEl.textContent = '⚠ HIGH RISK — liquidation ' + liqDist.toFixed(1) + '% above entry';
+    warnEl.style.background = 'rgba(255,215,0,0.12)'; warnEl.style.color = 'var(--yellow)';
+  } else {
+    warnEl.textContent = '🟢 Liquidation buffer: ' + liqDist.toFixed(1) + '% — reasonably safe';
+    warnEl.style.background = 'rgba(0,208,132,0.12)'; warnEl.style.color = 'var(--green)';
+  }
+
+  buildPnlTable('shortPnlTable', entry, size, lev, false);
+}
+
+// ── CALC TAB SWITCHING ──────────────────────────────────────
+function showCalcTab(name, el) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('calc-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
 // ── NAV ──────────────────────────────────────────────────────
 function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -924,6 +1541,7 @@ function showPage(name, el) {
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
   if (name === 'portfolio') updatePortfolio();
+  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcLong(); calcShort(); }
 }
 
 // ── INIT ─────────────────────────────────────────────────────
@@ -932,6 +1550,11 @@ buildSmallChart();
 buildBigChart();
 fetchPrice();
 updateCountdown();
+calcDCA();
+calcBuy();
+calcSell();
+calcLong();
+calcShort();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
