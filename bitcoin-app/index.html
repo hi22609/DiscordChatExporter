@@ -209,7 +209,8 @@
     padding: 18px 20px;
     margin: 16px 0;
   }
-  .chart-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .chart-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .chart-caption { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
   .chart-wrap { position: relative; height: 200px; }
 
   /* SIGNALS */
@@ -652,6 +653,7 @@
     <!-- Chart -->
     <div class="chart-card">
       <div class="chart-title">Price Projection Curve — Bottom-Anchored Cycle</div>
+      <div class="chart-caption">Three guesses for where BTC's price goes from here. <span style="color:var(--green);font-weight:700">Green = Bull</span> (best case), <span style="color:var(--orange);font-weight:700">Orange = Base</span> (most likely), <span style="color:var(--red);font-weight:700">Red = Bear</span> (worst case). The dashed white line marks today.</div>
       <div class="chart-wrap">
         <canvas id="projChart"></canvas>
       </div>
@@ -699,6 +701,7 @@
     <div class="section-header">Full Cycle Timeline</div>
     <div class="chart-card" style="margin-top:8px">
       <div class="chart-title">Bear / Base / Bull — Bottom-Anchored 1070/364 Cycle</div>
+      <div class="chart-caption">Same idea, zoomed out across the whole cycle: bottom (Nov 2022) → top (Oct 2025) → next bottom (Oct 2026) → next top (~2029). Each line is a different guess for how high or low price goes. The dashed white line shows where we are right now.</div>
       <div class="chart-wrap" style="height:260px">
         <canvas id="bigChart"></canvas>
       </div>
@@ -1275,12 +1278,52 @@ const PROJ_MONTHS = [
 const PROJ_DATA = PROJ_MONTHS.map(ym => {
   const d = new Date(ym + '-15T00:00:00Z');
   return {
+    dateObj: d,
     month: fmtMonthYr(d),
     bear: projectedPriceOn(d, 'bear'),
     base: projectedPriceOn(d, 'base'),
     bull: projectedPriceOn(d, 'bull'),
   };
 });
+
+// Where "today" falls between two PROJ_DATA points, expressed as a fractional
+// category index — used to draw the "TODAY" marker line on the charts.
+function todayFractionalIndex() {
+  const now = new Date();
+  if (now <= PROJ_DATA[0].dateObj) return 0;
+  for (let i = 0; i < PROJ_DATA.length - 1; i++) {
+    const a = PROJ_DATA[i].dateObj, b = PROJ_DATA[i + 1].dateObj;
+    if (now >= a && now <= b) {
+      return i + (now - a) / (b - a);
+    }
+  }
+  return PROJ_DATA.length - 1;
+}
+
+const todayLinePlugin = {
+  id: 'todayLine',
+  afterDraw(chart) {
+    const xScale = chart.scales.x;
+    const area = chart.chartArea;
+    if (!xScale || !area) return;
+    const x = xScale.getPixelForValue(todayFractionalIndex());
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.beginPath();
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.moveTo(x, area.top);
+    ctx.lineTo(x, area.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#e8e8f0';
+    ctx.font = '700 9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TODAY', x, area.top - 4);
+    ctx.restore();
+  }
+};
 
 // ── COUNTDOWN — to the next major cycle event ────────────────
 function updateCountdown() {
@@ -1381,21 +1424,29 @@ function updatePortfolio() {
 }
 
 // ── CHARTS ───────────────────────────────────────────────────
+const TOOLTIP_DOLLAR = {
+  callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString('en-US') }
+};
+
 function buildSmallChart() {
   const ctx = document.getElementById('projChart').getContext('2d');
   projChart = new Chart(ctx, {
     type: 'line',
+    plugins: [todayLinePlugin],
     data: {
       labels: PROJ_DATA.map(d => d.month),
       datasets: [
-        { label: 'Bull', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: 'Base', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.05)', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
-        { label: 'Bear', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+        { label: 'Bull (best case)', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+        { label: 'Base (most likely)', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.05)', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
+        { label: 'Bear (worst case)', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#e8e8f0', font: { size: 10 }, boxWidth: 10, padding: 8 } },
+        tooltip: TOOLTIP_DOLLAR
+      },
       scales: {
         x: { ticks: { color: '#6b6b80', font: { size: 9 }, maxTicksLimit: 6 }, grid: { color: 'rgba(255,255,255,0.04)' } },
         y: { ticks: { color: '#6b6b80', font: { size: 9 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(255,255,255,0.04)' } }
@@ -1408,17 +1459,21 @@ function buildBigChart() {
   const ctx = document.getElementById('bigChart').getContext('2d');
   bigChart = new Chart(ctx, {
     type: 'line',
+    plugins: [todayLinePlugin],
     data: {
       labels: PROJ_DATA.map(d => d.month),
       datasets: [
-        { label: 'Bull', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
-        { label: 'Base', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.08)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#f7931a', tension: 0.4, fill: false },
-        { label: 'Bear', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
+        { label: 'Bull (best case)', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
+        { label: 'Base (most likely)', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.08)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#f7931a', tension: 0.4, fill: false },
+        { label: 'Bear (worst case)', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#e8e8f0', font: { size: 11 } } } },
+      plugins: {
+        legend: { labels: { color: '#e8e8f0', font: { size: 11 }, boxWidth: 10, padding: 10 } },
+        tooltip: TOOLTIP_DOLLAR
+      },
       scales: {
         x: { ticks: { color: '#6b6b80', font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.04)' } },
         y: { ticks: { color: '#6b6b80', font: { size: 9 }, callback: v => '$' + (v/1000).toFixed(0) + 'K' }, grid: { color: 'rgba(255,255,255,0.04)' } }
