@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getCycleDay, getPhase, getCycleScore, ATH_DATE } from '../utils/cycle';
+import { getCycleDay, getPhase, getCycleScore, getNextEvent } from '../utils/cycle';
 import { useCountdown } from '../hooks/useCountdown';
 import { useStore } from '../utils/store';
 import { Card } from '../components/Card';
@@ -18,7 +18,8 @@ const AUTOPILOT_RULES = [
 export function AlertsScreen() {
   const insets = useSafeAreaInsets();
   const { alerts, toggleAlert } = useStore();
-  const cd = useCountdown(ATH_DATE);
+  const ev = getNextEvent();
+  const cd = useCountdown(ev.date);
   const day = getCycleDay();
   const score = getCycleScore(day);
   const phase = getPhase(day);
@@ -45,7 +46,7 @@ export function AlertsScreen() {
           </View>
           <View style={styles.metric}>
             <Text style={styles.metricVal}>{cd.days}</Text>
-            <Text style={styles.metricLabel}>Days to ATH</Text>
+            <Text style={styles.metricLabel}>Days to {ev.name}</Text>
           </View>
           <View style={styles.metric}>
             <Text style={[styles.metricVal, { color: phase.color }]}>{phase.risk}</Text>
@@ -97,14 +98,13 @@ export function AlertsScreen() {
       <Card>
         <SectionLabel>Upcoming Trigger Dates</SectionLabel>
         {[
-          { label: 'ATH Warning Window Opens', date: 'Day 1000 · Oct 14, 2026', color: COLORS.yellow },
-          { label: 'Projected ATH Zone',        date: 'Day 1070 · Jan 24, 2027', color: COLORS.orange },
-          { label: 'Arc 2 Begins',              date: 'Jan 24, 2027',            color: COLORS.red },
-          { label: 'Bear Capitulation',         date: 'Mar 25, 2027',            color: COLORS.red },
-          { label: 'Bear Bottom / Buy Zone',    date: 'Jan 23, 2028',            color: COLORS.green },
-          { label: 'Next Halving',              date: 'Apr 2028',                color: COLORS.purple },
+          { label: 'Capitulation',              date: 'Mar 2026',                 color: COLORS.red },
+          { label: 'Despair / Best DCA Window', date: 'Jun 2026',                 color: COLORS.muted },
+          { label: 'Next Bottom / Buy Zone',    date: 'Oct 5, 2026',              color: COLORS.green },
+          { label: 'New Cycle Begins',          date: 'Oct 5, 2026',              color: COLORS.purple },
+          { label: 'Next Cycle ATH',            date: '~Sep 10, 2029',            color: COLORS.orange },
         ].map((t, i) => (
-          <View key={i} style={[styles.triggerRow, i === 5 && { borderBottomWidth: 0 }]}>
+          <View key={i} style={[styles.triggerRow, i === 4 && { borderBottomWidth: 0 }]}>
             <Text style={styles.triggerLabel}>{t.label}</Text>
             <Text style={[styles.triggerDate, { color: t.color }]}>{t.date}</Text>
           </View>

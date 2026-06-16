@@ -5,20 +5,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getCycleDay, getPhase, getCycleScore } from '../utils/cycle';
+import { getCycleDay, getPhase, getCycleScore, ATH_TARGETS } from '../utils/cycle';
 import { useStore } from '../utils/store';
 import { Card } from '../components/Card';
 import { SectionLabel } from '../components/SectionLabel';
 import { COLORS } from '../utils/theme';
 
 const RISK_PROFILES = ['Conservative', 'Balanced', 'Aggressive'];
-const DCA_GUIDANCE = {
-  Accumulation:     { action: 'BUY AGGRESSIVELY',  desc: 'Best entry window. Full DCA.' },
-  'Re-Awakening':   { action: 'BUY REGULARLY',     desc: 'Keep DCA, momentum building.' },
-  'Momentum Build': { action: 'REDUCE DCA',        desc: 'Let existing positions run.' },
-  'Parabolic Advance': { action: 'HOLD',           desc: 'Stop buying. Prepare to exit.' },
-  'Blow-Off Top':   { action: 'EXECUTE SELL LADDER', desc: 'Do not wait for the exact top.' },
-};
+const NEXT_BOTTOM_BASE = 55000;
 
 export function PortfolioScreen() {
   const insets = useSafeAreaInsets();
@@ -27,13 +21,13 @@ export function PortfolioScreen() {
   const day = getCycleDay();
   const phase = getPhase(day);
   const score = getCycleScore(day);
-  const dca = DCA_GUIDANCE[phase.name] || { action: 'HOLD', desc: 'Monitor cycle.' };
+  const dca = { action: phase.action, desc: phase.detail };
 
   const portValue = btcPrice ? btcPrice * btcAmount : 0;
-  const bearValue = 140000 * btcAmount;
-  const baseValue = 200000 * btcAmount;
-  const bullValue = 350000 * btcAmount;
-  const bottomValue = 42000 * btcAmount;
+  const bearValue = ATH_TARGETS.bear * btcAmount;
+  const baseValue = ATH_TARGETS.base * btcAmount;
+  const bullValue = ATH_TARGETS.bull * btcAmount;
+  const bottomValue = NEXT_BOTTOM_BASE * btcAmount;
 
   function formatUSD(n) {
     return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -68,11 +62,11 @@ export function PortfolioScreen() {
 
       {/* Projections */}
       <Card>
-        <SectionLabel>If You Hold to Projected ATH (Jan 2027)</SectionLabel>
+        <SectionLabel>Value at Next Cycle ATH (~Sep 2029)</SectionLabel>
         {[
-          { label: 'Bear Case ($140K)', value: bearValue, color: COLORS.red },
-          { label: 'Base Case ($200K)', value: baseValue, color: COLORS.orange },
-          { label: 'Bull Case ($350K)', value: bullValue, color: COLORS.green },
+          { label: 'Bear Case ($' + (ATH_TARGETS.bear / 1000) + 'K)', value: bearValue, color: COLORS.red },
+          { label: 'Base Case ($' + (ATH_TARGETS.base / 1000) + 'K)', value: baseValue, color: COLORS.orange },
+          { label: 'Bull Case ($' + (ATH_TARGETS.bull / 1000) + 'K)', value: bullValue, color: COLORS.green },
         ].map(r => (
           <View key={r.label} style={styles.projRow}>
             <Text style={styles.projLabel}>{r.label}</Text>
@@ -80,7 +74,7 @@ export function PortfolioScreen() {
           </View>
         ))}
         <View style={[styles.projRow, { marginTop: 8, borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 12 }]}>
-          <Text style={styles.projLabel}>Bear Bottom ($42K) in 2028</Text>
+          <Text style={styles.projLabel}>If Next Bottom Hits First (~$55K) — Oct 5, 2026</Text>
           <Text style={[styles.projValue, { color: COLORS.muted }]}>{formatUSD(bottomValue)}</Text>
         </View>
       </Card>
@@ -158,9 +152,9 @@ export function PortfolioScreen() {
           ))}
         </View>
         <Text style={styles.riskDesc}>
-          {riskProfile === 'conservative' && 'Sell 25% per $50K above $150K. Stop-loss at -20%.'}
-          {riskProfile === 'balanced'     && 'Ladder out at $150K, $200K, $275K, $340K (25% each).'}
-          {riskProfile === 'aggressive'   && 'Hold to $300K+, single exit near cycle score >90.'}
+          {riskProfile === 'conservative' && 'Sell 25% per $100K above $250K. Stop-loss at -20%.'}
+          {riskProfile === 'balanced'     && 'Ladder out at $250K, $400K, $550K, $700K (25% each).'}
+          {riskProfile === 'aggressive'   && 'Hold to $600K+, single exit near cycle score >90.'}
         </Text>
       </Card>
 

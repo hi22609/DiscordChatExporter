@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getCountdown, ATH_DATE } from '../utils/cycle';
+import { getCountdown, getNextEvent } from '../utils/cycle';
 
-export function useCountdown(targetDate = ATH_DATE) {
+export function useCountdown(targetDate = getNextEvent().date) {
   const [cd, setCd] = useState(getCountdown(targetDate));
 
   useEffect(() => {

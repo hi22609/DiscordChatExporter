@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   getCycleDay, getPhase, getCycleScore, getArcProgress,
-  formatPrice, ARC1_DAYS, ATH_DATE, BOTTOM_DATE,
+  getNextEvent, currentCycleStart, ATH_TARGETS, CYCLE_LEN,
 } from '../utils/cycle';
 import { useStore } from '../utils/store';
 import { useLiveData } from '../hooks/useLiveData';
@@ -18,6 +18,10 @@ import { Card } from '../components/Card';
 import { SectionLabel } from '../components/SectionLabel';
 import { ProjectionChart } from '../components/ProjectionChart';
 import { COLORS } from '../utils/theme';
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 const SIGNALS = [
   { name: 'Fear & Greed', value: '72 / 100', badge: 'GREED',   badgeColor: COLORS.yellow },
@@ -32,13 +36,14 @@ export function HomeScreen() {
   useLiveData();
   const insets = useSafeAreaInsets();
   const { btcPrice, btcChange, fearGreed } = useStore();
-  const cd = useCountdown(ATH_DATE);
+  const ev = getNextEvent();
+  const cd = useCountdown(ev.date);
 
   const day = getCycleDay();
   const phase = getPhase(day);
   const score = getCycleScore(day);
   const arc = getArcProgress(day);
-  const daysLeft = Math.max(0, ARC1_DAYS - day);
+  const inAscent = arc.arc === 1;
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -105,7 +110,7 @@ export function HomeScreen() {
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
       >
         <View>
-          <Text style={[styles.phaseTag, { color: phase.color }]}>ARC {arc.arc} · CURRENT PHASE</Text>
+          <Text style={[styles.phaseTag, { color: phase.color }]}>{inAscent ? 'ASCENT (1070d)' : 'DESCENT (364d)'} · CURRENT PHASE</Text>
           <Text style={styles.phaseName}>{phase.emoji} {phase.name}</Text>
           <Text style={styles.phaseDesc}>{phase.desc}</Text>
         </View>
@@ -118,19 +123,19 @@ export function HomeScreen() {
       {/* Progress */}
       <Card>
         <View style={styles.progressHeader}>
-          <Text style={styles.progressLabel}>Halving · Apr 19, 2024</Text>
-          <Text style={styles.progressLabel}>ATH · Jan 24, 2027</Text>
+          <Text style={styles.progressLabel}>Cycle Bottom · {fmtDate(currentCycleStart())}</Text>
+          <Text style={styles.progressLabel}>{ev.name} · {fmtDate(ev.date)}</Text>
         </View>
         <CycleProgressBar pct={arc.pct} />
         <View style={styles.progressFooter}>
           <Text style={styles.progressStat}>{arc.pct.toFixed(1)}% complete</Text>
-          <Text style={styles.progressStat}>{daysLeft} days left</Text>
+          <Text style={styles.progressStat}>{arc.remaining} days left</Text>
         </View>
       </Card>
 
       {/* Countdown */}
       <Card>
-        <SectionLabel>⏱ Time to Projected ATH (Jan 24, 2027)</SectionLabel>
+        <SectionLabel>⏱ Time to {ev.name} ({fmtDate(ev.date)})</SectionLabel>
         <View style={styles.countdownRow}>
           <CountdownUnit value={cd.days}    label="Days" />
           <CountdownUnit value={cd.hours}   label="Hours" />
@@ -142,10 +147,10 @@ export function HomeScreen() {
       {/* Stats 2×2 */}
       <View style={styles.statsGrid}>
         {[
-          { label: 'Arc Progress',   value: arc.pct.toFixed(1) + '%', sub: 'of 1070 days', color: COLORS.orange },
-          { label: 'Since Halving',  value: day + ' days',            sub: 'Arc 1 of 1070', color: COLORS.text },
-          { label: 'Bear Bottom',    value: 'Jan 2028',               sub: '~$28K–$42K',    color: COLORS.red },
-          { label: 'Next Halving',   value: 'Apr 2028',               sub: 'Cycle resets',  color: COLORS.purple },
+          { label: 'Cycle Progress', value: arc.pct.toFixed(1) + '%', sub: inAscent ? 'of 1070-day ascent' : 'of 364-day descent', color: COLORS.orange },
+          { label: 'Day in Cycle',   value: day + ' / ' + CYCLE_LEN,  sub: 'Bottom → bottom',  color: COLORS.text },
+          { label: 'Next Bottom',    value: 'Oct 5, 2026',            sub: '~$40K–$75K',        color: COLORS.red },
+          { label: 'Next Cycle ATH', value: 'Sep 2029',               sub: '~$250K–$700K',       color: COLORS.purple },
         ].map(s => (
           <Card key={s.label} style={styles.statCard}>
             <Text style={styles.statLabel}>{s.label}</Text>
@@ -174,13 +179,13 @@ export function HomeScreen() {
         </View>
       </Card>
 
-      {/* ATH Projections */}
+      {/* Next Cycle ATH Projections */}
       <Card>
-        <SectionLabel>ATH Price Projections</SectionLabel>
+        <SectionLabel>Next Cycle ATH Projections (~Sep 2029)</SectionLabel>
         {[
-          { label: 'Bear Case', sub: 'If cycle underperforms', price: '$140,000', color: COLORS.red },
-          { label: 'Base Case', sub: 'Historical average',     price: '$200,000', color: COLORS.orange },
-          { label: 'Bull Case', sub: 'Institutions go hard',   price: '$350,000', color: COLORS.green },
+          { label: 'Bear Case', sub: 'Diminishing returns',         price: '$' + ATH_TARGETS.bear.toLocaleString(),  color: COLORS.red },
+          { label: 'Base Case', sub: 'Cycle average',                price: '$' + ATH_TARGETS.base.toLocaleString(), color: COLORS.orange },
+          { label: 'Bull Case', sub: 'Institutional supercycle',     price: '$' + ATH_TARGETS.bull.toLocaleString(), color: COLORS.green },
         ].map(r => (
           <View key={r.label} style={styles.projRow}>
             <View style={styles.projLeft}>
@@ -197,7 +202,10 @@ export function HomeScreen() {
 
       {/* Chart */}
       <Card>
-        <SectionLabel>Price Projection Curve — 2024 Cycle</SectionLabel>
+        <SectionLabel>Price Projection Curve — Bottom-Anchored Cycle</SectionLabel>
+        <Text style={styles.chartCaption}>
+          Three guesses for where BTC's price goes from here. <Text style={{ color: COLORS.green, fontWeight: '700' }}>Green = Bull</Text> (best case), <Text style={{ color: COLORS.orange, fontWeight: '700' }}>Orange = Base</Text> (most likely), <Text style={{ color: COLORS.red, fontWeight: '700' }}>Red = Bear</Text> (worst case). The dashed yellow line marks today.
+        </Text>
         <ProjectionChart currentDay={day} />
       </Card>
 
@@ -274,6 +282,8 @@ const styles = StyleSheet.create({
   projLabel: { fontSize: 13, fontWeight: '700', color: COLORS.text },
   projSub:   { fontSize: 11, color: COLORS.muted, marginTop: 2 },
   projPrice: { fontSize: 16, fontWeight: '900' },
+
+  chartCaption: { fontSize: 12, color: COLORS.muted, lineHeight: 17, marginBottom: 10 },
 
   signalRow:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   signalName: { fontSize: 13, color: COLORS.text },

@@ -8,16 +8,12 @@ import { SectionLabel } from '../components/SectionLabel';
 import { COLORS } from '../utils/theme';
 
 const MILESTONES = [
-  { label: 'Halving',         date: 'Apr 19, 2024', price: '$62,000',  color: COLORS.text },
-  { label: 'Re-Awakening',    date: 'Oct 16, 2024', price: '$76,000',  color: COLORS.yellow },
-  { label: 'Momentum Phase',  date: 'Apr 19, 2025', price: '$120,000', color: COLORS.orange },
-  { label: 'Parabolic Phase', date: 'Oct 11, 2025', price: '$165,000', color: COLORS.orange },
-  { label: 'Blow-Off Begins', date: 'Mar 10, 2026', price: '$233,000', color: '#ff6b35' },
-  { label: '🎯 Projected ATH', date: 'Jan 24, 2027', price: '$200,000', color: COLORS.green },
-  { label: 'Bear Capitulation', date: 'Mar 25, 2027', price: '$90,000', color: COLORS.red },
-  { label: 'Despair Bottom',  date: 'Jun 2027',     price: '$52,000',  color: COLORS.red },
-  { label: '🟢 Bear Bottom',  date: 'Jan 23, 2028', price: '$42,000',  color: COLORS.purple },
-  { label: 'Next Halving',    date: 'Apr 2028',     price: '—',        color: COLORS.muted },
+  { label: 'Last Cycle Bottom', date: 'Nov 2022',      price: '$15,500',  color: COLORS.text },
+  { label: '🎯 Cycle ATH (top)', date: 'Oct 6, 2025',   price: '$150,000', color: COLORS.green },
+  { label: 'Capitulation',      date: 'Mar 2026',       price: '$80,000',  color: COLORS.red },
+  { label: 'Despair Phase',     date: 'Jun 2026',       price: '$62,000',  color: COLORS.red },
+  { label: '🟢 NEXT BOTTOM',    date: 'Oct 5, 2026',    price: '$55,000',  color: COLORS.purple },
+  { label: 'Next Cycle ATH',    date: '~Sep 10, 2029',  price: '$400,000', color: COLORS.green },
 ];
 
 const BEAR_DRAWDOWNS = [
@@ -41,7 +37,10 @@ export function ChartScreen() {
       <Text style={styles.pageTitle}>Cycle Timeline</Text>
 
       <Card>
-        <SectionLabel>Bear / Base / Bull — Full 2024 Cycle</SectionLabel>
+        <SectionLabel>Bear / Base / Bull — Bottom-Anchored 1070/364 Cycle</SectionLabel>
+        <Text style={styles.chartCaption}>
+          Bottom (Nov 2022) → top (Oct 2025) → next bottom (Oct 2026) → next top (~2029). Each line is a different guess for how high or low price goes. The dashed yellow line shows where we are right now.
+        </Text>
         <ProjectionChart currentDay={day} />
       </Card>
 
@@ -107,6 +106,7 @@ const styles = StyleSheet.create({
   milestoneName: { fontSize: 13, fontWeight: '700', color: COLORS.text },
   milestoneDate: { fontSize: 11, color: COLORS.muted, marginTop: 2 },
   milestonePrice:{ fontSize: 15, fontWeight: '900' },
+  chartCaption:  { fontSize: 12, color: COLORS.muted, lineHeight: 17, marginBottom: 10 },
 
   tableHeader: { flexDirection: 'row', paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, marginBottom: 4 },
   tableHead:   { color: COLORS.muted, fontWeight: '700', fontSize: 10, textTransform: 'uppercase' },

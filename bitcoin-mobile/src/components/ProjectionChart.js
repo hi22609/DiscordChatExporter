@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Path, Line, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { PROJECTION_TIMELINE, getProjectedPrice } from '../utils/cycle';
+import { PROJECTION_TIMELINE, getProjectedPrice, ATH_TARGETS, formatPrice } from '../utils/cycle';
 import { COLORS } from '../utils/theme';
 
 const W = Dimensions.get('window').width - 64;
@@ -100,9 +100,9 @@ export function ProjectionChart({ currentDay }) {
       {/* Legend */}
       <View style={styles.legend}>
         {[
-          { color: COLORS.red,    label: 'Bear $140K' },
-          { color: COLORS.orange, label: 'Base $200K' },
-          { color: COLORS.green,  label: 'Bull $350K' },
+          { color: COLORS.red,    label: 'Bear ' + formatPrice(ATH_TARGETS.bear) },
+          { color: COLORS.orange, label: 'Base ' + formatPrice(ATH_TARGETS.base) },
+          { color: COLORS.green,  label: 'Bull ' + formatPrice(ATH_TARGETS.bull) },
         ].map(({ color, label }) => (
           <View key={label} style={styles.legendItem}>
             <View style={[styles.dot, { backgroundColor: color }]} />
