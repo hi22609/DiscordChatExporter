@@ -496,7 +496,7 @@
 
     <!-- Phase Banner -->
     <div class="phase-banner">
-      <div class="phase-label">Current Phase</div>
+      <div class="phase-label" id="phaseTag">CURRENT PHASE</div>
       <div class="phase-name" id="phaseName">—</div>
       <div class="phase-desc" id="phaseDesc">Loading...</div>
       <div class="phase-day">
@@ -508,24 +508,24 @@
     <!-- Progress Bar -->
     <div class="progress-section">
       <div class="progress-header">
-        <span>Halving · Apr 19, 2024</span>
-        <span>Projected ATH · Jan 24, 2027</span>
+        <span id="progLabelStart">Cycle Bottom</span>
+        <span id="progLabelEnd">Next Event</span>
       </div>
       <div class="progress-track">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
       <div class="progress-phases">
-        <span>Accum</span>
-        <span>Re-Awaken</span>
-        <span>Momentum</span>
-        <span>Parabolic</span>
-        <span>Blow-Off</span>
+        <span>Bottom</span>
+        <span>Bull Run</span>
+        <span>Top</span>
+        <span>Bear</span>
+        <span>Bottom</span>
       </div>
     </div>
 
     <!-- Countdown -->
     <div class="countdown-card">
-      <div class="countdown-title">⏱ Time to Projected ATH (Jan 24, 2027)</div>
+      <div class="countdown-title" id="countdownTitle">⏱ Time to Next Event</div>
       <div class="countdown-grid">
         <div class="countdown-unit">
           <div class="countdown-num" id="cdDays">—</div>
@@ -549,24 +549,24 @@
     <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Arc 1 Progress</div>
+        <div class="stat-label">Cycle Progress</div>
         <div class="stat-value" id="arcPct" style="color:var(--orange)">—</div>
-        <div class="stat-sub" id="arcDaysLeft">— days to ATH</div>
+        <div class="stat-sub" id="arcDaysLeft">— days to event</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Days Since Halving</div>
+        <div class="stat-label">Day in Cycle</div>
         <div class="stat-value" id="halvingDays" style="color:var(--text)">—</div>
-        <div class="stat-sub">of 1070 total</div>
+        <div class="stat-sub">of 1434 total</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Bear Bottom Est.</div>
-        <div class="stat-value" style="color:var(--red)">Jan 2028</div>
-        <div class="stat-sub">~$28K–$42K</div>
+        <div class="stat-label">Next Bottom</div>
+        <div class="stat-value" style="color:var(--red)">Oct 5, 2026</div>
+        <div class="stat-sub">~$40K–$75K</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Next Halving Est.</div>
-        <div class="stat-value" style="color:var(--accent)">Apr 2028</div>
-        <div class="stat-sub">Cycle resets</div>
+        <div class="stat-label">Next Cycle ATH</div>
+        <div class="stat-value" style="color:var(--accent)">Sep 2029</div>
+        <div class="stat-sub">~$250K–$700K</div>
       </div>
     </div>
 
@@ -591,42 +591,67 @@
 
     <!-- Projections -->
     <div class="proj-card">
-      <div class="proj-title">ATH Price Projections</div>
+      <div class="proj-title">Next Bottom Targets · Oct 5, 2026</div>
       <div class="proj-row">
         <div class="proj-scenario">
           <div class="proj-dot" style="background:var(--red)"></div>
           <div>
             <div class="proj-label">Bear Case</div>
-            <div class="proj-date">If cycle underperforms</div>
+            <div class="proj-date">Deep capitulation</div>
           </div>
         </div>
-        <div class="proj-price" style="color:var(--red)">$140,000</div>
+        <div class="proj-price" style="color:var(--red)">$40,000</div>
       </div>
       <div class="proj-row">
         <div class="proj-scenario">
           <div class="proj-dot" style="background:var(--orange)"></div>
           <div>
             <div class="proj-label">Base Case</div>
-            <div class="proj-date">Historical average</div>
+            <div class="proj-date">Typical -65% drawdown</div>
           </div>
         </div>
-        <div class="proj-price" style="color:var(--orange)">$200,000</div>
+        <div class="proj-price" style="color:var(--orange)">$55,000</div>
       </div>
       <div class="proj-row">
         <div class="proj-scenario">
           <div class="proj-dot" style="background:var(--green)"></div>
           <div>
             <div class="proj-label">Bull Case</div>
-            <div class="proj-date">If institutions go hard</div>
+            <div class="proj-date">Shallow bear</div>
           </div>
         </div>
-        <div class="proj-price" style="color:var(--green)">$350,000</div>
+        <div class="proj-price" style="color:var(--green)">$75,000</div>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-title">Next Cycle ATH Targets · ~Sep 2029</div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--red)"></div>
+          <div><div class="proj-label">Bear Case</div><div class="proj-date">Diminishing returns</div></div>
+        </div>
+        <div class="proj-price" style="color:var(--red)">$250,000</div>
+      </div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--orange)"></div>
+          <div><div class="proj-label">Base Case</div><div class="proj-date">Cycle average</div></div>
+        </div>
+        <div class="proj-price" style="color:var(--orange)">$400,000</div>
+      </div>
+      <div class="proj-row">
+        <div class="proj-scenario">
+          <div class="proj-dot" style="background:var(--green)"></div>
+          <div><div class="proj-label">Bull Case</div><div class="proj-date">Institutional supercycle</div></div>
+        </div>
+        <div class="proj-price" style="color:var(--green)">$700,000</div>
       </div>
     </div>
 
     <!-- Chart -->
     <div class="chart-card">
-      <div class="chart-title">Price Projection Curve — 2024 Cycle</div>
+      <div class="chart-title">Price Projection Curve — Bottom-Anchored Cycle</div>
       <div class="chart-wrap">
         <canvas id="projChart"></canvas>
       </div>
@@ -673,37 +698,37 @@
   <div class="page" id="page-chart">
     <div class="section-header">Full Cycle Timeline</div>
     <div class="chart-card" style="margin-top:8px">
-      <div class="chart-title">Bear / Base / Bull — 2024 Halving Cycle</div>
+      <div class="chart-title">Bear / Base / Bull — Bottom-Anchored 1070/364 Cycle</div>
       <div class="chart-wrap" style="height:260px">
         <canvas id="bigChart"></canvas>
       </div>
     </div>
 
     <div class="proj-card">
-      <div class="proj-title">Key Date Milestones</div>
+      <div class="proj-title">Key Date Milestones (Base Case)</div>
       <div class="proj-row">
-        <div><div class="proj-label">Halving</div><div class="proj-date">Apr 19, 2024</div></div>
-        <div class="proj-price" style="color:var(--text)">$62,000</div>
+        <div><div class="proj-label">Last Cycle Bottom</div><div class="proj-date">Nov 2022</div></div>
+        <div class="proj-price" style="color:var(--text)">$15,500</div>
       </div>
       <div class="proj-row">
-        <div><div class="proj-label">Momentum Phase</div><div class="proj-date">Apr 19, 2025</div></div>
-        <div class="proj-price" style="color:var(--orange)">$120,000</div>
+        <div><div class="proj-label">Cycle ATH (top)</div><div class="proj-date">Oct 6, 2025</div></div>
+        <div class="proj-price" style="color:var(--green)">$150,000</div>
       </div>
       <div class="proj-row">
-        <div><div class="proj-label">Parabolic Phase</div><div class="proj-date">Oct 11, 2025</div></div>
-        <div class="proj-price" style="color:var(--orange)">$165,000</div>
+        <div><div class="proj-label">Capitulation</div><div class="proj-date">Mar 2026</div></div>
+        <div class="proj-price" style="color:var(--red)">$80,000</div>
       </div>
       <div class="proj-row">
-        <div><div class="proj-label">Blow-Off Begins</div><div class="proj-date">Mar 10, 2026</div></div>
-        <div class="proj-price" style="color:var(--yellow)">$233,000</div>
+        <div><div class="proj-label">Despair Phase</div><div class="proj-date">Jun 2026</div></div>
+        <div class="proj-price" style="color:var(--red)">$62,000</div>
       </div>
       <div class="proj-row">
-        <div><div class="proj-label" style="color:var(--green)">🎯 Projected ATH</div><div class="proj-date">Jan 24, 2027</div></div>
-        <div class="proj-price" style="color:var(--green)">$200,000</div>
+        <div><div class="proj-label" style="color:var(--red)">🎯 NEXT BOTTOM</div><div class="proj-date">Oct 5, 2026</div></div>
+        <div class="proj-price" style="color:var(--red)">$55,000</div>
       </div>
       <div class="proj-row">
-        <div><div class="proj-label" style="color:var(--red)">Bear Bottom</div><div class="proj-date">Jan 23, 2028</div></div>
-        <div class="proj-price" style="color:var(--red)">$42,000</div>
+        <div><div class="proj-label" style="color:var(--green)">Next Cycle ATH</div><div class="proj-date">~Sep 10, 2029</div></div>
+        <div class="proj-price" style="color:var(--green)">$400,000</div>
       </div>
     </div>
   </div>
@@ -725,17 +750,17 @@
     </div>
 
     <div class="dca-card">
-      <div class="proj-title">If You Hold to Projected ATH</div>
+      <div class="proj-title">Value at Next Cycle ATH (~Sep 2029)</div>
       <div class="dca-row">
-        <div>Bear Case ($140K)</div>
+        <div>Bear Case ($250K)</div>
         <div style="font-weight:700;color:var(--red)" id="portBear">$0</div>
       </div>
       <div class="dca-row">
-        <div>Base Case ($200K)</div>
+        <div>Base Case ($400K)</div>
         <div style="font-weight:700;color:var(--orange)" id="portBase">$0</div>
       </div>
       <div class="dca-row">
-        <div>Bull Case ($350K)</div>
+        <div>Bull Case ($700K)</div>
         <div style="font-weight:700;color:var(--green)" id="portBull">$0</div>
       </div>
     </div>
@@ -815,15 +840,15 @@
             <div class="result-value" id="dcaAvgCost">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Bear ATH ($140K)</div>
+            <div class="result-label">Value at Bear ATH ($250K)</div>
             <div class="result-value" style="color:var(--red)" id="dcaValBear">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Base ATH ($200K)</div>
+            <div class="result-label">Value at Base ATH ($400K)</div>
             <div class="result-value" style="color:var(--orange)" id="dcaValBase">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Bull ATH ($350K)</div>
+            <div class="result-label">Value at Bull ATH ($700K)</div>
             <div class="result-value" style="color:var(--green)" id="dcaValBull">$0</div>
           </div>
         </div>
@@ -865,15 +890,15 @@
             <div class="result-value" id="buyEffPrice">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Bear ATH ($140K)</div>
+            <div class="result-label">Value at Bear ATH ($250K)</div>
             <div class="result-value" style="color:var(--red)" id="buyValBear">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Base ATH ($200K)</div>
+            <div class="result-label">Value at Base ATH ($400K)</div>
             <div class="result-value" style="color:var(--orange)" id="buyValBase">$0</div>
           </div>
           <div class="result-row">
-            <div class="result-label">Value at Bull ATH ($350K)</div>
+            <div class="result-label">Value at Bull ATH ($700K)</div>
             <div class="result-value" style="color:var(--green)" id="buyValBull">$0</div>
           </div>
         </div>
@@ -1066,48 +1091,48 @@
     <div class="alert-item">
       <div class="alert-icon">🎯</div>
       <div>
-        <div class="alert-title">ATH Zone Alert</div>
-        <div class="alert-desc">Notify me when we enter Day 1000+ (Top Warning)</div>
-      </div>
-      <div class="toggle"></div>
-    </div>
-    <div class="alert-item">
-      <div class="alert-icon">📈</div>
-      <div>
-        <div class="alert-title">Cycle Score &gt; 85</div>
-        <div class="alert-desc">Extreme greed — sell signal approaching</div>
+        <div class="alert-title">Bottom Zone Alert</div>
+        <div class="alert-desc">Notify when we enter Stealth Bottom (Day 1351+) near Oct 5, 2026</div>
       </div>
       <div class="toggle"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">🟢</div>
       <div>
-        <div class="alert-title">Pi Cycle Top Triggered</div>
-        <div class="alert-desc">Historical ATH indicator — exit immediately</div>
+        <div class="alert-title">Cycle Score &lt; 20</div>
+        <div class="alert-desc">Extreme undervalue — aggressive BUY signal</div>
       </div>
       <div class="toggle"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">💰</div>
       <div>
-        <div class="alert-title">Bear Bottom Zone</div>
-        <div class="alert-desc">Notify when Arc 2 Day 280+ (Stealth Buy Zone)</div>
+        <div class="alert-title">Despair DCA Window</div>
+        <div class="alert-desc">Quiet market, best accumulation zone opens</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    <div class="alert-item">
+      <div class="alert-icon">📈</div>
+      <div>
+        <div class="alert-title">New Bull Run Confirmed</div>
+        <div class="alert-desc">Ascent begins — Day 0 of next 1070-day climb</div>
       </div>
       <div class="toggle off"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">🐋</div>
       <div>
-        <div class="alert-title">Whale Exchange Inflow</div>
-        <div class="alert-desc">Large BTC moving to exchanges (sell pressure)</div>
+        <div class="alert-title">Whale Accumulation</div>
+        <div class="alert-desc">Large BTC leaving exchanges (buy pressure)</div>
       </div>
       <div class="toggle off"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">📉</div>
       <div>
-        <div class="alert-title">Price Below $100K</div>
-        <div class="alert-desc">Support level broken — cycle check needed</div>
+        <div class="alert-title">Price Below $50K</div>
+        <div class="alert-desc">Bottom target zone reached — load up</div>
       </div>
       <div class="toggle off"></div>
     </div>
@@ -1140,39 +1165,38 @@
 </div>
 
 <script>
-// ── CONSTANTS ────────────────────────────────────────────────
-const HALVING = new Date('2024-04-19T00:00:00Z');
-const ATH_DATE = new Date('2027-01-24T00:00:00Z');
-const BEAR_DATE = new Date('2028-01-23T00:00:00Z');
-const ARC1_DAYS = 1070;
+// ── CONSTANTS — BOTTOM-ANCHORED 1070/364 CYCLE ───────────────
+// The cycle runs: BOTTOM -> 1070 days up -> TOP -> 364 days down -> BOTTOM.
+// Anchored to the last real cycle bottom so the next bottom lands Oct 5, 2026.
+const DAY_MS       = 86400000;
+const ASCENT_DAYS  = 1070;
+const DESCENT_DAYS = 364;
+const CYCLE_LEN    = ASCENT_DAYS + DESCENT_DAYS; // 1434
+const ANCHOR_BOTTOM = new Date('2022-11-01T00:00:00Z'); // last cycle low -> next bottom Oct 5, 2026
 
+// Phases across the FULL cycle (day 0 = bottom)
 const PHASES = [
-  { name: 'Accumulation',    start: 0,   end: 180,  desc: 'Whales buying quietly. Best entry window.',         dca: 'BUY AGGRESSIVELY',  risk: 'Low',    riskColor: '#00d084' },
-  { name: 'Re-Awakening',    start: 181, end: 365,  desc: 'Media returns. Retail starts noticing.',            dca: 'BUY REGULARLY',     risk: 'Low',    riskColor: '#00d084' },
-  { name: 'Momentum Build',  start: 366, end: 540,  desc: 'Old ATH broken. Price discovery begins.',           dca: 'BUY LESS, HOLD',    risk: 'Medium', riskColor: '#ffd700' },
-  { name: 'Parabolic Advance', start: 541, end: 780, desc: 'Exponential move. FOMO is here.',                  dca: 'STOP BUYING, HOLD', risk: 'High',   riskColor: '#ffd700' },
-  { name: 'Blow-Off Top',    start: 781, end: 1070, desc: 'Euphoria. Everyone talks Bitcoin. START SELLING.',  dca: 'SELL IN LADDERS',   risk: 'EXIT',   riskColor: '#ff4560' },
+  { name: 'Accumulation',      start: 0,    end: 180,  desc: 'Bottom is in. Whales buying quietly. Best entry window.', dca: 'BUY AGGRESSIVELY',  risk: 'LOW',  riskColor: '#00d084', up: true },
+  { name: 'Re-Awakening',      start: 181,  end: 365,  desc: 'Media returns. Retail starts noticing.',                  dca: 'BUY REGULARLY',     risk: 'LOW',  riskColor: '#00d084', up: true },
+  { name: 'Momentum Build',    start: 366,  end: 540,  desc: 'Old ATH broken. Price discovery begins.',                 dca: 'BUY LESS, HOLD',    risk: 'MED',  riskColor: '#ffd700', up: true },
+  { name: 'Parabolic Advance', start: 541,  end: 780,  desc: 'Exponential move. FOMO is here.',                         dca: 'STOP BUYING, HOLD', risk: 'HIGH', riskColor: '#ff6b35', up: true },
+  { name: 'Blow-Off Top',      start: 781,  end: 1070, desc: 'Euphoria. Everyone talks Bitcoin. START SELLING.',        dca: 'SELL IN LADDERS',   risk: 'EXIT', riskColor: '#ff4560', up: true },
+  { name: 'Denial',            start: 1071, end: 1130, desc: 'ATH is in. Dip-buyers think it is just a correction.',    dca: 'WAIT — do not catch the knife', risk: 'HIGH', riskColor: '#ff6b35', up: false },
+  { name: 'Capitulation',      start: 1131, end: 1220, desc: 'Panic selling. Cascading liquidations.',                  dca: 'WAIT — bottom not in yet',      risk: 'HIGH', riskColor: '#ff4560', up: false },
+  { name: 'Despair',           start: 1221, end: 1350, desc: 'Dead market. Nobody talks crypto. Best DCA window opens.',dca: 'START DCA — accumulate',        risk: 'LOW',  riskColor: '#00d084', up: false },
+  { name: 'Stealth Bottom',    start: 1351, end: 1434, desc: 'Bottom forming. Whales absorbing supply.',                dca: 'BUY AGGRESSIVELY',              risk: 'LOW',  riskColor: '#00d084', up: false },
 ];
 
-// ── PROJECTION DATA ──────────────────────────────────────────
-const PROJ_DATA = [
-  { month: 'Apr 24', bear: 62000, base: 62000, bull: 62000 },
-  { month: 'Jul 24', bear: 55000, base: 67000, bull: 82000 },
-  { month: 'Oct 24', bear: 65000, base: 76000, bull: 96000 },
-  { month: 'Jan 25', bear: 80000, base: 98000, bull: 130000 },
-  { month: 'Apr 25', bear: 95000, base: 120000, bull: 175000 },
-  { month: 'Jul 25', bear: 110000, base: 145000, bull: 222000 },
-  { month: 'Oct 25', bear: 120000, base: 165000, bull: 272000 },
-  { month: 'Jan 26', bear: 126000, base: 192000, bull: 332000 },
-  { month: 'Apr 26', bear: 132000, base: 222000, bull: 390000 },
-  { month: 'Jul 26', bear: 130000, base: 252000, bull: 448000 },
-  { month: 'Oct 26', bear: 122000, base: 270000, bull: 495000 },
-  { month: 'Jan 27', bear: 140000, base: 200000, bull: 350000 },
-  { month: 'Apr 27', bear: 100000, base: 130000, bull: 230000 },
-  { month: 'Jul 27', bear: 65000,  base: 80000,  bull: 140000 },
-  { month: 'Oct 27', bear: 42000,  base: 55000,  bull: 95000 },
-  { month: 'Jan 28', bear: 28000,  base: 42000,  bull: 70000 },
+// Price scenario anchors along the calendar (base = mid case)
+const PRICE_ANCHORS = [
+  { date: new Date('2022-11-01T00:00:00Z'), bear: 15500,  base: 15500,  bull: 15500  }, // last bottom
+  { date: new Date('2025-10-06T00:00:00Z'), bear: 110000, base: 150000, bull: 200000 }, // cycle ATH
+  { date: new Date('2026-10-05T00:00:00Z'), bear: 40000,  base: 55000,  bull: 75000  }, // NEXT BOTTOM
+  { date: new Date('2029-09-10T00:00:00Z'), bear: 250000, base: 400000, bull: 700000 }, // next cycle ATH
 ];
+
+// Next-ATH targets used by the portfolio / calculators (the 2029 top)
+const ATH_TARGETS = { bear: 250000, base: 400000, bull: 700000 };
 
 // ── STATE ────────────────────────────────────────────────────
 let livePrice = null;
@@ -1180,9 +1204,19 @@ let projChart = null;
 let bigChart = null;
 
 // ── CYCLE CALC ───────────────────────────────────────────────
+function currentCycleStart() {
+  const elapsed = Date.now() - ANCHOR_BOTTOM.getTime();
+  const n = Math.floor(elapsed / (CYCLE_LEN * DAY_MS));
+  return new Date(ANCHOR_BOTTOM.getTime() + n * CYCLE_LEN * DAY_MS);
+}
+
 function getCycleDay() {
-  const now = new Date();
-  return Math.floor((now - HALVING) / 86400000);
+  return Math.floor((Date.now() - currentCycleStart().getTime()) / DAY_MS);
+}
+
+// Calendar date of a given day within the current cycle (day can exceed 1434 -> next cycle)
+function dateOfCycleDay(d) {
+  return new Date(currentCycleStart().getTime() + d * DAY_MS);
 }
 
 function getPhase(day) {
@@ -1192,22 +1226,74 @@ function getPhase(day) {
   return PHASES[PHASES.length - 1];
 }
 
+// 0 at bottom, ~95 at top. Rises through the ascent, falls through the descent.
 function getCycleScore(day) {
-  const pct = day / ARC1_DAYS;
-  // Rises from ~20 at day 0 to ~90 at day 1070
-  return Math.min(95, Math.round(20 + pct * 75));
+  if (day <= ASCENT_DAYS) {
+    return Math.round(8 + (day / ASCENT_DAYS) * 87);
+  }
+  const descPct = (day - ASCENT_DAYS) / DESCENT_DAYS;
+  return Math.max(6, Math.round(95 - descPct * 89));
 }
 
-// ── COUNTDOWN ────────────────────────────────────────────────
+// Next major cycle event from where we are
+function getNextEvent() {
+  const day = getCycleDay();
+  if (day < ASCENT_DAYS) {
+    return { name: 'Cycle ATH', date: dateOfCycleDay(ASCENT_DAYS) };
+  }
+  return { name: 'Cycle Bottom', date: dateOfCycleDay(CYCLE_LEN) };
+}
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(d) { return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
+function fmtMonthYr(d) { return MONTHS[d.getUTCMonth()] + ' ’' + String(d.getUTCFullYear()).slice(2); }
+
+// ── PRICE PROJECTION MODEL (calendar-anchored) ───────────────
+function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+function projectedPriceOn(dateObj, scenario) {
+  const t = dateObj.getTime();
+  const A = PRICE_ANCHORS;
+  if (t <= A[0].date.getTime()) return A[0][scenario];
+  if (t >= A[A.length - 1].date.getTime()) return A[A.length - 1][scenario];
+  for (let i = 0; i < A.length - 1; i++) {
+    const a = A[i], b = A[i + 1];
+    if (t >= a.date.getTime() && t <= b.date.getTime()) {
+      const frac = (t - a.date.getTime()) / (b.date.getTime() - a.date.getTime());
+      const s = smoothstep(frac);
+      return Math.round(a[scenario] + (b[scenario] - a[scenario]) * s);
+    }
+  }
+  return A[A.length - 1][scenario];
+}
+
+// ── PROJECTION TIMELINE (built from the model) ───────────────
+const PROJ_MONTHS = [
+  '2025-07','2025-10','2026-01','2026-04','2026-07','2026-10',
+  '2027-01','2027-04','2027-07','2027-10','2028-04','2028-10','2029-09'
+];
+const PROJ_DATA = PROJ_MONTHS.map(ym => {
+  const d = new Date(ym + '-15T00:00:00Z');
+  return {
+    month: fmtMonthYr(d),
+    bear: projectedPriceOn(d, 'bear'),
+    base: projectedPriceOn(d, 'base'),
+    bull: projectedPriceOn(d, 'bull'),
+  };
+});
+
+// ── COUNTDOWN — to the next major cycle event ────────────────
 function updateCountdown() {
-  const now = new Date();
-  const diff = ATH_DATE - now;
+  const ev = getNextEvent();
+  const diff = ev.date - new Date();
+  const titleEl = document.getElementById('countdownTitle');
+  if (titleEl) titleEl.textContent = '⏱ Time to ' + ev.name + ' (' + fmtDate(ev.date) + ')';
   if (diff <= 0) {
     ['cdDays','cdHours','cdMinutes','cdSeconds'].forEach(id => document.getElementById(id).textContent = '0');
     return;
   }
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
+  const days = Math.floor(diff / DAY_MS);
+  const hours = Math.floor((diff % DAY_MS) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
   document.getElementById('cdDays').textContent = days;
@@ -1221,23 +1307,31 @@ function updateCycleUI() {
   const day = getCycleDay();
   const phase = getPhase(day);
   const score = getCycleScore(day);
-  const pct = Math.min(100, (day / ARC1_DAYS * 100)).toFixed(1);
-  const daysLeft = Math.max(0, ARC1_DAYS - day);
+  const ev = getNextEvent();
+  const pct = Math.min(100, (day / CYCLE_LEN * 100)).toFixed(1);
+  const evDaysLeft = Math.max(0, Math.ceil((ev.date - new Date()) / DAY_MS));
+  const inAscent = day <= ASCENT_DAYS;
 
+  document.getElementById('phaseName').textContent = phase.emoji ? phase.emoji + ' ' + phase.name : phase.name;
   document.getElementById('phaseName').textContent = phase.name;
   document.getElementById('phaseDesc').textContent = phase.desc;
+  document.getElementById('phaseTag').textContent = (inAscent ? 'ASCENT (1070d)' : 'DESCENT (364d)') + ' · CURRENT PHASE';
   document.getElementById('cycleDay').textContent = day;
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('arcPct').textContent = pct + '%';
-  document.getElementById('arcDaysLeft').textContent = daysLeft + ' days to ATH';
+  document.getElementById('arcDaysLeft').textContent = evDaysLeft + ' days to ' + (inAscent ? 'ATH' : 'bottom');
   document.getElementById('halvingDays').textContent = day;
+
+  // Cycle markers
+  document.getElementById('progLabelStart').textContent = 'Cycle Bottom · ' + fmtDate(currentCycleStart());
+  document.getElementById('progLabelEnd').textContent = ev.name + ' · ' + fmtDate(ev.date);
 
   // Score
   document.getElementById('scoreNum').textContent = score;
   document.getElementById('scoreBar').style.width = score + '%';
 
   let actionText, actionBg, actionColor;
-  if (score < 40) { actionText = '🟢 Undervalued — BUY ZONE'; actionBg = 'rgba(0,208,132,0.1)'; actionColor = 'var(--green)'; }
+  if (score < 40) { actionText = '🟢 Undervalued — BUY / ACCUMULATE ZONE'; actionBg = 'rgba(0,208,132,0.1)'; actionColor = 'var(--green)'; }
   else if (score < 61) { actionText = '🟡 Fair Value — HOLD'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
   else if (score < 81) { actionText = '⚠ Overvalued — Consider taking partial profits'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
   else { actionText = '🔴 EXTREME — SELL. Cycle top imminent.'; actionBg = 'rgba(255,69,96,0.1)'; actionColor = 'var(--red)'; }
@@ -1281,9 +1375,9 @@ function updatePortfolio() {
   if (!livePrice || !btc) return;
   const val = btc * livePrice;
   document.getElementById('portValue').textContent = '$' + val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  document.getElementById('portBear').textContent = '$' + (btc * 140000).toLocaleString();
-  document.getElementById('portBase').textContent = '$' + (btc * 200000).toLocaleString();
-  document.getElementById('portBull').textContent = '$' + (btc * 350000).toLocaleString();
+  document.getElementById('portBear').textContent = '$' + (btc * ATH_TARGETS.bear).toLocaleString();
+  document.getElementById('portBase').textContent = '$' + (btc * ATH_TARGETS.base).toLocaleString();
+  document.getElementById('portBull').textContent = '$' + (btc * ATH_TARGETS.bull).toLocaleString();
 }
 
 // ── CHARTS ───────────────────────────────────────────────────
@@ -1333,23 +1427,7 @@ function buildBigChart() {
   });
 }
 
-// ── PROJECTED PRICE MODEL (shared by all calculators) ─────────
-function getProjectedPrice(day, scenario) {
-  const halvingPrice = 62000;
-  const multipliers = { bear: 2.26, base: 3.23, bull: 5.65 };
-  const m = multipliers[scenario];
-  if (day <= ARC1_DAYS) {
-    const sig = 1 / (1 + Math.exp(-(day - 600) / 130));
-    return Math.round(halvingPrice * (1 + (m - 1) * sig));
-  }
-  const ath = halvingPrice * m;
-  const arc2Day = day - ARC1_DAYS;
-  const drawdowns = { bear: 0.77, base: 0.79, bull: 0.80 };
-  const dd = drawdowns[scenario];
-  const decay = 1 - dd * (1 - Math.exp(-arc2Day / 85));
-  return Math.round(ath * decay);
-}
-
+// ── (projection model is calendar-anchored — see projectedPriceOn) ──
 function fmtUSD(n, decimals) {
   decimals = decimals === undefined ? 0 : decimals;
   const sign = n < 0 ? '-' : '';
@@ -1369,12 +1447,12 @@ function calcDCA() {
 
   const totalDays = weeks * 7;
   const periods = Math.max(1, Math.floor(totalDays / freq));
-  const startDay = getCycleDay();
+  const now = Date.now();
 
   let totalBtc = 0;
   for (let i = 0; i < periods; i++) {
-    const day = startDay + i * freq;
-    const price = getProjectedPrice(day, 'base');
+    const d = new Date(now + i * freq * DAY_MS);
+    const price = projectedPriceOn(d, 'base');
     totalBtc += amount / price;
   }
   const totalInvested = periods * amount;
@@ -1383,9 +1461,9 @@ function calcDCA() {
   document.getElementById('dcaBtcTotal').textContent = fmtBTC(totalBtc) + ' BTC';
   document.getElementById('dcaInvested').textContent = fmtUSD(totalInvested);
   document.getElementById('dcaAvgCost').textContent = fmtUSD(avgCost) + ' / BTC';
-  document.getElementById('dcaValBear').textContent = fmtUSD(totalBtc * 140000);
-  document.getElementById('dcaValBase').textContent = fmtUSD(totalBtc * 200000);
-  document.getElementById('dcaValBull').textContent = fmtUSD(totalBtc * 350000);
+  document.getElementById('dcaValBear').textContent = fmtUSD(totalBtc * ATH_TARGETS.bear);
+  document.getElementById('dcaValBase').textContent = fmtUSD(totalBtc * ATH_TARGETS.base);
+  document.getElementById('dcaValBull').textContent = fmtUSD(totalBtc * ATH_TARGETS.bull);
 }
 
 // ── CALCULATOR: BUY ─────────────────────────────────────────
@@ -1402,9 +1480,9 @@ function calcBuy() {
   document.getElementById('buyBtcAmount').textContent = fmtBTC(btc) + ' BTC';
   document.getElementById('buyFeeAmount').textContent = fmtUSD(feeAmt, 2);
   document.getElementById('buyEffPrice').textContent = fmtUSD(effPrice, 2);
-  document.getElementById('buyValBear').textContent = fmtUSD(btc * 140000);
-  document.getElementById('buyValBase').textContent = fmtUSD(btc * 200000);
-  document.getElementById('buyValBull').textContent = fmtUSD(btc * 350000);
+  document.getElementById('buyValBear').textContent = fmtUSD(btc * ATH_TARGETS.bear);
+  document.getElementById('buyValBase').textContent = fmtUSD(btc * ATH_TARGETS.base);
+  document.getElementById('buyValBull').textContent = fmtUSD(btc * ATH_TARGETS.bull);
 }
 
 function useLivePriceForSell() {
