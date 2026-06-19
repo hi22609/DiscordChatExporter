@@ -758,6 +758,145 @@
   }
   .email-inline-success.show { display: flex; }
 
+  /* ── LEARN / BLOCKCHAIN EXPLAINER ──────────────────────────── */
+  .learn-hero {
+    text-align: center; padding: 6px 0 4px;
+  }
+  .learn-kicker {
+    display: inline-block;
+    background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.35);
+    color: #a78bfa; font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; padding: 4px 11px; border-radius: 99px; margin-bottom: 12px;
+  }
+  .learn-title { font-size: 27px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.1; margin-bottom: 8px; }
+  .learn-title .hl { color: var(--orange); }
+  .learn-sub { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 340px; margin: 0 auto; }
+
+  .chain-canvas-wrap {
+    margin: 18px 0; border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.08) 0%, #0c0c14 60%);
+    position: relative;
+  }
+  .chain-canvas { width: 100%; height: 240px; display: block; }
+  .chain-caption {
+    position: absolute; bottom: 10px; left: 0; right: 0; text-align: center;
+    font-size: 11px; color: var(--muted); pointer-events: none;
+  }
+  .demo-btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 800;
+    cursor: pointer; letter-spacing: 0.3px; margin-bottom: 8px;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .demo-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(124,58,237,0.5); }
+  .demo-btn:active { transform: translateY(0); }
+  .demo-status {
+    text-align: center; font-size: 12px; color: var(--muted);
+    min-height: 18px; margin-bottom: 20px; transition: color 0.3s;
+  }
+  .demo-status.live { color: var(--green); font-weight: 600; }
+
+  .concept-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; margin-bottom: 10px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .concept-card.open { border-color: rgba(247,147,26,0.3); }
+  .concept-q {
+    display: flex; align-items: center; gap: 13px;
+    padding: 16px 16px; cursor: pointer; user-select: none;
+  }
+  .concept-emoji {
+    width: 38px; height: 38px; flex-shrink: 0;
+    background: var(--card2); border-radius: 11px;
+    display: flex; align-items: center; justify-content: center; font-size: 19px;
+  }
+  .concept-q-text { flex: 1; font-size: 14.5px; font-weight: 700; line-height: 1.3; }
+  .concept-chevron { color: var(--muted); font-size: 13px; transition: transform 0.25s; flex-shrink: 0; }
+  .concept-card.open .concept-chevron { transform: rotate(90deg); color: var(--orange); }
+  .concept-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    padding: 0 16px;
+  }
+  .concept-card.open .concept-a { max-height: 420px; padding: 0 16px 18px 16px; }
+  .concept-a p { font-size: 13.5px; color: #c7c7d6; line-height: 1.6; margin-bottom: 10px; }
+  .concept-a p:last-child { margin-bottom: 0; }
+  .concept-a .tldr {
+    background: rgba(0,208,132,0.07); border-left: 3px solid var(--green);
+    padding: 9px 12px; border-radius: 0 8px 8px 0; font-size: 13px; color: #d8ffe9;
+    margin-top: 4px;
+  }
+  .concept-a b { color: var(--text); }
+
+  .scarcity-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; margin: 18px 0;
+  }
+  .scarcity-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  .scarcity-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .scarcity-bar {
+    height: 26px; background: rgba(255,255,255,0.05); border-radius: 8px;
+    overflow: hidden; position: relative; margin-bottom: 10px;
+  }
+  .scarcity-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--orange), #ffb347);
+    border-radius: 8px; transition: width 1.4s cubic-bezier(0.22,1,0.36,1);
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+  .scarcity-legend { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .scarcity-legend b { color: var(--orange); font-size: 13px; }
+
+  .learn-stats { display: flex; gap: 10px; margin: 18px 0; }
+  .learn-stat {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 10px; text-align: center;
+  }
+  .learn-stat-num { font-size: 20px; font-weight: 900; color: var(--orange); }
+  .learn-stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+
+  .learn-takeaway {
+    background: linear-gradient(135deg, rgba(247,147,26,0.08), rgba(124,58,237,0.05));
+    border: 1px solid rgba(247,147,26,0.22); border-radius: 16px;
+    padding: 18px; margin: 18px 0 8px; text-align: center;
+  }
+  .learn-takeaway-title { font-size: 14px; font-weight: 800; color: var(--orange); margin-bottom: 6px; }
+  .learn-takeaway-text { font-size: 13px; color: #c7c7d6; line-height: 1.55; }
+
+  /* ── PORTFOLIO LIVE P&L ────────────────────────────────────── */
+  .pnl-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; margin-top: 16px;
+  }
+  .pnl-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .pnl-costwrap { display: flex; align-items: center; gap: 4px; }
+  .pnl-costwrap input {
+    width: 78px; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    color: var(--text); padding: 6px 8px; border-radius: 8px; font-size: 13px; font-weight: 700;
+    text-align: right; outline: none;
+  }
+  .pnl-costwrap input:focus { border-color: rgba(247,147,26,0.4); }
+  .pnl-hero { text-align: center; margin-bottom: 14px; }
+  .pnl-hero-val { font-size: 34px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .pnl-hero-pct { font-size: 13px; font-weight: 700; margin-top: 6px; }
+  .pnl-bar {
+    height: 8px; background: rgba(255,255,255,0.06); border-radius: 6px;
+    overflow: hidden; margin-bottom: 16px; position: relative;
+  }
+  .pnl-bar-fill { height: 100%; width: 50%; border-radius: 6px; transition: width 0.6s ease, background 0.4s; }
+  .pnl-grid { display: flex; gap: 8px; margin-bottom: 14px; }
+  .pnl-cell { flex: 1; background: var(--card2); border-radius: 10px; padding: 10px 8px; text-align: center; }
+  .pnl-cell-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .pnl-cell-val { font-size: 14px; font-weight: 800; }
+  .pnl-next {
+    background: rgba(247,147,26,0.07); border: 1px solid rgba(247,147,26,0.18);
+    border-radius: 10px; padding: 11px 13px; font-size: 12.5px; color: #d8c4a0; line-height: 1.45;
+  }
+
 </style>
 </head>
 <body>
@@ -1132,20 +1271,40 @@
       </div>
     </div>
 
-    <div class="dca-card">
-      <div class="proj-title">DCA Recommendation — Current Phase</div>
-      <div class="dca-row">
-        <div>Current Phase</div>
-        <div style="font-weight:700;color:var(--orange)" id="dcaPhase">—</div>
+    <!-- LIVE P&L — what your stack is actually doing right now -->
+    <div class="pnl-card" id="pnlCard">
+      <div class="pnl-head">
+        <div class="proj-title" style="margin:0">Your Profit / Loss</div>
+        <div class="pnl-costwrap">
+          <span style="font-size:11px;color:var(--muted)">Avg buy price $</span>
+          <input id="costInput" type="number" step="1" placeholder="65000" value="65000"
+            oninput="updatePnl();savePnl()">
+        </div>
       </div>
-      <div class="dca-row">
-        <div>DCA Action</div>
-        <div style="font-weight:700;color:var(--yellow)" id="dcaAction">—</div>
+
+      <div class="pnl-hero">
+        <div class="pnl-hero-val" id="pnlValue">—</div>
+        <div class="pnl-hero-pct" id="pnlPct">unrealized gain/loss</div>
       </div>
-      <div class="dca-row">
-        <div>Risk Level</div>
-        <div style="font-weight:700" id="dcaRisk">—</div>
+
+      <div class="pnl-bar"><div class="pnl-bar-fill" id="pnlBarFill"></div></div>
+
+      <div class="pnl-grid">
+        <div class="pnl-cell">
+          <div class="pnl-cell-label">Invested</div>
+          <div class="pnl-cell-val" id="pnlInvested">—</div>
+        </div>
+        <div class="pnl-cell">
+          <div class="pnl-cell-label">Worth Now</div>
+          <div class="pnl-cell-val" id="pnlNow">—</div>
+        </div>
+        <div class="pnl-cell">
+          <div class="pnl-cell-label">Break-even</div>
+          <div class="pnl-cell-val" id="pnlBreakeven">—</div>
+        </div>
       </div>
+
+      <div class="pnl-next" id="pnlNext">—</div>
     </div>
 
     <!-- MILESTONES -->
@@ -1902,6 +2061,140 @@
 
   </div>
 
+  <!-- PAGE: LEARN (Blockchain Explainer) -->
+  <div class="page" id="page-learn">
+
+    <div class="learn-hero">
+      <div class="learn-kicker">Bitcoin for Humans</div>
+      <div class="learn-title">What Is Bitcoin, <span class="hl">Really?</span></div>
+      <div class="learn-sub">No jargon. Watch how money moves across a network nobody owns — then see why it can't be faked, frozen, or printed.</div>
+    </div>
+
+    <!-- LIVE BLOCKCHAIN ANIMATION -->
+    <div class="chain-canvas-wrap">
+      <canvas class="chain-canvas" id="chainCanvas"></canvas>
+      <div class="chain-caption" id="chainCaption">Thousands of computers, one shared ledger</div>
+    </div>
+
+    <button class="demo-btn" onclick="sendDemoTx()">💸 Send 0.5 ₿ — Watch It Get Confirmed</button>
+    <div class="demo-status" id="demoStatus">Tap the button to broadcast a real-style transaction</div>
+
+    <!-- EXPLAINER ACCORDION -->
+    <div class="section-header">The Whole Thing, In Plain English</div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">📒</div>
+        <div class="concept-q-text">What is a "blockchain"?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>Imagine a notebook that <b>everyone in the world shares a copy of</b>. Every time someone sends money, a new line is written in every copy at the same time.</p>
+        <p>Because thousands of people hold identical copies, no single person can secretly erase a line or fake one — the other copies would instantly disagree and reject the lie.</p>
+        <div class="tldr">🟢 <b>TL;DR:</b> A blockchain is a shared notebook that nobody can secretly edit.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">📦</div>
+        <div class="concept-q-text">Why "block" + "chain"?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>Transactions don't get written one at a time. They're bundled into a <b>block</b> — like a page in the notebook — roughly every 10 minutes.</p>
+        <p>Each new page carries a fingerprint of the page before it. Change one old page and its fingerprint changes, which breaks every page after it. That's the <b>chain</b> — pages locked together in order, all the way back to 2009.</p>
+        <div class="tldr">🟢 <b>TL;DR:</b> Blocks are pages; the chain glues them so history can't be rewritten.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">⛏️</div>
+        <div class="concept-q-text">What is "mining"?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>To add the next page, computers around the world race to solve a hard math puzzle. The winner gets to write the page — and earns brand-new bitcoin as a reward.</p>
+        <p>The puzzle is hard to solve but instant to check. That's the trick: it costs real electricity to cheat, but it's free for everyone else to verify the winner played fair.</p>
+        <div class="tldr">🟢 <b>TL;DR:</b> Miners burn electricity to earn the right to add the next block — and get paid in BTC.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">🔑</div>
+        <div class="concept-q-text">What is a wallet &amp; a "key"?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>Your bitcoin isn't a file on your phone — it's just an entry in that shared notebook. Your <b>wallet</b> holds a secret <b>private key</b>: a password only you know that proves the entry is yours.</p>
+        <p>Sign with your key and the network accepts your transaction. Lose the key and the coins are frozen forever. This is why people say <b>"not your keys, not your coins."</b></p>
+        <div class="tldr">🟢 <b>TL;DR:</b> Your key is the master password to your money — guard it like your life.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">🛡️</div>
+        <div class="concept-q-text">Why can't it be hacked or faked?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>To rewrite history, an attacker would need to out-compute every honest miner on Earth — <b>at the same time</b> — and keep doing it forever. The electricity bill alone would be billions of dollars per day.</p>
+        <p>It's not "unhackable" by magic. It's protected by making cheating cost more than it could ever pay. Honesty is simply the profitable move.</p>
+        <div class="tldr">🟢 <b>TL;DR:</b> Cheating costs more than it's worth, so the network stays honest by design.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="toggleConcept(this)">
+      <div class="concept-q">
+        <div class="concept-emoji">💎</div>
+        <div class="concept-q-text">Why is it valuable?</div>
+        <div class="concept-chevron">▶</div>
+      </div>
+      <div class="concept-a">
+        <p>There will only ever be <b>21 million bitcoin</b> — written into the code, impossible to change. No government can print more, no bank can freeze it, and it moves anywhere on Earth in minutes.</p>
+        <p>It's the first money in history that is provably scarce <b>and</b> fully digital. That combination — like gold you can email — is what the whole cycle is built on.</p>
+        <div class="tldr">🟢 <b>TL;DR:</b> Fixed supply + global + unstoppable = digital gold.</div>
+      </div>
+    </div>
+
+    <!-- SCARCITY VISUAL -->
+    <div class="scarcity-card">
+      <div class="scarcity-title">⛏️ The 21 Million Cap</div>
+      <div class="scarcity-sub">How much of all the bitcoin that will ever exist is already mined</div>
+      <div class="scarcity-bar">
+        <div class="scarcity-fill" id="scarcityFill"></div>
+      </div>
+      <div class="scarcity-legend">
+        <span><b id="scarcityMined">~19.9M</b> mined</span>
+        <span>21M max supply</span>
+      </div>
+    </div>
+
+    <div class="learn-stats">
+      <div class="learn-stat">
+        <div class="learn-stat-num">~10 min</div>
+        <div class="learn-stat-label">Per new block</div>
+      </div>
+      <div class="learn-stat">
+        <div class="learn-stat-num">21M</div>
+        <div class="learn-stat-label">Max coins ever</div>
+      </div>
+      <div class="learn-stat">
+        <div class="learn-stat-num">2009</div>
+        <div class="learn-stat-label">First block</div>
+      </div>
+    </div>
+
+    <div class="learn-takeaway">
+      <div class="learn-takeaway-title">🎯 The One Idea That Matters</div>
+      <div class="learn-takeaway-text">Bitcoin is money that runs on math instead of trust. No company, no CEO, no off-switch — just a fixed-supply ledger that anyone can use and no one can control. The cycle tracker tells you <i>when</i>. This page tells you <i>why it's worth tracking.</i></div>
+    </div>
+
+  </div>
+
 </div><!-- end container -->
 
 <!-- BOTTOM NAV -->
@@ -1925,6 +2218,10 @@
   <div class="nav-item" onclick="showPage('alerts',this)">
     <span class="nav-icon">🔔</span>
     <span class="nav-label">Alerts</span>
+  </div>
+  <div class="nav-item" onclick="showPage('learn',this)">
+    <span class="nav-icon">🎓</span>
+    <span class="nav-label">Learn</span>
   </div>
 </div>
 
@@ -2267,13 +2564,6 @@ function updateCycleUI() {
   setSig('sigDaysEvent', evDaysLeft + ' days');
   const enEl = document.getElementById('sigEventName');
   if (enEl) enEl.textContent = (inAscent ? 'TO TOP' : 'TO BOTTOM');
-
-  // Portfolio DCA
-  document.getElementById('dcaPhase').textContent = phase.name;
-  document.getElementById('dcaAction').textContent = phase.dca;
-  const riskEl = document.getElementById('dcaRisk');
-  riskEl.textContent = phase.risk;
-  riskEl.style.color = phase.riskColor;
 }
 
 // ── PRICE FETCH ──────────────────────────────────────────────
@@ -2328,6 +2618,55 @@ function updatePortfolio() {
   document.getElementById('portBear').textContent = '$' + (btc * ATH_TARGETS.bear).toLocaleString();
   document.getElementById('portBase').textContent = '$' + (btc * ATH_TARGETS.base).toLocaleString();
   document.getElementById('portBull').textContent = '$' + (btc * ATH_TARGETS.bull).toLocaleString();
+  updatePnl();
+}
+
+// Live profit/loss vs. your real cost basis — what a portfolio is actually for
+function savePnl() {
+  const v = document.getElementById('costInput')?.value;
+  if (v != null) localStorage.setItem('btc_cost_basis', v);
+}
+function updatePnl() {
+  const btc  = parseFloat(document.getElementById('btcInput')?.value || 0);
+  const cost = parseFloat(document.getElementById('costInput')?.value || 0);
+  const set  = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+  if (!livePrice || !btc || !cost) {
+    set('pnlValue', '—'); set('pnlPct', 'enter your average buy price');
+    return;
+  }
+  const invested = btc * cost;
+  const now      = btc * livePrice;
+  const pnl      = now - invested;
+  const pct      = (livePrice / cost - 1) * 100;
+  const up       = pnl >= 0;
+  const color    = up ? 'var(--green)' : 'var(--red)';
+
+  const valEl = document.getElementById('pnlValue');
+  if (valEl) { valEl.textContent = (up ? '+' : '−') + fmtUSD(Math.abs(pnl)); valEl.style.color = color; }
+  const pctEl = document.getElementById('pnlPct');
+  if (pctEl) { pctEl.textContent = (up ? '▲ ' : '▼ ') + (up ? '+' : '') + pct.toFixed(1) + '% on your money'; pctEl.style.color = color; }
+
+  // bar: center = break-even; map -100%..+200% onto 0..100%
+  const fill = document.getElementById('pnlBarFill');
+  if (fill) {
+    const clamped = Math.max(-100, Math.min(200, pct));
+    const w = ((clamped + 100) / 300) * 100;
+    fill.style.width = w + '%';
+    fill.style.background = up ? 'linear-gradient(90deg,#00d084,#00ffa3)' : 'linear-gradient(90deg,#ff4560,#ff7b8f)';
+  }
+
+  set('pnlInvested', fmtUSD(invested));
+  set('pnlNow', fmtUSD(now));
+  set('pnlBreakeven', fmtUSD(cost));
+
+  // forward-looking line tied to the cycle target
+  const atBase = btc * ATH_TARGETS.base;
+  const xBase  = atBase / invested;
+  const nextEl = document.getElementById('pnlNext');
+  if (nextEl) {
+    if (up) nextEl.innerHTML = `🎯 At the Base ATH target ($400K) your stack is worth <b>${fmtUSD(atBase)}</b> — a <b>${xBase.toFixed(1)}x</b> on what you put in.`;
+    else    nextEl.innerHTML = `🩸 You're underwater by ${fmtUSD(Math.abs(pnl))}. Break-even needs BTC back to <b>${fmtUSD(cost)}</b>. Base ATH target would still make it <b>${xBase.toFixed(1)}x</b>.`;
+  }
 }
 
 // ── CHARTS ───────────────────────────────────────────────────
@@ -2770,6 +3109,194 @@ function initHeroAnim() {
   draw();
 }
 
+// ── BLOCKCHAIN EXPLAINER (Learn page) ─────────────────────────
+function toggleConcept(el) {
+  const wasOpen = el.classList.contains('open');
+  // accordion: close siblings for a clean one-at-a-time feel
+  document.querySelectorAll('.concept-card.open').forEach(c => { if (c !== el) c.classList.remove('open'); });
+  el.classList.toggle('open', !wasOpen);
+}
+
+let chainAnim = null;
+function randHash() {
+  const z = '00'; // leading zeros = "mined" difficulty
+  let h = '';
+  for (let i = 0; i < 4; i++) h += '0123456789abcdef'[Math.floor(Math.random()*16)];
+  return z + h;
+}
+function initChainAnim() {
+  const c = document.getElementById('chainCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let frame = 0;
+
+  // Network nodes (upper region) — fractional positions
+  const nodeF = [
+    [0.16,0.22],[0.40,0.14],[0.66,0.20],[0.86,0.34],
+    [0.74,0.55],[0.46,0.60],[0.20,0.50],[0.58,0.36],
+  ];
+  const edges = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[1,7],[7,2],[7,5],[0,5],[2,4]];
+
+  // Block chain (lower strip)
+  let blocks = [];
+  let nextId = 840000 + Math.floor(Math.random()*500);
+  for (let i = 0; i < 5; i++) blocks.push({ id: nextId++, hash: randHash(), flash: 0 });
+  let mineTimer = 180;
+
+  // Live transactions hopping the network
+  let txs = [];
+  // Ambient packets on edges
+  let packets = [];
+
+  function spawnPacket() {
+    const e = edges[Math.floor(Math.random()*edges.length)];
+    packets.push({ a: e[0], b: e[1], t: 0, speed: 0.006 + Math.random()*0.008, hot: false });
+  }
+
+  function addBlock(hot) {
+    blocks.push({ id: nextId++, hash: randHash(), flash: 1 });
+    if (blocks.length > 6) blocks.shift();
+  }
+
+  function send() {
+    // path of 4-5 random node hops ending in a mined block
+    const path = [];
+    let cur = Math.floor(Math.random()*nodeF.length);
+    path.push(cur);
+    for (let i = 0; i < 4; i++) {
+      const opts = edges.filter(e => e.includes(cur)).map(e => e[0]===cur ? e[1] : e[0]);
+      cur = opts[Math.floor(Math.random()*opts.length)] ?? cur;
+      path.push(cur);
+    }
+    txs.push({ path, seg: 0, t: 0, speed: 0.022 });
+    const st = document.getElementById('demoStatus');
+    if (st) { st.textContent = '📡 Broadcasting to the network…'; st.classList.add('live'); }
+  }
+
+  function resize() {
+    const r = window.devicePixelRatio || 1;
+    c.width = c.offsetWidth * r; c.height = c.offsetHeight * r;
+    ctx.setTransform(r,0,0,r,0,0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function nodeXY(i, W, H) {
+    const nh = H * 0.66; // network occupies top 66%
+    return [nodeF[i][0]*W, 16 + nodeF[i][1]*(nh-16)];
+  }
+
+  function draw() {
+    const W = c.offsetWidth, H = c.offsetHeight;
+    ctx.clearRect(0,0,W,H);
+    frame++;
+
+    // ambient packet spawns
+    if (frame % 26 === 0) spawnPacket();
+
+    // ── EDGES ──
+    edges.forEach(e => {
+      const [ax,ay] = nodeXY(e[0],W,H), [bx,by] = nodeXY(e[1],W,H);
+      ctx.strokeStyle = 'rgba(124,58,237,0.14)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke();
+    });
+
+    // ── AMBIENT PACKETS ──
+    packets = packets.filter(p => p.t < 1);
+    packets.forEach(p => {
+      p.t += p.speed;
+      const [ax,ay] = nodeXY(p.a,W,H), [bx,by] = nodeXY(p.b,W,H);
+      const x = ax+(bx-ax)*p.t, y = ay+(by-ay)*p.t;
+      ctx.beginPath(); ctx.arc(x,y,1.6,0,Math.PI*2);
+      ctx.fillStyle = 'rgba(167,139,250,0.6)'; ctx.fill();
+    });
+
+    // ── LIVE TX (orange, hopping) ──
+    txs = txs.filter(tx => tx.seg < tx.path.length-1);
+    txs.forEach(tx => {
+      tx.t += tx.speed;
+      if (tx.t >= 1) { tx.t = 0; tx.seg++;
+        if (tx.seg >= tx.path.length-1) {
+          // confirmed → mine a block
+          addBlock(true);
+          const st = document.getElementById('demoStatus');
+          if (st) { st.textContent = '✅ Confirmed & written into block #' + (nextId-1) + ' — irreversible.'; st.classList.add('live'); }
+          return;
+        }
+      }
+      const a = tx.path[tx.seg], b = tx.path[tx.seg+1];
+      const [ax,ay] = nodeXY(a,W,H), [bx,by] = nodeXY(b,W,H);
+      const x = ax+(bx-ax)*tx.t, y = ay+(by-ay)*tx.t;
+      ctx.save();
+      ctx.shadowBlur = 14; ctx.shadowColor = '#f7931a';
+      ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2);
+      ctx.fillStyle = '#f7931a'; ctx.fill();
+      ctx.restore();
+    });
+
+    // ── NODES ──
+    nodeF.forEach((_,i) => {
+      const [x,y] = nodeXY(i,W,H);
+      const pulse = 0.5 + 0.5*Math.sin(frame*0.05 + i);
+      ctx.save();
+      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(124,58,237,0.6)';
+      ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2);
+      ctx.fillStyle = '#16161f'; ctx.fill();
+      ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(167,139,250,${0.4+0.5*pulse})`;
+      ctx.stroke(); ctx.restore();
+    });
+
+    // ── BLOCK CHAIN (lower strip) ──
+    if (mineTimer-- <= 0) { addBlock(false); mineTimer = 300 + Math.floor(Math.random()*120); }
+    const stripY = H * 0.78;
+    const bw = 46, gap = (W - bw*blocks.length) / (blocks.length+1);
+    blocks.forEach((blk, i) => {
+      const x = gap + i*(bw+gap), y = stripY - 18;
+      // connector chain
+      if (i > 0) {
+        ctx.strokeStyle = 'rgba(247,147,26,0.4)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x-gap+2, y+18); ctx.lineTo(x-2, y+18); ctx.stroke();
+      }
+      if (blk.flash > 0) blk.flash = Math.max(0, blk.flash - 0.02);
+      const glow = blk.flash;
+      ctx.save();
+      if (glow > 0) { ctx.shadowBlur = 18*glow; ctx.shadowColor = '#00d084'; }
+      ctx.fillStyle = glow > 0 ? `rgba(0,208,132,${0.12+0.2*glow})` : 'rgba(247,147,26,0.10)';
+      ctx.strokeStyle = glow > 0 ? `rgba(0,208,132,${0.5+0.5*glow})` : 'rgba(247,147,26,0.5)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, x, y, bw, 36, 7); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      // block number + hash
+      ctx.fillStyle = '#e8e8f0'; ctx.font = '700 9px monospace'; ctx.textAlign = 'center';
+      ctx.fillText('#'+(blk.id % 100000), x+bw/2, y+15);
+      ctx.fillStyle = '#6b6b80'; ctx.font = '8px monospace';
+      ctx.fillText(blk.hash, x+bw/2, y+27);
+    });
+    ctx.textAlign = 'left';
+
+    requestAnimationFrame(draw);
+  }
+  function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+  draw();
+  chainAnim = { send, resize };
+}
+function sendDemoTx() { if (chainAnim) chainAnim.send(); }
+
+function animateScarcity() {
+  const fill = document.getElementById('scarcityFill');
+  if (!fill) return;
+  // ~19.9M of 21M mined ≈ 94.7% — reset then animate so it replays each visit
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fill.style.transition = '';
+      fill.style.width = '94.7%';
+    });
+  });
+}
+
 // ── STRATEGY ENGINE ───────────────────────────────────────────
 function buildStrategy() {
   const day   = getCycleDay();
@@ -2926,8 +3453,12 @@ function loadSaved() {
     const saved = localStorage.getItem('btc_cycle_portfolio');
     if (saved && document.getElementById('btcInput')) {
       document.getElementById('btcInput').value = saved;
-      updatePortfolio();
     }
+    const savedCost = localStorage.getItem('btc_cost_basis');
+    if (savedCost && document.getElementById('costInput')) {
+      document.getElementById('costInput').value = savedCost;
+    }
+    updatePortfolio();
     ['atgl1','atgl2','atgl3','atgl4','atgl5','atgl6'].forEach((id, i) => {
       const state = localStorage.getItem('alert_' + id);
       const el = document.getElementById(id);
@@ -3355,6 +3886,7 @@ function showPage(name, el) {
   if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); }
   if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcVsUSD(); calcSP500(); calcLadder(); calcMyNumber(); calcTax(); calcLifestyle(); calcRetire(); calcMultiCycle(); buildStrategy(); }
   if (name === 'alerts') updateWeeklyBrief();
+  if (name === 'learn') { if (chainAnim) chainAnim.resize(); animateScarcity(); }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -3445,6 +3977,7 @@ updatePortfolioMilestones();
 loadSaved();
 restoreEmailUI();
 initHeroAnim();
+initChainAnim();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
