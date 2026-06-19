@@ -897,9 +897,67 @@
     border-radius: 10px; padding: 11px 13px; font-size: 12.5px; color: #d8c4a0; line-height: 1.45;
   }
 
+  /* ── CYCLE RING ─────────────────────────────────────────────── */
+  .cycle-ring-section {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 0 20px; position: relative;
+  }
+  #cycleRingCanvas { display: block; max-width: 260px; width: 100%; }
+  .cycle-ring-legend {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px 14px; margin-top: 14px; max-width: 340px;
+  }
+  .ring-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+  .ring-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── PHASE GLOW OVERLAY ─────────────────────────────────────── */
+  #phaseGlow {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    transition: background 3s ease;
+    background: radial-gradient(ellipse at 50% -10%, rgba(124,58,237,0.08) 0%, transparent 55%);
+  }
+  .container, .header, .bottom-nav, .email-overlay { position: relative; z-index: 1; }
+
+  /* ── EXIT PLAN (Portfolio) ──────────────────────────────────── */
+  .exit-plan-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; margin-top: 16px;
+  }
+  .exit-ladder { margin-top: 12px; }
+  .exit-rung {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .exit-rung:last-child { border-bottom: none; }
+  .exit-rung-num {
+    width: 26px; height: 26px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0;
+  }
+  .exit-rung-info { flex: 1; }
+  .exit-rung-price { font-size: 14px; font-weight: 800; }
+  .exit-rung-detail { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .exit-rung-take { font-size: 13px; font-weight: 800; text-align: right; }
+
+  /* ── TIME MACHINE ───────────────────────────────────────────── */
+  .tm-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+  .tm-preset {
+    padding: 7px 12px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+    color: var(--text); font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .tm-preset:hover { background: rgba(247,147,26,0.12); border-color: rgba(247,147,26,0.35); color: var(--orange); }
+  .tm-preset.active { background: rgba(247,147,26,0.15); border-color: rgba(247,147,26,0.5); color: var(--orange); }
+  .tm-vs { text-align: center; font-size: 11px; color: var(--muted); padding: 10px 0 6px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 6px; }
+  .tm-winner { text-align: center; margin-top: 12px; padding: 12px; background: rgba(0,208,132,0.06); border: 1px solid rgba(0,208,132,0.15); border-radius: 10px; font-size: 13px; color: #d8ffe9; line-height: 1.5; }
+
 </style>
 </head>
 <body>
+
+<!-- Phase-reactive background glow — shifts color with cycle phase -->
+<div id="phaseGlow"></div>
 
 <!-- HEADER -->
 <div class="header">
@@ -977,22 +1035,10 @@
       </div>
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-section">
-      <div class="progress-header">
-        <span id="progLabelStart">Cycle Bottom</span>
-        <span id="progLabelEnd">Next Event</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill" style="width:0%"></div>
-      </div>
-      <div class="progress-phases">
-        <span>Bottom</span>
-        <span>Bull Run</span>
-        <span>Top</span>
-        <span>Bear</span>
-        <span>Bottom</span>
-      </div>
+    <!-- Cycle Ring (replaces flat progress bar) -->
+    <div class="cycle-ring-section">
+      <canvas id="cycleRingCanvas" width="260" height="260"></canvas>
+      <div class="cycle-ring-legend" id="cycleRingLegend"></div>
     </div>
 
     <!-- Countdown -->
@@ -1307,6 +1353,12 @@
       <div class="pnl-next" id="pnlNext">—</div>
     </div>
 
+    <!-- EXIT PLAN -->
+    <div class="section-header">Your Exit Plan</div>
+    <div class="exit-plan-card" id="exitPlanCard">
+      <div style="font-size:13px;color:var(--muted)">Enter your BTC amount and cost basis above to generate a personalized sell ladder.</div>
+    </div>
+
     <!-- MILESTONES -->
     <div class="section-header">Bitcoin Milestones</div>
     <div class="dca-card" style="padding:14px">
@@ -1362,6 +1414,67 @@
       <div class="calc-tab" onclick="showCalcTab('lifestyle',this)">Lifestyle</div>
       <div class="calc-tab" onclick="showCalcTab('retire',this)">Retire</div>
       <div class="calc-tab" onclick="showCalcTab('multicycle',this)">2 Cycles</div>
+      <div class="calc-tab" onclick="showCalcTab('timemachine',this)" style="background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.3);color:#a78bfa">⏰ Time Machine</div>
+    </div>
+
+    <!-- TIME MACHINE CALCULATOR -->
+    <div class="calc-panel" id="calc-timemachine">
+      <div class="proj-card" style="margin-top:8px">
+        <div class="proj-title">⏰ Time Machine</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5">See what any investment would be worth today — and how it stacks up against just parking it in the S&amp;P 500.</div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Amount Invested</div>
+            <div class="field-input-wrap">
+              <span class="field-prefix">$</span>
+              <input class="field-input" type="number" id="tmAmount" value="1000" oninput="calcTimeMachine()">
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Date You Bought</div>
+            <input class="field-input no-prefix" type="date" id="tmDate" min="2015-01-14" max="2025-06-01" value="2020-03-13" style="padding-left:12px" oninput="calcTimeMachine()">
+          </div>
+        </div>
+
+        <div class="tm-presets">
+          <button class="tm-preset" onclick="setTMDate('2020-03-13')">📉 COVID Crash</button>
+          <button class="tm-preset" onclick="setTMDate('2022-11-22')">🎯 FTX Bottom</button>
+          <button class="tm-preset" onclick="setTMDate('2024-04-19')">⛏️ Last Halving</button>
+          <button class="tm-preset" onclick="setTMDate('2020-05-11')">🔥 2020 Halving</button>
+          <button class="tm-preset" onclick="setTMDate('2018-12-15')">🩸 2018 Bottom</button>
+          <button class="tm-preset" onclick="setTMDate('2015-01-14')">🌑 2015 Bottom</button>
+        </div>
+
+        <div class="result-card" id="tmResultCard">
+          <div class="result-hero">
+            <div class="result-hero-label" id="tmHeroLabel">Your $1,000 is now</div>
+            <div class="result-hero-value" id="tmHeroVal" style="color:var(--orange)">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">BTC Price Then</div>
+            <div class="result-value" id="tmBuyPrice">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">BTC You Got</div>
+            <div class="result-value" style="color:var(--orange)" id="tmBtcBought">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">Bitcoin Return</div>
+            <div class="result-value" id="tmBtcReturn">—</div>
+          </div>
+          <div class="tm-vs">vs. S&amp;P 500 (same $)</div>
+          <div class="result-row">
+            <div class="result-label">S&amp;P 500 Worth Today</div>
+            <div class="result-value" style="color:var(--muted)" id="tmSpVal">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">S&amp;P Return</div>
+            <div class="result-value" style="color:var(--muted)" id="tmSpReturn">—</div>
+          </div>
+          <div class="tm-winner" id="tmWinner"></div>
+        </div>
+      </div>
     </div>
 
     <!-- DCA CALCULATOR -->
@@ -2527,15 +2640,13 @@ function updateCycleUI() {
   document.getElementById('phaseName').textContent = phase.name;
   document.getElementById('phaseDesc').textContent = phase.desc;
   document.getElementById('phaseTag').textContent = (inAscent ? 'ASCENT (1070d)' : 'DESCENT (364d)') + ' · CURRENT PHASE';
-  document.getElementById('cycleDay').textContent = day;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('arcPct').textContent = pct + '%';
-  document.getElementById('arcDaysLeft').textContent = evDaysLeft + ' days to ' + (inAscent ? 'ATH' : 'bottom');
-  document.getElementById('halvingDays').textContent = day;
+  const setEl2 = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+  setEl2('cycleDay', day);
+  setEl2('arcPct', pct + '%');
+  setEl2('arcDaysLeft', evDaysLeft + ' days to ' + (inAscent ? 'ATH' : 'bottom'));
+  setEl2('halvingDays', day);
 
-  // Cycle markers
-  document.getElementById('progLabelStart').textContent = 'Cycle Bottom · ' + fmtDate(currentCycleStart());
-  document.getElementById('progLabelEnd').textContent = ev.name + ' · ' + fmtDate(ev.date);
+  applyPhaseTheme(PHASES.indexOf(phase));
 
   // Score — driven by the SAME brain as the Signal (one source of truth).
   document.getElementById('scoreNum').textContent = score;
@@ -2586,6 +2697,9 @@ async function fetchPrice() {
     calcBuy();
     updateSignal();
     updateQuickCalc();
+    checkAlerts();
+    buildExitPlan();
+    calcTimeMachine();
   } catch(e) {
     if (!livePrice) document.getElementById('btcPrice').textContent = '$—';
   }
@@ -2619,6 +2733,7 @@ function updatePortfolio() {
   document.getElementById('portBase').textContent = '$' + (btc * ATH_TARGETS.base).toLocaleString();
   document.getElementById('portBull').textContent = '$' + (btc * ATH_TARGETS.bull).toLocaleString();
   updatePnl();
+  buildExitPlan();
 }
 
 // Live profit/loss vs. your real cost basis — what a portfolio is actually for
@@ -3445,7 +3560,13 @@ function toggleAlert(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.toggle('off');
-  try { localStorage.setItem('alert_' + id, el.classList.contains('off') ? '0' : '1'); } catch(e) {}
+  const isOn = !el.classList.contains('off');
+  try { localStorage.setItem('alert_' + id, isOn ? '1' : '0'); } catch(e) {}
+  if (isOn && 'Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      if (p !== 'granted') { el.classList.add('off'); localStorage.setItem('alert_' + id, '0'); }
+    });
+  }
 }
 
 function loadSaved() {
@@ -3952,6 +4073,277 @@ function restoreEmailUI() {
   if (wrap && success) { wrap.style.display = 'none'; success.classList.add('show'); }
 }
 
+// ── PHASE THEME ──────────────────────────────────────────────
+const PHASE_COLORS = ['#7c3aed','#6366f1','#06b6d4','#f59e0b','#f7931a','#ef4444','#ec4899','#8b5cf6','#7c3aed'];
+const PHASE_GLOWS  = [
+  'radial-gradient(ellipse at 50% -10%,rgba(124,58,237,0.13) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(99,102,241,0.10) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(6,182,212,0.09) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(245,158,11,0.12) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(247,147,26,0.16) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(239,68,68,0.11) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(236,72,153,0.09) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(139,92,246,0.09) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% -10%,rgba(124,58,237,0.11) 0%,transparent 55%)',
+];
+function applyPhaseTheme(idx) {
+  const el = document.getElementById('phaseGlow');
+  if (el) el.style.background = PHASE_GLOWS[Math.max(0, Math.min(8, idx))];
+}
+
+// ── CYCLE RING ────────────────────────────────────────────────
+let _ringFrame = 0, _ringRAF = null;
+function initCycleRing() {
+  const c = document.getElementById('cycleRingCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const size = Math.min(c.parentElement.offsetWidth || 260, 260);
+    c.style.width = size + 'px'; c.style.height = size + 'px';
+    c.width = size * dpr; c.height = size * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Build legend once
+  const lg = document.getElementById('cycleRingLegend');
+  if (lg && !lg.children.length) {
+    PHASES.forEach((ph, i) => {
+      const item = document.createElement('div');
+      item.className = 'ring-legend-item';
+      item.innerHTML = `<div class="ring-legend-dot" style="background:${PHASE_COLORS[i]}"></div>${ph.name}`;
+      lg.appendChild(item);
+    });
+  }
+
+  function draw() {
+    _ringRAF = requestAnimationFrame(draw);
+    _ringFrame++;
+    const W = c.offsetWidth, H = c.offsetHeight;
+    const cx = W / 2, cy = H / 2;
+    const outerR = Math.min(cx, cy) * 0.86;
+    const sw = outerR * 0.22;
+    const trackR = outerR - sw / 2;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const day    = getCycleDay();
+    const score  = getCycleScore(day);
+    const phase  = getPhase(day);
+    const phIdx  = PHASES.indexOf(phase);
+
+    // Track
+    ctx.beginPath();
+    ctx.arc(cx, cy, trackR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = sw; ctx.stroke();
+
+    // Phase arcs
+    PHASES.forEach((ph, i) => {
+      const sa = -Math.PI / 2 + (ph.start / CYCLE_LEN) * Math.PI * 2;
+      const ea = -Math.PI / 2 + (ph.end   / CYCLE_LEN) * Math.PI * 2;
+      const isCurrent = i === phIdx;
+      const isPast    = ph.end <= day;
+      ctx.globalAlpha = isCurrent ? 1 : isPast ? 0.4 : 0.11;
+      ctx.beginPath(); ctx.arc(cx, cy, trackR, sa, ea);
+      ctx.strokeStyle = PHASE_COLORS[i];
+      ctx.lineWidth = isCurrent ? sw * 1.12 : sw;
+      if (isCurrent) {
+        ctx.save(); ctx.shadowBlur = 18; ctx.shadowColor = PHASE_COLORS[phIdx];
+        ctx.stroke(); ctx.restore();
+      } else { ctx.stroke(); }
+    });
+    ctx.globalAlpha = 1;
+
+    // Tick marks at phase boundaries
+    PHASES.forEach(ph => {
+      const a = -Math.PI / 2 + (ph.start / CYCLE_LEN) * Math.PI * 2;
+      const tx = cx + (trackR) * Math.cos(a), ty = cy + (trackR) * Math.sin(a);
+      ctx.beginPath(); ctx.arc(tx, ty, 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fill();
+    });
+
+    // Today dot (pulsing)
+    const todayA = -Math.PI / 2 + (day / CYCLE_LEN) * Math.PI * 2;
+    const dx = cx + trackR * Math.cos(todayA), dy = cy + trackR * Math.sin(todayA);
+    const pulse = 1 + 0.28 * Math.sin(_ringFrame * 0.07);
+    ctx.save();
+    ctx.shadowBlur = 22; ctx.shadowColor = '#fff';
+    ctx.beginPath(); ctx.arc(dx, dy, sw * 0.38 * pulse, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.restore();
+
+    // Center text
+    ctx.textAlign = 'center';
+    // Score
+    const scoreSize = Math.round(outerR * 0.5);
+    ctx.font = `900 ${scoreSize}px -apple-system,sans-serif`;
+    ctx.fillStyle = '#e8e8f0';
+    ctx.fillText(score, cx, cy + scoreSize * 0.34);
+    // Label above
+    ctx.font = `600 ${Math.round(outerR * 0.11)}px -apple-system,sans-serif`;
+    ctx.fillStyle = '#6b6b80';
+    ctx.fillText('CYCLE SCORE', cx, cy - outerR * 0.27);
+    // Phase name below
+    ctx.font = `700 ${Math.round(outerR * 0.115)}px -apple-system,sans-serif`;
+    ctx.fillStyle = PHASE_COLORS[phIdx];
+    ctx.fillText(phase.name.toUpperCase(), cx, cy + outerR * 0.46);
+    ctx.textAlign = 'left';
+  }
+  draw();
+}
+
+// ── BROWSER NOTIFICATIONS ─────────────────────────────────────
+const _alertsFired = {};
+function checkAlerts() {
+  if (!('Notification' in window) || Notification.permission !== 'granted' || !livePrice) return;
+  const day   = getCycleDay();
+  const score = getCycleScore(day);
+  const checks = [
+    { id:'atgl1', test: () => day >= 1351,           title:'🎯 Bottom Zone',     body:`Day ${day} — Stealth Bottom phase OPEN. Best buy window in the cycle.` },
+    { id:'atgl2', test: () => score < 20,            title:'🟢 Extreme Buy Signal', body:`Cycle score ${score}/100. Historically the best-returning entry point.` },
+    { id:'atgl3', test: () => score < 32,            title:'💰 DCA Window Open', body:`Score ${score}/100 — Despair accumulation phase. Quiet market, best prices.` },
+    { id:'atgl6', test: () => livePrice < 50000,     title:'📉 BTC Below $50K', body:`Bitcoin at ${fmtUSD(Math.round(livePrice))} — bottom zone target reached.` },
+  ];
+  checks.forEach(({ id, test, title, body }) => {
+    const el = document.getElementById(id);
+    if (el && !el.classList.contains('off') && test() && !_alertsFired[id]) {
+      _alertsFired[id] = true;
+      try { new Notification(title, { body, icon: 'icons/icon-192.png' }); } catch(e) {}
+    }
+  });
+}
+
+// ── TIME MACHINE ──────────────────────────────────────────────
+const HIST_PRICES = [
+  ['2015-01-14',  178], ['2016-07-09',  657], ['2017-01-01',  997],
+  ['2017-12-17',19783], ['2018-12-15', 3122], ['2019-06-26',13800],
+  ['2020-03-13', 4944], ['2020-05-11', 8700], ['2020-11-01',13780],
+  ['2021-04-14',64200], ['2021-11-10',68789], ['2022-01-01',46200],
+  ['2022-06-18',17760], ['2022-11-01',20100], ['2022-11-22',15476],
+  ['2023-01-01',16544], ['2023-07-01',30440], ['2024-01-10',46092],
+  ['2024-04-19',63843], ['2024-10-01',60000], ['2024-11-05',75000],
+  ['2025-01-20',109000],['2025-06-01', 95000],
+].map(([d,p]) => [new Date(d).getTime(), p]).sort((a,b)=>a[0]-b[0]);
+
+function getHistPrice(dateStr) {
+  const ts = new Date(dateStr).getTime();
+  if (!ts || isNaN(ts)) return null;
+  if (ts <= HIST_PRICES[0][0]) return HIST_PRICES[0][1];
+  const last = HIST_PRICES[HIST_PRICES.length-1];
+  if (ts >= last[0]) return last[1];
+  for (let i = 0; i < HIST_PRICES.length-1; i++) {
+    if (ts >= HIST_PRICES[i][0] && ts <= HIST_PRICES[i+1][0]) {
+      const t = (ts - HIST_PRICES[i][0]) / (HIST_PRICES[i+1][0] - HIST_PRICES[i][0]);
+      return HIST_PRICES[i][1] + t * (HIST_PRICES[i+1][1] - HIST_PRICES[i][1]);
+    }
+  }
+  return null;
+}
+function setTMDate(d) {
+  const inp = document.getElementById('tmDate');
+  if (inp) { inp.value = d; calcTimeMachine(); }
+  document.querySelectorAll('.tm-preset').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tm-preset').forEach(b => { if (b.textContent.includes(d)) b.classList.add('active'); });
+}
+function calcTimeMachine() {
+  const amount  = parseFloat(document.getElementById('tmAmount')?.value) || 1000;
+  const dateStr = document.getElementById('tmDate')?.value;
+  if (!dateStr || !livePrice) return;
+  const buyPrice = getHistPrice(dateStr);
+  if (!buyPrice || buyPrice <= 0) return;
+  const btcBought  = amount / buyPrice;
+  const currentVal = btcBought * livePrice;
+  const btcMult    = currentVal / amount;
+  const years      = (Date.now() - new Date(dateStr).getTime()) / (365.25 * DAY_MS);
+  const spVal      = amount * Math.pow(1.105, Math.max(0, years));
+  const spMult     = spVal / amount;
+
+  const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  s('tmHeroLabel', `Your ${fmtUSD(amount)} invested on ${new Date(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} is now`);
+  const heroEl = document.getElementById('tmHeroVal');
+  if (heroEl) {
+    heroEl.textContent = fmtUSD(Math.round(currentVal));
+    heroEl.style.color = btcMult >= 1 ? 'var(--green)' : 'var(--red)';
+  }
+  s('tmBuyPrice',  fmtUSD(Math.round(buyPrice)));
+  s('tmBtcBought', btcBought.toFixed(6) + ' BTC');
+  s('tmBtcReturn', (btcMult >= 1 ? '+' : '') + ((btcMult - 1)*100).toFixed(0) + '% · ' + btcMult.toFixed(1) + 'x');
+  const retEl = document.getElementById('tmBtcReturn');
+  if (retEl) retEl.style.color = btcMult >= 1 ? 'var(--green)' : 'var(--red)';
+  s('tmSpVal',    fmtUSD(Math.round(spVal)));
+  s('tmSpReturn', '+' + ((spMult-1)*100).toFixed(0) + '% · ' + spMult.toFixed(2) + 'x');
+
+  const winEl = document.getElementById('tmWinner');
+  if (winEl) {
+    const edge = (currentVal / spVal).toFixed(1);
+    if (btcMult > spMult) {
+      winEl.innerHTML = `₿ Bitcoin beat the S&P 500 by <b style="color:var(--green)">${edge}x</b> over this period.<br>The cycle works. Stay the course.`;
+    } else {
+      winEl.innerHTML = `S&P edged Bitcoin over this short window. Zoom out to a full cycle — the gap reverses decisively.`;
+    }
+  }
+}
+
+// ── EXIT PLAN GENERATOR ───────────────────────────────────────
+function buildExitPlan() {
+  const el = document.getElementById('exitPlanCard');
+  if (!el) return;
+  const btc  = parseFloat(document.getElementById('btcInput')?.value) || 0;
+  const cost = parseFloat(document.getElementById('costInput')?.value) || 0;
+  if (!btc || !livePrice) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted)">Enter your BTC and avg buy price above to unlock your personalized exit plan.</div>';
+    return;
+  }
+  const day   = getCycleDay();
+  const score = getCycleScore(day);
+
+  // Sell ladder targets: progressive from conservative → aggressive
+  const RUNGS = [
+    { pct: 10, price: 180000, label: 'Early momentum',    color: '#06b6d4' },
+    { pct: 15, price: 250000, label: 'Bear ATH target',   color: '#f59e0b' },
+    { pct: 25, price: 350000, label: 'Parabolic advance', color: '#f7931a' },
+    { pct: 25, price: 400000, label: '⭐ Base ATH target', color: '#00d084' },
+    { pct: 15, price: 550000, label: 'Bull extension',    color: '#a78bfa' },
+    { pct: 10, price: 700000, label: 'Bull ATH (hold for)', color: '#ec4899' },
+  ];
+
+  let remaining = btc;
+  let totalProceeds = 0;
+  const rows = RUNGS.map(r => {
+    const sell = btc * (r.pct / 100);
+    const proceeds = sell * r.price;
+    totalProceeds += proceeds;
+    remaining -= sell;
+    return { ...r, sell, proceeds, remainAfter: remaining };
+  });
+
+  const invested = btc * cost;
+  const totalX   = totalProceeds / invested;
+
+  el.innerHTML = `
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5">
+      ${score > 65 ? '🔴 You\'re in exit territory. Start the ladder now.' : score > 45 ? '🟡 Getting close. Start thinking about your exit.' : '🟢 Still accumulating phase. Lock in your exit plan now so you don\'t freeze at the top.'}
+    </div>
+    <div class="exit-ladder">
+      ${rows.map((r, i) => `
+      <div class="exit-rung">
+        <div class="exit-rung-num" style="background:${r.color}20;color:${r.color}">${r.pct}%</div>
+        <div class="exit-rung-info">
+          <div class="exit-rung-price" style="color:${r.color}">${fmtUSD(r.price)}</div>
+          <div class="exit-rung-detail">${r.sell.toFixed(4)} BTC · ${r.label}</div>
+        </div>
+        <div class="exit-rung-take" style="color:${r.color}">${fmtUSD(Math.round(r.proceeds))}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:12px;padding:12px;background:rgba(0,208,132,0.07);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;color:#d8ffe9;line-height:1.6">
+      Total proceeds if all 6 rungs hit: <b style="color:var(--green)">${fmtUSD(Math.round(totalProceeds))}</b> · That's a <b style="color:var(--green)">${totalX.toFixed(1)}x</b> on your ${fmtUSD(Math.round(invested))} invested. The plan isn't to sell everything — it's to <i>never panic at the top.</i>
+    </div>`;
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 updateCycleUI();
 buildSmallChart();
@@ -3978,6 +4370,9 @@ loadSaved();
 restoreEmailUI();
 initHeroAnim();
 initChainAnim();
+initCycleRing();
+calcTimeMachine();
+buildExitPlan();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
