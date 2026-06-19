@@ -657,6 +657,7 @@
         <div class="signal-chip">Score: <span id="signalScore" style="color:var(--green)">—</span></div>
         <div class="signal-chip"><span id="signalDays">—</span> days to event</div>
         <div class="signal-chip" id="signalPhase">—</div>
+        <div class="signal-chip" id="signalValuation" style="display:none">—</div>
       </div>
       <div class="quick-box">
         <div class="quick-box-label">If I invest this much today →</div>
@@ -846,38 +847,31 @@
       </div>
     </div>
 
-    <!-- Signals -->
+    <!-- Live Signals -->
     <div class="signals-card">
-      <div class="proj-title">On-Chain Signals</div>
+      <div class="proj-title">Live Market Signals</div>
       <div class="signal-row">
-        <div class="signal-name">Fear & Greed</div>
-        <div class="signal-val">72 / 100</div>
-        <div class="signal-badge badge-hold">GREED</div>
+        <div class="signal-name">Fear &amp; Greed Index <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-val" id="fgValue">—</div>
+        <div class="signal-badge badge-hold" id="fgBadge">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">MVRV Z-Score</div>
-        <div class="signal-val">2.1</div>
-        <div class="signal-badge badge-hold">HOLD</div>
+        <div class="signal-name">Live Price vs Model <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-val" id="sigValRatio">—</div>
+        <div class="signal-badge badge-hold" id="sigValBadge">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">SOPR</div>
-        <div class="signal-val">1.04</div>
-        <div class="signal-badge badge-hold">HOLD</div>
+        <div class="signal-name">Cycle Day <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-val" id="sigCycleDay">—</div>
+        <div class="signal-badge badge-hold" id="sigCyclePhase">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">Puell Multiple</div>
-        <div class="signal-val">1.8</div>
-        <div class="signal-badge badge-watch">WATCH</div>
+        <div class="signal-name">Days to Next Event <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-val" id="sigDaysEvent">—</div>
+        <div class="signal-badge badge-watch" id="sigEventName">…</div>
       </div>
-      <div class="signal-row">
-        <div class="signal-name">Exchange Outflows</div>
-        <div class="signal-val">+4,200 BTC</div>
-        <div class="signal-badge badge-buy">BULLISH</div>
-      </div>
-      <div class="signal-row">
-        <div class="signal-name">Pi Cycle Top</div>
-        <div class="signal-val">Not Triggered</div>
-        <div class="signal-badge badge-buy">SAFE</div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;padding-top:10px;line-height:1.5">
+        Every metric above updates from live data. Fear &amp; Greed from alternative.me · price from CoinGecko · valuation from the 1070/364 cycle model.
       </div>
     </div>
 
@@ -1813,6 +1807,7 @@ const ATH_TARGETS = { bear: 250000, base: 400000, bull: 700000 };
 
 // ── STATE ────────────────────────────────────────────────────
 let livePrice = null;
+let liveFearGreed = null;   // {value, label} from alternative.me
 let projChart = null;
 let bigChart = null;
 
@@ -1839,13 +1834,47 @@ function getPhase(day) {
   return PHASES[PHASES.length - 1];
 }
 
-// 0 at bottom, ~95 at top. Rises through the ascent, falls through the descent.
-function getCycleScore(day) {
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// The TIME skeleton: where we are on the 1434-day clock (0 bottom → ~95 top).
+function getTimeScore(day) {
   if (day <= ASCENT_DAYS) {
     return Math.round(8 + (day / ASCENT_DAYS) * 87);
   }
   const descPct = (day - ASCENT_DAYS) / DESCENT_DAYS;
   return Math.max(6, Math.round(95 - descPct * 89));
+}
+
+// Valuation ratio: live price ÷ the model's base-case "fair value" for today.
+//   <1 = Bitcoin is cheaper than the cycle model says (more BUY)
+//   >1 = richer than the model says (more SELL)
+function getValuationRatio() {
+  if (!livePrice) return null;
+  const fair = rawProjectedOn(Date.now(), 'base');
+  return fair > 0 ? livePrice / fair : null;
+}
+
+// THE BRAIN: blends time-in-cycle with real-time valuation so the score
+// actually reacts to the market instead of being a calendar countdown.
+function getCycleScore(day) {
+  const timeScore = getTimeScore(day);
+  const ratio = getValuationRatio();
+  if (ratio === null) return timeScore;            // no live price yet → time only
+  // ratio 0.6 → −24, 1.0 → 0, 1.6 → +24 (capped so time still dominates)
+  const valAdj = clamp((ratio - 1) * 40, -24, 24);
+  return clamp(Math.round(timeScore + valAdj), 1, 99);
+}
+
+// Plain-English valuation read used on the home screen.
+function getValuationRead() {
+  const ratio = getValuationRatio();
+  if (ratio === null) return { label: 'Loading…', color: 'var(--muted)', pct: 0 };
+  const pct = Math.round((ratio - 1) * 100);
+  if (ratio < 0.8)  return { label: 'Deeply undervalued vs model', color: 'var(--green)', pct };
+  if (ratio < 0.95) return { label: 'Below model — a discount',    color: 'var(--green)', pct };
+  if (ratio <= 1.05) return { label: 'Right on the model trend',    color: 'var(--yellow)', pct };
+  if (ratio <= 1.25) return { label: 'Above model — running hot',   color: '#ff6b35', pct };
+  return { label: 'Richly valued vs model', color: 'var(--red)', pct };
 }
 
 // Next major cycle event from where we are
@@ -1864,20 +1893,51 @@ function fmtMonthYr(d) { return MONTHS[d.getUTCMonth()] + ' ’' + String(d.getU
 // ── PRICE PROJECTION MODEL (calendar-anchored) ───────────────
 function smoothstep(t) { return t * t * (3 - 2 * t); }
 
-function projectedPriceOn(dateObj, scenario) {
-  const t = dateObj.getTime();
-  const A = PRICE_ANCHORS;
+// Interpolate a scenario price across an arbitrary anchor array.
+function interpAnchors(A, t, scenario) {
   if (t <= A[0].date.getTime()) return A[0][scenario];
   if (t >= A[A.length - 1].date.getTime()) return A[A.length - 1][scenario];
   for (let i = 0; i < A.length - 1; i++) {
     const a = A[i], b = A[i + 1];
     if (t >= a.date.getTime() && t <= b.date.getTime()) {
       const frac = (t - a.date.getTime()) / (b.date.getTime() - a.date.getTime());
-      const s = smoothstep(frac);
-      return Math.round(a[scenario] + (b[scenario] - a[scenario]) * s);
+      return Math.round(a[scenario] + (b[scenario] - a[scenario]) * smoothstep(frac));
     }
   }
   return A[A.length - 1][scenario];
+}
+
+// RAW model — the pure calendar anchors, no live price. Used for valuation math.
+function rawProjectedOn(ms, scenario) {
+  return interpAnchors(PRICE_ANCHORS, ms, scenario);
+}
+
+// Anchors with a LIVE "today" point spliced in so every curve passes through
+// the real current price and converges back to the model's future targets.
+function activeAnchors() {
+  if (!livePrice) return PRICE_ANCHORS;
+  const nowMs = Date.now();
+  const sBase = rawProjectedOn(nowMs, 'base');
+  const r = sBase > 0 ? livePrice / sBase : 1;
+  // Preserve the model's bear/bull spread proportionally around the live price.
+  const today = {
+    date: new Date(nowMs),
+    bear: Math.round(rawProjectedOn(nowMs, 'bear') * r),
+    base: Math.round(livePrice),
+    bull: Math.round(rawProjectedOn(nowMs, 'bull') * r),
+  };
+  const out = [];
+  let inserted = false;
+  for (const a of PRICE_ANCHORS) {
+    if (!inserted && a.date.getTime() > nowMs) { out.push(today); inserted = true; }
+    out.push(a);
+  }
+  if (!inserted) out.push(today);
+  return out;
+}
+
+function projectedPriceOn(dateObj, scenario) {
+  return interpAnchors(activeAnchors(), dateObj.getTime(), scenario);
 }
 
 // ── PROJECTION TIMELINE (built from the model) ───────────────
@@ -1885,16 +1945,31 @@ const PROJ_MONTHS = [
   '2025-07','2025-10','2026-01','2026-04','2026-07','2026-10',
   '2027-01','2027-04','2027-07','2027-10','2028-04','2028-10','2029-09'
 ];
-const PROJ_DATA = PROJ_MONTHS.map(ym => {
-  const d = new Date(ym + '-15T00:00:00Z');
-  return {
-    dateObj: d,
-    month: fmtMonthYr(d),
-    bear: projectedPriceOn(d, 'bear'),
-    base: projectedPriceOn(d, 'base'),
-    bull: projectedPriceOn(d, 'bull'),
-  };
-});
+function buildProjData() {
+  return PROJ_MONTHS.map(ym => {
+    const d = new Date(ym + '-15T00:00:00Z');
+    return {
+      dateObj: d,
+      month: fmtMonthYr(d),
+      bear: projectedPriceOn(d, 'bear'),
+      base: projectedPriceOn(d, 'base'),
+      bull: projectedPriceOn(d, 'bull'),
+    };
+  });
+}
+let PROJ_DATA = buildProjData();
+
+// Recompute the projection against the live price and push into both charts.
+function refreshProjection() {
+  PROJ_DATA = buildProjData();
+  [projChart, bigChart].forEach(ch => {
+    if (!ch) return;
+    ch.data.datasets[0].data = PROJ_DATA.map(d => d.bull);
+    ch.data.datasets[1].data = PROJ_DATA.map(d => d.base);
+    ch.data.datasets[2].data = PROJ_DATA.map(d => d.bear);
+    ch.update('none');
+  });
+}
 
 // Where "today" falls between two PROJ_DATA points, expressed as a fractional
 // category index — used to draw the "TODAY" marker line on the charts.
@@ -1979,20 +2054,33 @@ function updateCycleUI() {
   document.getElementById('progLabelStart').textContent = 'Cycle Bottom · ' + fmtDate(currentCycleStart());
   document.getElementById('progLabelEnd').textContent = ev.name + ' · ' + fmtDate(ev.date);
 
-  // Score
+  // Score — driven by the SAME brain as the Signal (one source of truth).
   document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = getSignalConfig(score).color;
   document.getElementById('scoreBar').style.width = score + '%';
 
-  let actionText, actionBg, actionColor;
-  if (score < 40) { actionText = '🟢 Undervalued — BUY / ACCUMULATE ZONE'; actionBg = 'rgba(0,208,132,0.1)'; actionColor = 'var(--green)'; }
-  else if (score < 61) { actionText = '🟡 Fair Value — HOLD'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
-  else if (score < 81) { actionText = '⚠ Overvalued — Consider taking partial profits'; actionBg = 'rgba(255,215,0,0.1)'; actionColor = 'var(--yellow)'; }
-  else { actionText = '🔴 EXTREME — SELL. Cycle top imminent.'; actionBg = 'rgba(255,69,96,0.1)'; actionColor = 'var(--red)'; }
-
+  const cfg = getSignalConfig(score);
   const scoreEl = document.getElementById('scoreAction');
-  scoreEl.textContent = actionText;
-  scoreEl.style.background = actionBg;
-  scoreEl.style.color = actionColor;
+  scoreEl.textContent = cfg.verdict + ' — ' + cfg.reason.split('.')[0] + '.';
+  scoreEl.style.background = cfg.bg;
+  scoreEl.style.color = cfg.color;
+
+  // Live signal rows (home)
+  const setSig = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+  const vr = getValuationRead();
+  setSig('sigValRatio', vr.pct === 0 && getValuationRatio() === null ? '—' : (vr.pct >= 0 ? '+' : '') + vr.pct + '% vs model');
+  const vBadge = document.getElementById('sigValBadge');
+  if (vBadge) {
+    vBadge.textContent = vr.label.split(' ')[0].toUpperCase();
+    const ratio = getValuationRatio();
+    vBadge.className = 'signal-badge ' + (ratio === null ? 'badge-hold' : ratio < 0.95 ? 'badge-buy' : ratio <= 1.05 ? 'badge-hold' : 'badge-sell');
+  }
+  setSig('sigCycleDay', 'Day ' + day + ' / ' + CYCLE_LEN);
+  const cpEl = document.getElementById('sigCyclePhase');
+  if (cpEl) { cpEl.textContent = inAscent ? 'ASCENT' : 'DESCENT'; cpEl.className = 'signal-badge ' + (inAscent ? 'badge-buy' : 'badge-watch'); }
+  setSig('sigDaysEvent', evDaysLeft + ' days');
+  const enEl = document.getElementById('sigEventName');
+  if (enEl) enEl.textContent = (inAscent ? 'TO TOP' : 'TO BOTTOM');
 
   // Portfolio DCA
   document.getElementById('dcaPhase').textContent = phase.name;
@@ -2015,13 +2103,34 @@ async function fetchPrice() {
     changeEl.textContent = (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change).toFixed(2) + '% 24h';
     changeEl.className = 'btc-change ' + (change >= 0 ? 'positive' : 'negative');
 
+    // Live price changes the valuation → refresh everything that depends on it.
+    refreshProjection();
+    updateCycleUI();
     updatePortfolio();
     calcBuy();
     updateSignal();
     updateQuickCalc();
   } catch(e) {
-    document.getElementById('btcPrice').textContent = '$—';
+    if (!livePrice) document.getElementById('btcPrice').textContent = '$—';
   }
+}
+
+// ── LIVE FEAR & GREED (alternative.me, free + CORS-enabled) ───
+async function fetchFearGreed() {
+  try {
+    const r = await fetch('https://api.alternative.me/fng/?limit=1');
+    const d = await r.json();
+    const v = parseInt(d.data[0].value, 10);
+    liveFearGreed = { value: v, label: d.data[0].value_classification };
+    const valEl = document.getElementById('fgValue');
+    const badgeEl = document.getElementById('fgBadge');
+    if (valEl) valEl.textContent = v + ' / 100';
+    if (badgeEl) {
+      badgeEl.textContent = liveFearGreed.label.toUpperCase();
+      const cls = v >= 75 ? 'badge-sell' : v >= 55 ? 'badge-hold' : v >= 45 ? 'badge-watch' : 'badge-buy';
+      badgeEl.className = 'signal-badge ' + cls;
+    }
+  } catch(e) { /* keep last known */ }
 }
 
 // ── PORTFOLIO ────────────────────────────────────────────────
@@ -2672,6 +2781,17 @@ function updateSignal() {
   if (dEl) dEl.textContent = daysToEvent;
   const pEl = document.getElementById('signalPhase');
   if (pEl) pEl.textContent = phase.name;
+  // Live valuation chip — proves the score reacts to real price, not just the clock.
+  const vEl2 = document.getElementById('signalValuation');
+  const vr = getValuationRead();
+  if (vEl2) {
+    if (getValuationRatio() === null) { vEl2.style.display = 'none'; }
+    else {
+      vEl2.style.display = '';
+      vEl2.textContent = (vr.pct >= 0 ? '+' : '') + vr.pct + '% vs model';
+      vEl2.style.color = vr.color;
+    }
+  }
   updateQuickCalc();
 }
 
@@ -3056,6 +3176,7 @@ updateCycleUI();
 buildSmallChart();
 buildBigChart();
 fetchPrice();
+fetchFearGreed();
 updateCountdown();
 calcDCA();
 calcBuy();
@@ -3077,6 +3198,7 @@ initHeroAnim();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
+setInterval(fetchFearGreed, 600000); // Fear & Greed updates ~hourly; poll every 10 min
 </script>
 </body>
 </html>
