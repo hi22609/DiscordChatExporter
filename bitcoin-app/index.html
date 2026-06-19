@@ -614,6 +614,150 @@
   .roadmap-desc { font-size:11px; color:var(--muted); margin-top:2px; }
   .roadmap-badge { font-size:9px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px; border-radius:99px; flex-shrink:0; margin-top:2px; }
 
+  /* ── EMAIL CAPTURE ─────────────────────────────────────────── */
+  .email-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .email-overlay.open { opacity: 1; pointer-events: all; }
+  .email-modal {
+    background: #13131e;
+    border: 1px solid rgba(247,147,26,0.3);
+    border-radius: 24px;
+    padding: 32px 28px;
+    max-width: 380px; width: 100%;
+    position: relative;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 0 80px rgba(247,147,26,0.15), 0 24px 48px rgba(0,0,0,0.6);
+  }
+  .email-overlay.open .email-modal { transform: translateY(0) scale(1); }
+  .email-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .email-modal-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .email-modal-glow {
+    width: 72px; height: 72px;
+    background: radial-gradient(circle, rgba(247,147,26,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 18px;
+  }
+  .email-modal-badge {
+    display: inline-block;
+    background: rgba(247,147,26,0.12);
+    border: 1px solid rgba(247,147,26,0.35);
+    color: var(--orange);
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 99px; margin-bottom: 12px;
+  }
+  .email-modal-title { font-size: 22px; font-weight: 900; letter-spacing: -0.4px; margin-bottom: 8px; line-height: 1.2; }
+  .email-modal-sub { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+  .email-benefits { margin-bottom: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .email-benefit { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); }
+  .email-benefit-icon {
+    width: 28px; height: 28px;
+    background: rgba(247,147,26,0.1); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .email-input-wrap { margin-bottom: 10px; }
+  .email-input-wrap input {
+    width: 100%; padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; color: var(--text); font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .email-input-wrap input:focus { border-color: rgba(247,147,26,0.5); background: rgba(247,147,26,0.03); }
+  .email-input-wrap input::placeholder { color: var(--muted); }
+  .email-cta {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, #f7931a, #e8820f);
+    border: none; border-radius: 12px;
+    color: #fff; font-size: 15px; font-weight: 800;
+    cursor: pointer; letter-spacing: 0.3px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(247,147,26,0.35);
+  }
+  .email-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(247,147,26,0.5); }
+  .email-cta:active { transform: translateY(0); }
+  .email-dismiss {
+    display: block; text-align: center; margin-top: 14px;
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;
+  }
+  .email-dismiss:hover { color: var(--text); }
+  .email-form.hide { display: none; }
+  .email-success { display: none; text-align: center; }
+  .email-success.show { display: block; }
+  .email-success-icon { font-size: 48px; margin-bottom: 12px; }
+  .email-success-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .email-success-sub { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+  .email-success-close {
+    padding: 12px 28px;
+    background: rgba(247,147,26,0.1); border: 1px solid rgba(247,147,26,0.3);
+    border-radius: 10px; color: var(--orange); font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .email-success-close:hover { background: rgba(247,147,26,0.18); }
+
+  /* In-page signup card (Alerts page) */
+  .email-signup-card {
+    background: linear-gradient(135deg, rgba(247,147,26,0.07) 0%, rgba(124,58,237,0.04) 100%);
+    border: 1px solid rgba(247,147,26,0.22);
+    border-radius: 20px; padding: 22px 18px; margin-bottom: 22px;
+    position: relative; overflow: hidden;
+  }
+  .email-signup-card::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(247,147,26,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .email-signup-card-title { font-size: 16px; font-weight: 800; margin-bottom: 5px; }
+  .email-signup-card-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.4; }
+  .email-inline-wrap { display: flex; gap: 8px; }
+  .email-inline-wrap input {
+    flex: 1; min-width: 0;
+    padding: 11px 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: var(--text); font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .email-inline-wrap input:focus { border-color: rgba(247,147,26,0.4); }
+  .email-inline-wrap input::placeholder { color: var(--muted); }
+  .email-inline-wrap button {
+    padding: 11px 14px;
+    background: var(--orange); border: none; border-radius: 10px;
+    color: #fff; font-size: 12px; font-weight: 800; cursor: pointer;
+    white-space: nowrap; transition: opacity 0.2s;
+  }
+  .email-inline-wrap button:hover { opacity: 0.88; }
+  .email-inline-success {
+    display: none; align-items: center; gap: 10px;
+    background: rgba(0,208,132,0.08); border: 1px solid rgba(0,208,132,0.2);
+    border-radius: 10px; padding: 11px 14px;
+    font-size: 13px; color: var(--green); font-weight: 600;
+  }
+  .email-inline-success.show { display: flex; }
+
 </style>
 </head>
 <body>
@@ -1656,6 +1800,19 @@
       <div class="brief-mindset" id="briefMindset"></div>
     </div>
 
+    <!-- EMAIL SIGNUP -->
+    <div class="email-signup-card">
+      <div class="email-signup-card-title">📬 Get Cycle Alerts in Your Inbox</div>
+      <div class="email-signup-card-sub">Weekly brief + instant alerts when score crosses BUY/SELL thresholds. 100% free.</div>
+      <div class="email-inline-wrap" id="emailInlineWrap">
+        <input type="email" id="emailInlineInput" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitEmailInline()">
+        <button onclick="submitEmailInline()">Notify Me</button>
+      </div>
+      <div class="email-inline-success" id="emailInlineSuccess">
+        ✅ You're in! Weekly brief starts this Sunday.
+      </div>
+    </div>
+
     <div class="section-header">Smart Alerts</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Autopilot notifications based on cycle signals</div>
 
@@ -1768,6 +1925,35 @@
   <div class="nav-item" onclick="showPage('alerts',this)">
     <span class="nav-icon">🔔</span>
     <span class="nav-label">Alerts</span>
+  </div>
+</div>
+
+<!-- EMAIL CAPTURE MODAL -->
+<div class="email-overlay" id="emailOverlay">
+  <div class="email-modal">
+    <div class="email-modal-close" onclick="closeEmailModal()">✕</div>
+    <div class="email-modal-glow">₿</div>
+    <div class="email-modal-badge">Free Early Access</div>
+    <div class="email-modal-title">Never Miss a Cycle Move</div>
+    <div class="email-modal-sub">Get the weekly brief straight to your inbox — when to buy, hold, and take profit based on the 1070/364 cycle.</div>
+    <div class="email-benefits">
+      <div class="email-benefit"><div class="email-benefit-icon">📊</div>Weekly cycle score + what action to take</div>
+      <div class="email-benefit"><div class="email-benefit-icon">🎯</div>Alerts when score crosses BUY &amp; SELL thresholds</div>
+      <div class="email-benefit"><div class="email-benefit-icon">🚀</div>Phase change notice before the big moves</div>
+    </div>
+    <div class="email-form" id="emailModalForm">
+      <div class="email-input-wrap">
+        <input type="email" id="emailModalInput" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitEmailModal()">
+      </div>
+      <button class="email-cta" onclick="submitEmailModal()">Get Free Cycle Alerts →</button>
+      <span class="email-dismiss" onclick="dismissEmailModal()">Maybe later — I'll check manually</span>
+    </div>
+    <div class="email-success" id="emailModalSuccess">
+      <div class="email-success-icon">🎉</div>
+      <div class="email-success-title">You're on the list!</div>
+      <div class="email-success-sub">Your first weekly brief arrives this Sunday. We'll alert you the moment the cycle score crosses a major threshold.</div>
+      <button class="email-success-close" onclick="closeEmailModal()">Got it, let's go →</button>
+    </div>
   </div>
 </div>
 
@@ -3171,6 +3357,69 @@ function showPage(name, el) {
   if (name === 'alerts') updateWeeklyBrief();
 }
 
+// ── EMAIL CAPTURE ─────────────────────────────────────────────
+function openEmailModal() {
+  document.getElementById('emailOverlay').classList.add('open');
+}
+function closeEmailModal() {
+  document.getElementById('emailOverlay').classList.remove('open');
+}
+function dismissEmailModal() {
+  closeEmailModal();
+  localStorage.setItem('email_dismissed_at', Date.now());
+}
+function maybeShowEmailModal() {
+  if (localStorage.getItem('email_subscribed')) return;
+  const dismissedAt = parseInt(localStorage.getItem('email_dismissed_at') || '0', 10);
+  if (dismissedAt && Date.now() - dismissedAt < 86400000) return; // wait 24h after dismiss
+  openEmailModal();
+}
+function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function saveEmail(email) {
+  const list = JSON.parse(localStorage.getItem('email_list') || '[]');
+  if (!list.includes(email)) list.push(email);
+  localStorage.setItem('email_list', JSON.stringify(list));
+  localStorage.setItem('email_subscribed', email);
+}
+function submitEmailModal() {
+  const input = document.getElementById('emailModalInput');
+  const email = input.value.trim();
+  if (!validateEmail(email)) {
+    input.style.borderColor = 'var(--red)';
+    input.focus();
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+  saveEmail(email);
+  // Mirror to inline form if on Alerts page
+  const inlineInput = document.getElementById('emailInlineInput');
+  if (inlineInput) inlineInput.value = email;
+  document.getElementById('emailModalForm').classList.add('hide');
+  document.getElementById('emailModalSuccess').classList.add('show');
+  restoreEmailUI();
+}
+function submitEmailInline() {
+  const input = document.getElementById('emailInlineInput');
+  const email = input.value.trim();
+  if (!validateEmail(email)) {
+    input.style.borderColor = 'var(--red)';
+    input.focus();
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+  saveEmail(email);
+  document.getElementById('emailInlineWrap').style.display = 'none';
+  document.getElementById('emailInlineSuccess').classList.add('show');
+}
+function restoreEmailUI() {
+  const email = localStorage.getItem('email_subscribed');
+  if (!email) return;
+  // Inline form: show success state
+  const wrap = document.getElementById('emailInlineWrap');
+  const success = document.getElementById('emailInlineSuccess');
+  if (wrap && success) { wrap.style.display = 'none'; success.classList.add('show'); }
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 updateCycleUI();
 buildSmallChart();
@@ -3194,11 +3443,13 @@ calcMultiCycle();
 buildStrategy();
 updatePortfolioMilestones();
 loadSaved();
+restoreEmailUI();
 initHeroAnim();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
 setInterval(fetchFearGreed, 600000); // Fear & Greed updates ~hourly; poll every 10 min
+setTimeout(maybeShowEmailModal, 30000); // show email capture after 30s on first visit
 </script>
 </body>
 </html>
