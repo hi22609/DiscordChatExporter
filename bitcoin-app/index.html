@@ -583,6 +583,37 @@
   .brief-bullet:last-child { border-bottom: none; }
   .brief-bullet strong { color: var(--text); }
   .brief-mindset { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 12px; line-height: 1.6; }
+  /* HERO ANIMATION */
+  .hero-anim-wrap { position:relative; width:100%; height:180px; overflow:hidden; border-radius:0 0 24px 24px; margin-bottom:0; background:linear-gradient(180deg,rgba(0,10,5,0.6) 0%,rgba(0,0,0,0) 100%); }
+  .hero-anim-canvas { width:100%; height:100%; display:block; }
+  .hero-anim-labels { position:absolute; top:12px; left:0; right:0; display:flex; justify-content:space-between; padding:0 16px; pointer-events:none; }
+  .hero-anim-btc { font-size:11px; font-weight:800; color:#00d084; letter-spacing:1px; }
+  .hero-anim-usd { font-size:11px; font-weight:800; color:#ff4560; letter-spacing:1px; }
+
+  /* STRATEGY ENGINE */
+  .strat-verdict { border-radius:16px; padding:18px; margin-bottom:12px; border:1px solid; }
+  .strat-phase-label { font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .strat-headline { font-size:22px; font-weight:900; line-height:1.15; margin-bottom:10px; }
+  .strat-section { font-size:10px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin:14px 0 8px; }
+  .strat-rule { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); align-items:flex-start; }
+  .strat-rule:last-child { border-bottom:none; }
+  .strat-rule-num { font-size:13px; font-weight:900; color:var(--orange); width:18px; flex-shrink:0; }
+  .strat-rule-text { font-size:13px; color:var(--text); line-height:1.5; }
+  .strat-zone { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:8px; margin-bottom:6px; }
+  .strat-zone-label { font-size:12px; font-weight:700; }
+  .strat-zone-price { font-size:13px; font-weight:900; }
+
+  /* ALERT TOGGLE FIX */
+  .toggle { cursor:pointer; }
+
+  /* ROADMAP */
+  .roadmap-item { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); align-items:flex-start; }
+  .roadmap-item:last-child { border-bottom:none; }
+  .roadmap-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .roadmap-title { font-size:13px; font-weight:700; color:var(--text); }
+  .roadmap-desc { font-size:11px; color:var(--muted); margin-top:2px; }
+  .roadmap-badge { font-size:9px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px; border-radius:99px; flex-shrink:0; margin-top:2px; }
+
 </style>
 </head>
 <body>
@@ -607,6 +638,15 @@
 
   <!-- PAGE: HOME -->
   <div class="page active" id="page-home">
+
+    <!-- HERO ANIMATION: BTC rising / USD falling -->
+    <div class="hero-anim-wrap">
+      <canvas class="hero-anim-canvas" id="heroAnim"></canvas>
+      <div class="hero-anim-labels">
+        <span class="hero-anim-btc">₿ Bitcoin ↑</span>
+        <span class="hero-anim-usd">$ US Dollar ↓</span>
+      </div>
+    </div>
 
     <!-- THE SIGNAL -->
     <div class="signal-hero" id="signalHero" style="background:rgba(0,208,132,0.09);border:1px solid rgba(0,208,132,0.25)">
@@ -933,7 +973,7 @@
           <div style="font-size:11px;color:var(--muted)">Your BTC</div>
           <input id="btcInput" type="number" step="0.001" placeholder="0.00" value="0.1"
             style="background:rgba(255,255,255,0.08);border:1px solid var(--border);color:white;padding:8px 12px;border-radius:8px;font-size:16px;font-weight:700;width:120px;text-align:center;margin-top:4px"
-            oninput="updatePortfolio()">
+            oninput="updatePortfolio();savePortfolio()">
         </div>
       </div>
     </div>
@@ -1016,9 +1056,9 @@
       <div class="calc-tab active" onclick="showCalcTab('dca',this)">DCA</div>
       <div class="calc-tab" onclick="showCalcTab('buy',this)">Buy</div>
       <div class="calc-tab" onclick="showCalcTab('sell',this)">Sell / P&amp;L</div>
-      <div class="calc-tab" onclick="showCalcTab('long',this)">Long</div>
-      <div class="calc-tab" onclick="showCalcTab('short',this)">Short</div>
+      <div class="calc-tab" onclick="showCalcTab('strategy',this)">⚡ Strategy</div>
       <div class="calc-tab" onclick="showCalcTab('usd',this)" style="background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.3);color:var(--red)">₿ vs $USD</div>
+      <div class="calc-tab" onclick="showCalcTab('sp500',this)" style="background:rgba(100,149,237,0.1);border-color:rgba(100,149,237,0.3);color:#6495ed">₿ vs S&amp;P</div>
       <div class="calc-tab" onclick="showCalcTab('ladder',this)">Sell Ladder</div>
       <div class="calc-tab" onclick="showCalcTab('mynum',this)">My #</div>
       <div class="calc-tab" onclick="showCalcTab('tax',this)">Tax</div>
@@ -1207,110 +1247,9 @@
       </div>
     </div>
 
-    <!-- LONG CALCULATOR -->
-    <div class="calc-panel" id="calc-long">
-      <div class="proj-card" style="margin-top:8px">
-        <div class="proj-title">Long Position Calculator</div>
-
-        <div class="field-group">
-          <div class="field-label">
-            <span>Entry Price</span>
-            <span style="cursor:pointer;color:var(--orange)" onclick="useLivePriceFor('long')">Use Live Price</span>
-          </div>
-          <div class="field-input-wrap">
-            <span class="field-prefix">$</span>
-            <input class="field-input" type="number" id="longEntry" value="95000" oninput="calcLong()">
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-label">Position Size (Notional)</div>
-          <div class="field-input-wrap">
-            <span class="field-prefix">$</span>
-            <input class="field-input" type="number" id="longSize" value="5000" oninput="calcLong()">
-          </div>
-        </div>
-
-        <div class="leverage-slider-wrap">
-          <div class="field-label"><span>Leverage</span></div>
-          <div class="leverage-value" id="longLevValue">10×</div>
-          <input class="leverage-slider" type="range" id="longLev" min="1" max="100" value="10" oninput="calcLong()">
-        </div>
-
-        <div class="result-card" id="longResult">
-          <div class="result-hero">
-            <div class="result-hero-label">Liquidation Price</div>
-            <div class="result-hero-value" style="color:var(--red)" id="longLiqPrice">$0</div>
-          </div>
-          <div class="result-row">
-            <div class="result-label">Margin Required</div>
-            <div class="result-value" id="longMargin">$0</div>
-          </div>
-          <div class="result-row">
-            <div class="result-label">Distance to Liquidation</div>
-            <div class="result-value" id="longLiqDist">0%</div>
-          </div>
-          <div class="liq-warning" id="longLiqWarning">—</div>
-
-          <div class="pnl-table">
-            <div class="proj-title" style="margin-bottom:6px;margin-top:6px">P&amp;L at Target Prices</div>
-            <div id="longPnlTable"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SHORT CALCULATOR -->
-    <div class="calc-panel" id="calc-short">
-      <div class="proj-card" style="margin-top:8px">
-        <div class="proj-title">Short Position Calculator</div>
-
-        <div class="field-group">
-          <div class="field-label">
-            <span>Entry Price</span>
-            <span style="cursor:pointer;color:var(--orange)" onclick="useLivePriceFor('short')">Use Live Price</span>
-          </div>
-          <div class="field-input-wrap">
-            <span class="field-prefix">$</span>
-            <input class="field-input" type="number" id="shortEntry" value="95000" oninput="calcShort()">
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-label">Position Size (Notional)</div>
-          <div class="field-input-wrap">
-            <span class="field-prefix">$</span>
-            <input class="field-input" type="number" id="shortSize" value="5000" oninput="calcShort()">
-          </div>
-        </div>
-
-        <div class="leverage-slider-wrap">
-          <div class="field-label"><span>Leverage</span></div>
-          <div class="leverage-value" id="shortLevValue">10×</div>
-          <input class="leverage-slider" type="range" id="shortLev" min="1" max="100" value="10" oninput="calcShort()">
-        </div>
-
-        <div class="result-card" id="shortResult">
-          <div class="result-hero">
-            <div class="result-hero-label">Liquidation Price</div>
-            <div class="result-hero-value" style="color:var(--red)" id="shortLiqPrice">$0</div>
-          </div>
-          <div class="result-row">
-            <div class="result-label">Margin Required</div>
-            <div class="result-value" id="shortMargin">$0</div>
-          </div>
-          <div class="result-row">
-            <div class="result-label">Distance to Liquidation</div>
-            <div class="result-value" id="shortLiqDist">0%</div>
-          </div>
-          <div class="liq-warning" id="shortLiqWarning">—</div>
-
-          <div class="pnl-table">
-            <div class="proj-title" style="margin-bottom:6px;margin-top:6px">P&amp;L at Target Prices</div>
-            <div id="shortPnlTable"></div>
-          </div>
-        </div>
-      </div>
+    <!-- STRATEGY ENGINE -->
+    <div class="calc-panel" id="calc-strategy">
+      <div id="strategyContent" style="margin-top:8px"></div>
     </div>
 
     <!-- VS USD CALCULATOR -->
@@ -1443,6 +1382,54 @@
     </div>
 
   </div><!-- end calc-usd -->
+
+  <!-- ── S&P 500 VS BITCOIN ── -->
+  <div class="calc-panel" id="calc-sp500">
+    <div class="vs-hero" style="background:linear-gradient(135deg,rgba(100,149,237,0.08),rgba(0,0,0,0));border-color:rgba(100,149,237,0.2)">
+      <div class="vs-headline" style="color:#6495ed;font-size:20px">S&P 500 vs Bitcoin</div>
+      <div class="vs-sub">The S&P 500 averages <strong style="color:#6495ed">~10%/yr</strong> before inflation. Bitcoin has returned <strong style="color:var(--orange)">+1,000%+</strong> per cycle. Same dollars — radically different outcomes.</div>
+    </div>
+
+    <div class="fact-strip">
+      <div class="fact-card"><div class="fact-stat" style="color:#6495ed">10%</div><div class="fact-label">S&P 500 avg annual return (100yr avg, nominal)</div></div>
+      <div class="fact-card"><div class="fact-stat" style="color:#6495ed">6.8%</div><div class="fact-label">S&P 500 real return after inflation (historical)</div></div>
+      <div class="fact-card"><div class="fact-stat btc-stat">+1,543%</div><div class="fact-label">Bitcoin's last 4-year cycle return (2022→2025)</div></div>
+      <div class="fact-card"><div class="fact-stat btc-stat">+11,013%</div><div class="fact-label">Bitcoin's best cycle (2015→2017)</div></div>
+      <div class="fact-card"><div class="fact-stat" style="color:#6495ed">80%</div><div class="fact-label">S&P 500 max drawdown (2008 crash)</div></div>
+      <div class="fact-card"><div class="fact-stat btc-stat">21M</div><div class="fact-label">Bitcoin supply cap — S&P 500 companies can dilute forever</div></div>
+    </div>
+
+    <div class="proj-card" style="margin-top:0">
+      <div class="proj-title">Run the Comparison</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Same weekly amount. One into the S&P 500. One into Bitcoin. See the difference at ATH.</div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label"><span>Weekly Amount</span><span id="spWeeklyLabel" style="color:var(--orange);font-weight:800">$100/wk</span></div>
+          <input class="leverage-slider" type="range" id="spWeekly" min="5" max="1000" value="100" step="5" oninput="calcSP500()">
+        </div>
+        <div class="field-group">
+          <div class="field-label"><span>Years</span><span id="spYearsLabel" style="font-weight:800">10 yrs</span></div>
+          <input class="leverage-slider" type="range" id="spYears" min="1" max="20" value="10" step="1" oninput="calcSP500()">
+        </div>
+      </div>
+
+      <div class="compare-grid" style="margin-top:8px">
+        <div class="compare-card" style="background:rgba(100,149,237,0.06);border-color:rgba(100,149,237,0.2)">
+          <div class="compare-currency" style="color:#6495ed">📊 S&P 500</div>
+          <div class="compare-amount" id="spResult" style="color:#6495ed">—</div>
+          <div class="compare-detail" id="spDetail">~10%/yr compound</div>
+        </div>
+        <div class="compare-card btc-card">
+          <div class="compare-currency" style="color:var(--orange)">₿ Bitcoin</div>
+          <div class="compare-amount" id="spBtcResult" style="color:var(--orange)">—</div>
+          <div class="compare-detail" id="spBtcDetail">Base ATH scenario</div>
+        </div>
+      </div>
+
+      <div id="spTable" style="margin-top:12px"></div>
+    </div>
+  </div>
 
   <!-- ── SELL LADDER ── -->
   <div class="calc-panel" id="calc-ladder">
@@ -1684,7 +1671,7 @@
         <div class="alert-title">Bottom Zone Alert</div>
         <div class="alert-desc">Notify when we enter Stealth Bottom (Day 1351+) near Oct 5, 2026</div>
       </div>
-      <div class="toggle"></div>
+      <div class="toggle" id="atgl1" onclick="toggleAlert('atgl1')"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">🟢</div>
@@ -1692,7 +1679,7 @@
         <div class="alert-title">Cycle Score &lt; 20</div>
         <div class="alert-desc">Extreme undervalue — aggressive BUY signal</div>
       </div>
-      <div class="toggle"></div>
+      <div class="toggle" id="atgl2" onclick="toggleAlert('atgl2')"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">💰</div>
@@ -1700,7 +1687,7 @@
         <div class="alert-title">Despair DCA Window</div>
         <div class="alert-desc">Quiet market, best accumulation zone opens</div>
       </div>
-      <div class="toggle"></div>
+      <div class="toggle" id="atgl3" onclick="toggleAlert('atgl3')"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">📈</div>
@@ -1708,7 +1695,7 @@
         <div class="alert-title">New Bull Run Confirmed</div>
         <div class="alert-desc">Ascent begins — Day 0 of next 1070-day climb</div>
       </div>
-      <div class="toggle off"></div>
+      <div class="toggle off" id="atgl4" onclick="toggleAlert('atgl4')"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">🐋</div>
@@ -1716,7 +1703,7 @@
         <div class="alert-title">Whale Accumulation</div>
         <div class="alert-desc">Large BTC leaving exchanges (buy pressure)</div>
       </div>
-      <div class="toggle off"></div>
+      <div class="toggle off" id="atgl5" onclick="toggleAlert('atgl5')"></div>
     </div>
     <div class="alert-item">
       <div class="alert-icon">📉</div>
@@ -1724,8 +1711,44 @@
         <div class="alert-title">Price Below $50K</div>
         <div class="alert-desc">Bottom target zone reached — load up</div>
       </div>
-      <div class="toggle off"></div>
+      <div class="toggle off" id="atgl6" onclick="toggleAlert('atgl6')"></div>
     </div>
+
+    <!-- ROADMAP -->
+    <div class="section-header" style="margin-top:24px">Roadmap — What's Coming</div>
+    <div class="proj-card" style="margin-top:0">
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--green)"></div>
+        <div style="flex:1"><div class="roadmap-title">The Full Calculator Suite</div><div class="roadmap-desc">DCA, Sell Ladder, Tax, Lifestyle, Retire, Multi-Cycle — all live</div></div>
+        <div class="roadmap-badge" style="background:rgba(0,208,132,0.15);color:var(--green)">LIVE</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--green)"></div>
+        <div style="flex:1"><div class="roadmap-title">Strategy Engine</div><div class="roadmap-desc">Phase-locked playbook — exactly what to do right now</div></div>
+        <div class="roadmap-badge" style="background:rgba(0,208,132,0.15);color:var(--green)">LIVE</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--orange)"></div>
+        <div style="flex:1"><div class="roadmap-title">Real Push Notifications</div><div class="roadmap-desc">SMS + email when cycle score crosses key thresholds</div></div>
+        <div class="roadmap-badge" style="background:rgba(247,147,26,0.15);color:var(--orange)">SOON</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--orange)"></div>
+        <div style="flex:1"><div class="roadmap-title">Exchange Connect</div><div class="roadmap-desc">Read-only Coinbase/Kraken API → auto-sync your portfolio</div></div>
+        <div class="roadmap-badge" style="background:rgba(247,147,26,0.15);color:var(--orange)">SOON</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--accent)"></div>
+        <div style="flex:1"><div class="roadmap-title">Premium Accounts ($9/mo)</div><div class="roadmap-desc">Saved portfolio, alert history, PDF reports, early access</div></div>
+        <div class="roadmap-badge" style="background:rgba(124,58,237,0.15);color:var(--accent)">Q3 2026</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--muted)"></div>
+        <div style="flex:1"><div class="roadmap-title">App Store Release</div><div class="roadmap-desc">Native iOS + Android — same data, native notifications</div></div>
+        <div class="roadmap-badge" style="background:rgba(107,107,128,0.15);color:var(--muted)">2027</div>
+      </div>
+    </div>
+
   </div>
 
 </div><!-- end container -->
@@ -2348,6 +2371,278 @@ function calcVsUSD() {
     </div>`;
 }
 
+// ── HERO ANIMATION ───────────────────────────────────────────
+function initHeroAnim() {
+  const c = document.getElementById('heroAnim');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  let frame = 0, drawProg = 0;
+
+  function resize() {
+    const r = window.devicePixelRatio || 1;
+    c.width  = c.offsetWidth  * r;
+    c.height = c.offsetHeight * r;
+    ctx.scale(r, r);
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); });
+
+  function draw() {
+    const W = c.offsetWidth, H = c.offsetHeight;
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    if (drawProg < 1) drawProg = Math.min(1, drawProg + 0.008);
+
+    // subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 5; i++) {
+      ctx.beginPath(); ctx.moveTo(0, (i/5)*H); ctx.lineTo(W, (i/5)*H); ctx.stroke();
+    }
+    for (let i = 1; i < 8; i++) {
+      ctx.beginPath(); ctx.moveTo((i/8)*W, 0); ctx.lineTo((i/8)*W, H); ctx.stroke();
+    }
+
+    const pts = Math.floor(120 * drawProg);
+
+    // BTC path: smoothstep curve rising
+    const btcY = t => H * 0.88 - (t*t*(3-2*t)) * H * 0.78;
+    const btcX = t => t * W;
+
+    // USD path: slow linear decline
+    const usdY = t => H * 0.18 + t * H * 0.62;
+    const usdX = t => t * W;
+
+    // BTC area fill
+    if (pts > 1) {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, 'rgba(0,208,132,0.18)');
+      grad.addColorStop(1, 'rgba(0,208,132,0)');
+      ctx.beginPath();
+      ctx.moveTo(btcX(0), btcY(0));
+      for (let i = 1; i <= pts; i++) { const t = i/120; ctx.lineTo(btcX(t), btcY(t)); }
+      const lastT = pts/120;
+      ctx.lineTo(btcX(lastT), H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = grad; ctx.fill();
+    }
+
+    // BTC line with glow
+    if (pts > 0) {
+      ctx.save();
+      ctx.shadowBlur = 18; ctx.shadowColor = '#00d084';
+      ctx.strokeStyle = '#00d084'; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let i = 0; i <= pts; i++) { const t = i/120; i===0 ? ctx.moveTo(btcX(t),btcY(t)) : ctx.lineTo(btcX(t),btcY(t)); }
+      ctx.stroke(); ctx.restore();
+    }
+
+    // USD dashed line with glow
+    if (pts > 0) {
+      ctx.save();
+      ctx.shadowBlur = 10; ctx.shadowColor = '#ff4560';
+      ctx.strokeStyle = '#ff4560'; ctx.lineWidth = 1.8; ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      for (let i = 0; i <= pts; i++) { const t = i/120; i===0 ? ctx.moveTo(usdX(t),usdY(t)) : ctx.lineTo(usdX(t),usdY(t)); }
+      ctx.stroke(); ctx.restore();
+    }
+
+    // Current price dot on BTC
+    if (drawProg > 0.3) {
+      const tNow = 0.5 + 0.1*Math.sin(frame*0.04);
+      const dotX = btcX(drawProg > 0.5 ? drawProg : 0.5);
+      const dotY = btcY(drawProg > 0.5 ? drawProg : 0.5);
+      ctx.save();
+      ctx.shadowBlur = 20; ctx.shadowColor = '#00d084';
+      ctx.beginPath(); ctx.arc(dotX, dotY, 4, 0, Math.PI*2);
+      ctx.fillStyle = '#00d084'; ctx.fill(); ctx.restore();
+    }
+
+    // Floating ₿ particles
+    for (let i = 0; i < 6; i++) {
+      const seed = i * 173;
+      const px = ((frame * 0.25 + seed * 3.7) % (W + 40)) - 20;
+      const py = H * 0.12 + Math.sin(frame * 0.018 + seed) * H * 0.12;
+      ctx.save();
+      ctx.globalAlpha = 0.08 + 0.07 * Math.sin(frame * 0.04 + i);
+      ctx.fillStyle = '#f7931a';
+      ctx.font = `${12 + i*2}px serif`;
+      ctx.fillText('₿', px, py);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ── STRATEGY ENGINE ───────────────────────────────────────────
+function buildStrategy() {
+  const day   = getCycleDay();
+  const score = getCycleScore(day);
+  const phase = getPhase(day);
+  const ev    = getNextEvent();
+  const cfg   = getSignalConfig(score);
+  const price = livePrice || projectedPriceOn(new Date(), 'base');
+  const daysToEvent = Math.max(0, Math.ceil((ev.date - new Date()) / DAY_MS));
+
+  const PHASE_PLAYBOOK = {
+    'Accumulation':      ['Buy every week — this is the historically best entry window', 'Set DCA schedule and automate it — remove emotion', 'Keep 6 months cash, invest the rest', 'Do NOT check price daily — zoom out to the ATH'],
+    'Re-Awakening':      ['Continue weekly DCA — we are still early', 'Buy dips aggressively — media is just noticing', 'Ignore FOMO from friends — your timing is better', 'Start thinking about your sell ladder target prices'],
+    'Momentum Build':    ['Reduce buying frequency — price discovery is here', 'Set sell ladder triggers at $250K, $325K, $400K, $550K', 'Move some profit to stablecoins as score approaches 70', 'Do NOT add leverage — use cash flow only'],
+    'Parabolic Advance': ['Stop new buying — you already have exposure', 'Execute 10% sell at $250K if you have not yet', 'Watch cycle score daily — exit at 80+', 'Prepare sell orders on exchange NOW'],
+    'Blow-Off Top':      ['SELL IN LADDERS — this is what you waited for', 'Hit your sell ladder rungs — do not wait for higher', 'Do NOT listen to $1M predictions — exit the plan', 'Move gains to stablecoins or real assets'],
+    'Denial':            ['Stop buying — macro trend has reversed', 'Sell any remaining ladder rungs immediately', 'Do not catch the knife — bottom is NOT in', 'Protect capital — patience is the strategy now'],
+    'Capitulation':      ['Stay out — panic selling is here, bottom unknown', 'Watch for score dropping below 15 — that is the buy signal', 'Mental fortitude — this phase always ends', 'Start building your accumulation watchlist'],
+    'Despair':           ['Start small weekly DCA — best accumulation window', 'Buy quietly — nobody is talking about Bitcoin right now', 'Dollar-cost average through the silence', 'Target: accumulate before the next cycle awakening'],
+    'Stealth Bottom':    ['BUY AGGRESSIVELY — bottom is forming', 'This phase has historically produced the best 3-year returns', 'Maximize DCA — you will thank yourself in 2029', 'Tell nobody — the next bull run is being set up right now'],
+  };
+
+  const rules = PHASE_PLAYBOOK[phase.name] || PHASE_PLAYBOOK['Despair'];
+
+  const ENTRY_ZONES = [
+    { label: '🟢 Excellent (Oct–Dec 2026)', price: '$45K–$60K', color: 'rgba(0,208,132,0.08)', border: 'rgba(0,208,132,0.2)', textColor: 'var(--green)' },
+    { label: '🟡 Good (Now)',               price: fmtUSD(Math.round(price * 0.85)) + '–' + fmtUSD(Math.round(price * 1.05)), color: 'rgba(255,215,0,0.08)', border: 'rgba(255,215,0,0.2)', textColor: 'var(--yellow)' },
+    { label: '🟠 Fair (Current)',            price: fmtUSD(Math.round(price * 1.05)) + '+', color: 'rgba(255,107,53,0.06)', border: 'rgba(255,107,53,0.15)', textColor: '#ff6b35' },
+  ];
+
+  const el = document.getElementById('strategyContent');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="strat-verdict" style="background:${cfg.bg};border-color:${cfg.border.replace('rgba','rgba').replace('0.35)','0.4)')}">
+      <div class="strat-phase-label" style="color:${cfg.color}">${phase.name} Phase · Day ${day}/${CYCLE_LEN}</div>
+      <div class="strat-headline" style="color:${cfg.color}">${cfg.verdict}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">${cfg.reason}</div>
+      <div style="display:flex;gap:12px;margin-top:12px">
+        <div style="text-align:center;flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:${cfg.color}">${score}</div>
+          <div style="font-size:10px;color:var(--muted)">Cycle Score</div>
+        </div>
+        <div style="text-align:center;flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:var(--text)">${daysToEvent}</div>
+          <div style="font-size:10px;color:var(--muted)">Days to ${ev.name}</div>
+        </div>
+        <div style="text-align:center;flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:8px">
+          <div style="font-size:14px;font-weight:900;color:var(--orange)">${phase.risk}</div>
+          <div style="font-size:10px;color:var(--muted)">Risk Level</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card" style="margin-top:0">
+      <div class="strat-section">📋 Your Playbook Right Now</div>
+      ${rules.map((r,i) => `<div class="strat-rule"><div class="strat-rule-num">${i+1}</div><div class="strat-rule-text">${r}</div></div>`).join('')}
+    </div>
+
+    <div class="proj-card" style="margin-top:8px">
+      <div class="strat-section">🎯 Entry Zones</div>
+      ${ENTRY_ZONES.map(z => `<div class="strat-zone" style="background:${z.color};border:1px solid ${z.border};"><span class="strat-zone-label" style="color:${z.textColor}">${z.label}</span><span class="strat-zone-price">${z.price}</span></div>`).join('')}
+    </div>
+
+    <div class="proj-card" style="margin-top:8px">
+      <div class="strat-section">🚪 Exit Rules (When Score Rises)</div>
+      <div class="strat-rule"><div class="strat-rule-num">70+</div><div class="strat-rule-text">Start sell ladder — fire first rung at $250K</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">80+</div><div class="strat-rule-text">Sell 30% more — execute middle rungs</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">90+</div><div class="strat-rule-text">Sell remaining 60% — euphoria is here</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">Pi ⊤</div><div class="strat-rule-text">Pi Cycle Top triggered — emergency full exit</div></div>
+    </div>
+
+    <div class="proj-card" style="margin-top:8px">
+      <div class="strat-section">⚖️ Position Sizing Rules</div>
+      <div class="strat-rule"><div class="strat-rule-num">1</div><div class="strat-rule-text">Never more than 20% of net worth in Bitcoin (unless you truly understand the risk)</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">2</div><div class="strat-rule-text">Keep 6 months of living expenses in cash — never invest money you may need</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">3</div><div class="strat-rule-text">No leverage on cycle positions — leverage kills time in the market</div></div>
+      <div class="strat-rule"><div class="strat-rule-num">4</div><div class="strat-rule-text">Set and forget your DCA — automation beats emotion every single time</div></div>
+    </div>`;
+}
+
+// ── S&P 500 VS BITCOIN ────────────────────────────────────────
+function calcSP500() {
+  const weekly  = parseFloat(document.getElementById('spWeekly')?.value) || 100;
+  const years   = parseInt(document.getElementById('spYears')?.value) || 10;
+  const wLabel  = document.getElementById('spWeeklyLabel');
+  const yLabel  = document.getElementById('spYearsLabel');
+  if (wLabel) wLabel.textContent = fmtUSD(weekly) + '/wk';
+  if (yLabel) yLabel.textContent = years + ' yr' + (years !== 1 ? 's' : '');
+
+  const SP_ANNUAL  = 0.10; // nominal
+  const SP_REAL    = 0.068; // after inflation
+  const totalWeeks = years * 52;
+  const totalPut   = weekly * totalWeeks;
+
+  // S&P 500: compound weekly DCA at 10%/yr
+  let spValue = 0;
+  const weeklyRate = Math.pow(1 + SP_ANNUAL, 1/52) - 1;
+  for (let w = 0; w < totalWeeks; w++) {
+    spValue = (spValue + weekly) * (1 + weeklyRate);
+  }
+  const spReal = spValue * Math.pow(1 - 0.035, years); // inflation adjusted
+
+  // Bitcoin: DCA at projected price → value at base ATH
+  const now = Date.now();
+  let totalBtc = 0;
+  for (let w = 0; w < totalWeeks; w++) {
+    const d = new Date(now + w * 7 * DAY_MS);
+    const p = projectedPriceOn(d, 'base') || 55000;
+    totalBtc += weekly / p;
+  }
+  const btcBase = totalBtc * ATH_TARGETS.base;
+  const btcBear = totalBtc * ATH_TARGETS.bear;
+  const btcBull = totalBtc * ATH_TARGETS.bull;
+
+  const spEl  = document.getElementById('spResult');
+  const sdEl  = document.getElementById('spDetail');
+  const btcEl = document.getElementById('spBtcResult');
+  const bdEl  = document.getElementById('spBtcDetail');
+  if (spEl) spEl.textContent = fmtUSD(spValue);
+  if (sdEl) sdEl.textContent = fmtUSD(totalPut) + ' invested · ' + ((spValue/totalPut - 1)*100).toFixed(0) + '% gain';
+  if (btcEl) btcEl.textContent = fmtUSD(btcBase);
+  if (bdEl) bdEl.textContent = totalBtc.toFixed(6) + ' BTC · ' + ((btcBase/totalPut - 1)*100).toFixed(0) + '% gain';
+
+  const tableEl = document.getElementById('spTable');
+  if (!tableEl) return;
+  const multiplier = btcBase / spValue;
+  tableEl.innerHTML = `
+    <div class="year-table">
+      <div class="year-table-row year-table-head">
+        <div>Metric</div><div style="color:#6495ed">S&P 500</div><div style="color:var(--orange)">Bitcoin</div>
+      </div>
+      <div class="year-table-row"><div style="font-size:11px;font-weight:700">Total Invested</div><div style="font-size:12px;font-weight:700">${fmtUSD(totalPut)}</div><div style="font-size:12px;font-weight:700">${fmtUSD(totalPut)}</div></div>
+      <div class="year-table-row"><div style="font-size:11px;font-weight:700">Nominal Value</div><div style="font-size:12px;font-weight:700;color:#6495ed">${fmtUSD(spValue)}</div><div style="font-size:12px;font-weight:700;color:var(--orange)">${fmtUSD(btcBase)}</div></div>
+      <div class="year-table-row"><div style="font-size:11px;font-weight:700">Bear Scenario</div><div style="font-size:12px;color:var(--muted)">S&P -50% crash = ${fmtUSD(spValue*0.5)}</div><div style="font-size:12px;font-weight:700;color:var(--red)">${fmtUSD(btcBear)}</div></div>
+      <div class="year-table-row"><div style="font-size:11px;font-weight:700">Bull Scenario</div><div style="font-size:12px;color:var(--muted)">Best case ${fmtUSD(spValue*1.3)}</div><div style="font-size:12px;font-weight:700;color:var(--green)">${fmtUSD(btcBull)}</div></div>
+      <div class="year-table-row" style="background:rgba(247,147,26,0.06)"><div style="font-size:11px;font-weight:800">BTC Advantage</div><div colspan="2" style="font-size:16px;font-weight:900;color:var(--orange)">${multiplier.toFixed(1)}x more at base ATH</div><div></div></div>
+    </div>`;
+}
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────
+function savePortfolio() {
+  try { localStorage.setItem('btc_cycle_portfolio', document.getElementById('btcInput')?.value || '0'); } catch(e) {}
+}
+
+function toggleAlert(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('off');
+  try { localStorage.setItem('alert_' + id, el.classList.contains('off') ? '0' : '1'); } catch(e) {}
+}
+
+function loadSaved() {
+  try {
+    const saved = localStorage.getItem('btc_cycle_portfolio');
+    if (saved && document.getElementById('btcInput')) {
+      document.getElementById('btcInput').value = saved;
+      updatePortfolio();
+    }
+    ['atgl1','atgl2','atgl3','atgl4','atgl5','atgl6'].forEach((id, i) => {
+      const state = localStorage.getItem('alert_' + id);
+      const el = document.getElementById(id);
+      if (!el || state === null) return;
+      if (state === '1') el.classList.remove('off');
+      else el.classList.add('off');
+    });
+  } catch(e) {}
+}
+
 // ── THE SIGNAL ───────────────────────────────────────────────
 function getSignalConfig(score) {
   if (score < 25) return { verdict: '🟢 BUY AGGRESSIVELY', bg: 'rgba(0,208,132,0.12)', border: 'rgba(0,208,132,0.35)', color: 'var(--green)',  reason: 'Extreme undervalue. Score ' + score + '/100. Historically the best-returning entry point across every cycle.' };
@@ -2752,7 +3047,7 @@ function showPage(name, el) {
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
   if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); }
-  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcLong(); calcShort(); calcVsUSD(); calcLadder(); calcMyNumber(); calcTax(); calcLifestyle(); calcRetire(); calcMultiCycle(); }
+  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcVsUSD(); calcSP500(); calcLadder(); calcMyNumber(); calcTax(); calcLifestyle(); calcRetire(); calcMultiCycle(); buildStrategy(); }
   if (name === 'alerts') updateWeeklyBrief();
 }
 
@@ -2765,9 +3060,8 @@ updateCountdown();
 calcDCA();
 calcBuy();
 calcSell();
-calcLong();
-calcShort();
 calcVsUSD();
+calcSP500();
 updateSignal();
 updateWeeklyBrief();
 calcLadder();
@@ -2776,7 +3070,10 @@ calcTax();
 calcLifestyle();
 calcRetire();
 calcMultiCycle();
+buildStrategy();
 updatePortfolioMilestones();
+loadSaved();
+initHeroAnim();
 
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
