@@ -361,12 +361,17 @@
     background: rgba(10,10,15,0.95);
     border-top: 1px solid var(--border);
     display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     backdrop-filter: blur(20px);
     z-index: 100;
+    scrollbar-width: none;
   }
+  .bottom-nav::-webkit-scrollbar { display: none; }
   .nav-item {
-    flex: 1;
-    padding: 12px 0 20px;
+    flex-shrink: 0;
+    min-width: 60px;
+    padding: 12px 8px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1078,6 +1083,208 @@
   .timeline-text { font-size: 12.5px; color: #c7c7d6; line-height: 1.5; }
   .timeline-text b { color: var(--text); }
 
+  /* ── DONATION CARD ──────────────────────────────────────────── */
+  .donation-card {
+    background: linear-gradient(135deg, rgba(247,147,26,0.1), rgba(247,147,26,0.03));
+    border: 1px solid rgba(247,147,26,0.35);
+    border-radius: 20px; padding: 20px; margin-bottom: 22px; position: relative; overflow: hidden;
+  }
+  .donation-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(247,147,26,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .donation-title { font-size: 15px; font-weight: 800; color: var(--orange); margin-bottom: 4px; }
+  .donation-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.4; }
+  .donation-qr {
+    width: 120px; height: 120px; margin: 0 auto 14px;
+    display: grid; grid-template-columns: repeat(11, 1fr); gap: 1px;
+    background: #fff; padding: 8px; border-radius: 8px;
+  }
+  .qr-cell { border-radius: 1px; }
+  .donation-addr {
+    font-family: 'Courier New', monospace; font-size: 10px; color: var(--orange);
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(247,147,26,0.2);
+    border-radius: 8px; padding: 8px 10px; word-break: break-all;
+    text-align: center; line-height: 1.6; margin-bottom: 12px; cursor: pointer;
+  }
+  .donation-copy-btn {
+    width: 100%; background: rgba(247,147,26,0.15); border: 1px solid rgba(247,147,26,0.35);
+    color: var(--orange); border-radius: 10px; padding: 10px; font-size: 13px;
+    font-weight: 700; cursor: pointer; transition: background 0.2s;
+  }
+  .donation-copy-btn:hover { background: rgba(247,147,26,0.25); }
+
+  /* ── CONFIDENCE BANNER ──────────────────────────────────────── */
+  .confidence-banner {
+    background: linear-gradient(135deg, rgba(247,147,26,0.12), rgba(247,147,26,0.04));
+    border: 1px solid rgba(247,147,26,0.4); border-radius: 20px;
+    padding: 20px; margin: 14px 0; position: relative; overflow: hidden;
+  }
+  .confidence-banner::before {
+    content: ''; position: absolute; top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(247,147,26,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .confidence-title { font-size: 17px; font-weight: 900; margin-bottom: 8px; line-height: 1.2; }
+  .confidence-body { font-size: 13px; color: #c7c7d6; line-height: 1.6; margin-bottom: 14px; }
+  .confidence-cta {
+    display: inline-block; background: var(--orange); color: #000;
+    font-size: 13px; font-weight: 800; padding: 11px 20px; border-radius: 10px;
+    cursor: pointer; border: none; transition: opacity 0.2s;
+  }
+  .confidence-cta:hover { opacity: 0.88; }
+
+  /* ── INTEL PAGE ─────────────────────────────────────────────── */
+  .intel-section { margin-bottom: 22px; }
+  .intel-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 18px; margin-bottom: 14px; overflow: hidden;
+  }
+  .intel-card-title {
+    font-size: 15px; font-weight: 800; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .intel-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .intel-table th {
+    text-align: left; color: var(--muted); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 4px; border-bottom: 1px solid var(--border);
+  }
+  .intel-table td { padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  .intel-table tr:last-child td { border-bottom: none; }
+  .intel-table .company-name { font-weight: 700; font-size: 12.5px; }
+  .intel-table .btc-amt { color: var(--orange); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .intel-table .usd-val { color: var(--muted); font-size: 11px; }
+  .intel-table .supply-pct { color: var(--green); font-size: 11px; font-weight: 600; }
+
+  .celeb-grid { display: flex; flex-direction: column; gap: 10px; }
+  .celeb-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card2); border-radius: 12px; padding: 11px 13px;
+  }
+  .celeb-emoji { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+  .celeb-name { font-size: 13px; font-weight: 800; }
+  .celeb-detail { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+  .celeb-badge {
+    margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 99px;
+  }
+  .badge-bull { background: rgba(0,208,132,0.12); color: var(--green); border: 1px solid rgba(0,208,132,0.25); }
+  .badge-bear { background: rgba(255,69,96,0.1); color: var(--red); border: 1px solid rgba(255,69,96,0.2); }
+  .badge-neutral { background: rgba(255,215,0,0.1); color: var(--yellow); border: 1px solid rgba(255,215,0,0.25); }
+
+  .whale-feed {
+    background: #0a0a10; border-radius: 12px; padding: 12px;
+    max-height: 280px; overflow-y: auto; font-family: monospace; font-size: 11.5px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .whale-entry {
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #c7c7d6; line-height: 1.5; animation: fadeInDown 0.4s ease;
+  }
+  .whale-entry:last-child { border-bottom: none; }
+  .whale-amount { color: var(--orange); font-weight: 700; }
+  .whale-usd { color: var(--green); }
+  @keyframes fadeInDown { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+
+  .deriv-bar-wrap { margin: 10px 0; }
+  .deriv-bar-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
+  .deriv-bar { height: 18px; border-radius: 8px; overflow: hidden; display: flex; }
+  .deriv-bar-long { background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #000; }
+  .deriv-bar-short { background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; }
+  .deriv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .deriv-cell { background: var(--card2); border-radius: 10px; padding: 10px; text-align: center; }
+  .deriv-cell-val { font-size: 16px; font-weight: 900; }
+  .deriv-cell-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  .news-feed { display: flex; flex-direction: column; gap: 10px; }
+  .news-item {
+    background: var(--card2); border-radius: 12px; padding: 13px;
+    border-left: 3px solid transparent; transition: border-color 0.2s;
+  }
+  .news-item.bullish { border-left-color: var(--green); }
+  .news-item.bearish { border-left-color: var(--red); }
+  .news-item.neutral { border-left-color: var(--yellow); }
+  .news-headline { font-size: 13px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+  .news-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .news-source { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .news-time { font-size: 10px; color: var(--muted); }
+  .news-badge { font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 99px; }
+  .news-badge.bullish { background: rgba(0,208,132,0.12); color: var(--green); }
+  .news-badge.bearish { background: rgba(255,69,96,0.1); color: var(--red); }
+  .news-badge.neutral { background: rgba(255,215,0,0.1); color: var(--yellow); }
+
+  /* ── MEMPOOL CARD ────────────────────────────────────────────── */
+  .mempool-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 18px; margin-bottom: 14px;
+  }
+  .mempool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .mempool-cell { background: var(--card2); border-radius: 10px; padding: 11px 10px; text-align: center; }
+  .mempool-cell-val { font-size: 18px; font-weight: 900; color: var(--orange); font-variant-numeric: tabular-nums; }
+  .mempool-cell-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  .block-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .block-row {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card2); border-radius: 10px; padding: 10px 12px;
+    font-size: 12px;
+  }
+  .block-num { font-weight: 900; color: var(--orange); font-size: 12px; min-width: 72px; }
+  .block-info { flex: 1; color: var(--muted); line-height: 1.3; }
+  .block-reward { color: var(--green); font-weight: 700; font-size: 11px; }
+
+  /* ── LOGO 3D SPIN ───────────────────────────────────────────── */
+  @keyframes spinY { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+  .logo-icon { transform-style: preserve-3d; transition: transform 0.1s; }
+  .logo-icon:hover { animation: spinY 0.8s ease-in-out; cursor: pointer; }
+
+  /* ── KONAMI / EASTER EGG OVERLAY ───────────────────────────── */
+  .orange-pill-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.96);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 30px;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .op-title { font-size: 34px; font-weight: 900; color: var(--orange); margin-bottom: 10px; line-height: 1.1; }
+  .op-sub { font-size: 16px; color: var(--muted); margin-bottom: 20px; }
+  .op-msg { font-size: 14px; color: var(--text); line-height: 1.6; max-width: 320px; margin: 0 auto 20px; }
+  .op-club { font-size: 15px; font-weight: 800; color: var(--orange); margin-bottom: 24px; }
+  .op-dismiss { font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .btc-particle {
+    position: absolute; font-size: 24px; animation: fall linear infinite;
+    pointer-events: none; opacity: 0.7; color: var(--orange);
+  }
+  @keyframes fall {
+    0% { transform: translateY(-60px) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── SATOSHI BANNER ─────────────────────────────────────────── */
+  .satoshi-banner {
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(247,147,26,0.08));
+    border: 1px solid rgba(124,58,237,0.35); border-radius: 14px;
+    padding: 14px 18px; margin: 12px 0;
+    font-size: 13px; color: #c7c7d6; line-height: 1.5; text-align: center;
+  }
+
+  /* ── TOAST ──────────────────────────────────────────────────── */
+  .toast-msg {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: var(--card); border: 1px solid rgba(247,147,26,0.4);
+    color: var(--text); border-radius: 12px; padding: 11px 20px;
+    font-size: 13px; font-weight: 600; z-index: 9000;
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards;
+    white-space: nowrap; max-width: 90vw; text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  @keyframes toastIn { from { opacity:0; transform: translate(-50%, 10px); } to { opacity:1; transform: translate(-50%, 0); } }
+  @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
 </style>
 </head>
 <body>
@@ -1231,6 +1438,13 @@
       <div class="score-action" id="scoreAction" style="background:rgba(255,215,0,0.1); color:var(--yellow);">
         ⚠ Overvalued — Consider taking partial profits
       </div>
+    </div>
+
+    <!-- CONFIDENCE BANNER -->
+    <div class="confidence-banner">
+      <div class="confidence-title">🟠 The Clock Is Ticking — And It's On Your Side</div>
+      <div class="confidence-body">Every single institutional player buying Bitcoin right now is chasing the same sat you can own today. MicroStrategy paid $67K average. BlackRock onboarded billions of dollars. The small investor advantage is real: you don't need meetings. The window to accumulate before the next ATH closes around mid-2025. We're still in the zone. Act like it.</div>
+      <button class="confidence-cta" onclick="showPage('portfolio',document.querySelector('[onclick*=portfolio]'))">See My Exit Plan →</button>
     </div>
 
     <!-- Projections -->
@@ -1520,6 +1734,16 @@
       </div>
       <button onclick="copyShareCard()" style="width:100%;background:rgba(247,147,26,0.15);border:1px solid rgba(247,147,26,0.35);color:var(--orange);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer">📋 Copy to Clipboard</button>
     </div>
+
+    <!-- DONATION CARD -->
+    <div class="section-header">Support This Tool</div>
+    <div class="donation-card">
+      <div class="donation-title">₿ Support Independent Tools</div>
+      <div class="donation-sub">Support independent tools. Every sat counts. 🙏</div>
+      <div class="donation-qr" id="donationQR"></div>
+      <div class="donation-addr" onclick="copyDonationAddr()" title="Click to copy">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
+      <button class="donation-copy-btn" onclick="copyDonationAddr()">📋 Copy Wallet Address</button>
+    </div>
   </div>
 
   <!-- PAGE: CALCULATOR -->
@@ -1620,6 +1844,14 @@
       <div class="disclaimer-inline">
         <span>⚠️</span>
         <div><b>Not financial advice.</b> These tools are projections built on a historical cycle model and live price data — not predictions, guarantees, or personalized advice. Bitcoin is volatile and you can lose money. Do your own research and never invest more than you can afford to lose.</div>
+      </div>
+
+      <!-- DONATION CARD (Calc footer) -->
+      <div class="donation-card" style="margin-top:18px">
+        <div class="donation-title">₿ Support This Tool</div>
+        <div class="donation-sub">Support independent tools. Every sat counts. 🙏</div>
+        <div class="donation-addr" onclick="copyDonationAddr()" title="Click to copy">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
+        <button class="donation-copy-btn" onclick="copyDonationAddr()">📋 Copy Wallet Address</button>
       </div>
     </div>
 
@@ -2479,6 +2711,31 @@
         <p>Bitcoin held in self-custody is the opposite: <b>you hold it directly.</b> No middleman, no permission, no off-switch. For the first time in history, anyone on Earth can hold savings nobody else can touch.</p>
       </div>
 
+      <!-- AI + BITCOIN THESIS CARDS -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">🤖</div>
+          <div class="truth-card-title">AI Runs on Crypto Rails</div>
+        </div>
+        <p>The next wave of AI doesn't run on dollars — it runs on programmable money. When an AI model needs to pay for compute, data, or API calls, it can't open a bank account or wait 3 business days for a wire. It can send Bitcoin or stablecoins in seconds, autonomously, to any wallet on Earth. Microsoft, OpenAI, and dozens of AI startups are already integrating crypto payment rails. As AI scales — and it will — the demand for crypto settlement infrastructure scales with it. Bitcoin is the reserve asset of that new economy.</p>
+      </div>
+
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">⏰</div>
+          <div class="truth-card-title">The Window Is Closing</div>
+        </div>
+        <p>Right now, retail investors can still buy Bitcoin at prices that institutional giants pay. That window closes fast. BlackRock holds 300,000+ BTC. MicroStrategy 214,000+. The U.S. government seized nearly 200,000. These aren't speculators — they're building vaults. When AI-driven payment volume sends Bitcoin demand vertical, the same sat that costs $X today will be fighting over allocation against trillion-dollar balance sheets. The small guy advantage: you can move faster. You don't need board approval. You don't need a committee. You can buy a fraction of a sat right now, today.</p>
+      </div>
+
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">🧠</div>
+          <div class="truth-card-title">Why AI Makes Bitcoin Rocket</div>
+        </div>
+        <p>Think about what happens when 10,000 AI agents are running 24/7, autonomously paying for services, compute, APIs, and data. They need money that moves without humans in the loop. Bitcoin's Lightning Network can settle payments in milliseconds, with no permission, no bank, no middleman. As AI adoption grows from millions to billions of micro-transactions per day, Bitcoin becomes the settlement layer. The payment demand alone — separate from speculation — creates structural buying pressure that didn't exist in previous cycles. This cycle is different. Not because of hype. Because of what's actually being built.</p>
+      </div>
+
       <div class="learn-takeaway">
         <div class="learn-takeaway-title" style="color:#ff4560">🔴 The Whole Point</div>
         <div class="learn-takeaway-text">Bitcoin isn't a stock or a lottery ticket. It's an opt-out — a fixed-supply, borderless money that no government, bank, or CEO can inflate, freeze, or seize. The cycle tracker tells you <i>when</i>. This is <i>why</i> people refuse to look away once they see it.</div>
@@ -2512,6 +2769,23 @@
 
     <button class="demo-btn" onclick="sendDemoTx()">💸 Send 0.5 ₿ — Watch It Get Confirmed</button>
     <div class="demo-status" id="demoStatus">Tap the button to broadcast a real-style transaction</div>
+
+    <!-- MEMPOOL STATUS CARD -->
+    <div class="mempool-card">
+      <div class="intel-card-title">⛓ Mempool Status <span style="font-size:11px;color:var(--green);font-weight:600">● Simulated Live</span></div>
+      <div class="mempool-grid">
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolTxs">82,441</div><div class="mempool-cell-label">Txs in Mempool</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolFee">22 sat/vB</div><div class="mempool-cell-label">Avg Fee</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolNext">4:12</div><div class="mempool-cell-label">Next Block</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolHashrate">743 EH/s</div><div class="mempool-cell-label">Hash Rate</div></div>
+      </div>
+    </div>
+
+    <!-- RECENT BLOCKS -->
+    <div class="mempool-card">
+      <div class="intel-card-title">📦 Recently Confirmed Blocks</div>
+      <div class="block-list" id="blockList"></div>
+    </div>
 
     <!-- EXPLAINER ACCORDION -->
     <div class="section-header">The Whole Thing, In Plain English</div>
@@ -2622,6 +2896,23 @@
       </div>
     </div>
 
+    <!-- LIVE MEMPOOL SIMULATION -->
+    <div class="section-header" style="margin-top:22px">Live Network Status</div>
+    <div class="mempool-card">
+      <div class="intel-card-title">⛓️ Bitcoin Mempool — Right Now</div>
+      <div class="mempool-grid">
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolTxs">82,441</div><div class="mempool-cell-label">Pending Transactions</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolFee">22 sat/vB</div><div class="mempool-cell-label">Avg Fee Rate</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolNext">4:12</div><div class="mempool-cell-label">Next Block Est.</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolHash">741 EH/s</div><div class="mempool-cell-label">Network Hash Rate</div></div>
+      </div>
+    </div>
+
+    <div class="mempool-card">
+      <div class="intel-card-title">🧱 Recently Confirmed Blocks</div>
+      <div class="block-list" id="blockList"></div>
+    </div>
+
     <div class="learn-takeaway">
       <div class="learn-takeaway-title">🎯 The One Idea That Matters</div>
       <div class="learn-takeaway-text">Bitcoin is money that runs on math instead of trust. No company, no CEO, no off-switch — just a fixed-supply ledger that anyone can use and no one can control. The cycle tracker tells you <i>when</i>. This page tells you <i>why it's worth tracking.</i></div>
@@ -2638,6 +2929,119 @@
   </div>
 
 </div><!-- end container -->
+
+<!-- PAGE: INTEL (Whale Intelligence) -->
+<div class="page" id="page-intel">
+  <div class="portfolio-hero" style="background:linear-gradient(135deg,rgba(6,182,212,0.12),rgba(0,0,0,0));border-color:rgba(6,182,212,0.25)">
+    <div style="font-size:12px;color:#06b6d4;margin-bottom:6px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">Market Intelligence</div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:-0.5px">🐋 Whale Intel</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px">Who's holding, who's moving, and what the smart money knows.</div>
+  </div>
+
+  <!-- INSTITUTIONAL HOLDERS -->
+  <div class="section-header">₿ Big Money Holders</div>
+  <div class="intel-card">
+    <div class="intel-card-title">Corporate &amp; Government Vaults</div>
+    <table class="intel-table">
+      <thead>
+        <tr>
+          <th>Entity</th>
+          <th style="text-align:right">BTC</th>
+          <th style="text-align:right">USD Value</th>
+          <th style="text-align:right">% of 21M</th>
+        </tr>
+      </thead>
+      <tbody id="intelHoldersTbody">
+        <tr><td colspan="4" style="color:var(--muted);font-size:12px;padding:12px 4px">Loading live price…</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5">* ETF figures represent custodied assets. Figures approximate and updated based on public disclosures.</div>
+  </div>
+
+  <!-- CELEBRITY HOLDERS -->
+  <div class="section-header">🌟 Known Public Holders</div>
+  <div class="intel-card">
+    <div class="intel-card-title">Individuals on Record</div>
+    <div class="celeb-grid">
+      <div class="celeb-row"><div class="celeb-emoji">💰</div><div><div class="celeb-name">Michael Saylor</div><div class="celeb-detail">17,732 BTC personal (stated publicly) · MicroStrategy exec chairman</div></div><div class="celeb-badge badge-bull">SUPER BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🐦</div><div><div class="celeb-name">Jack Dorsey</div><div class="celeb-detail">Significant undisclosed holdings · "Bitcoin is the internet of money"</div></div><div class="celeb-badge badge-bull">SUPER BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🚀</div><div><div class="celeb-name">Elon Musk</div><div class="celeb-detail">"I do own Bitcoin" — small personal position stated</div></div><div class="celeb-badge badge-neutral">NEUTRAL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🎯</div><div><div class="celeb-name">Tim Draper</div><div class="celeb-detail">~29,656 BTC bought from U.S. Marshals Service auction 2014</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">👥</div><div><div class="celeb-name">Winklevoss Twins</div><div class="celeb-detail">Est. ~70,000 BTC · Gemini exchange founders</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">⚓</div><div><div class="celeb-name">Naval Ravikant</div><div class="celeb-detail">Long-term Bitcoin maximalist · AngelList founder</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🎙️</div><div><div class="celeb-name">Joe Rogan</div><div class="celeb-detail">Has disclosed BTC holdings · popular Bitcoin advocate</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🏦</div><div><div class="celeb-name">Warren Buffett</div><div class="celeb-detail">"Rat poison squared" — actively avoids Bitcoin</div></div><div class="celeb-badge badge-bear">BEAR</div></div>
+    </div>
+  </div>
+
+  <!-- WHALE ALERT FEED -->
+  <div class="section-header">🐋 Whale Alert Feed</div>
+  <div class="intel-card">
+    <div class="intel-card-title" style="justify-content:space-between">
+      <span>Real-Time Large Transactions</span>
+      <span style="font-size:10px;color:var(--green);font-weight:700">● SIMULATED LIVE</span>
+    </div>
+    <div class="whale-feed" id="whaleFeed">
+      <div class="whale-entry" style="color:var(--muted);font-size:11px">Connecting to whale alert network…</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">Simulated feed based on real whale alert patterns. New transactions appear every few seconds.</div>
+  </div>
+
+  <!-- DERIVATIVES INTELLIGENCE -->
+  <div class="section-header">📊 Derivatives Intelligence</div>
+  <div class="intel-card">
+    <div class="intel-card-title">Open Interest &amp; Market Positioning</div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Aggregated futures &amp; options data across major exchanges</div>
+
+    <div class="deriv-bar-wrap">
+      <div class="deriv-bar-label">
+        <span style="color:var(--green);font-weight:800">🟢 LONGS 54%</span>
+        <span style="color:var(--red);font-weight:800">46% SHORTS 🔴</span>
+      </div>
+      <div class="deriv-bar">
+        <div class="deriv-bar-long" style="width:54%">54%</div>
+        <div class="deriv-bar-short" style="width:46%">46%</div>
+      </div>
+    </div>
+
+    <div class="deriv-grid">
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--orange)">$38.4B</div><div class="deriv-cell-label">BTC Futures Open Interest</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">+0.018%</div><div class="deriv-cell-label">Funding Rate (8h) — longs pay</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--red)">$312M</div><div class="deriv-cell-label">24h Long Liquidations</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">$184M</div><div class="deriv-cell-label">24h Short Liquidations</div></div>
+    </div>
+
+    <div style="margin-top:14px;padding:12px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;color:#d8ffe9;line-height:1.6">
+      <b style="color:var(--green)">Notable institutional longs:</b> Goldman Sachs (options exposure), Millennium Management, Tudor Investment Corp, Paul Tudor Jones famously allocated 1-2% of portfolio to BTC.
+    </div>
+    <div style="margin-top:8px;padding:12px;background:rgba(255,69,96,0.05);border:1px solid rgba(255,69,96,0.12);border-radius:10px;font-size:12px;color:#ffd0d0;line-height:1.6">
+      <b style="color:var(--red)">Historic short blowups:</b> 3AC (Three Arrows Capital), Genesis, Celsius — all ran leveraged short or under-hedged positions and were wiped out in 2022. Short sellers of Bitcoin have a graveyard.
+    </div>
+  </div>
+
+  <!-- NEWS FEED -->
+  <div class="section-header">📰 Bitcoin News Feed</div>
+  <div class="intel-card">
+    <div class="intel-card-title" style="justify-content:space-between">
+      <span>Latest Intelligence</span>
+      <span style="font-size:10px;color:var(--orange);font-weight:700">CURATED</span>
+    </div>
+    <div class="news-feed" id="newsFeed"></div>
+  </div>
+
+  <!-- AI + BTC INTEL CARD -->
+  <div class="section-header">🤖 AI × Bitcoin Thesis</div>
+  <div class="intel-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(247,147,26,0.05));border-color:rgba(124,58,237,0.25)">
+    <div class="intel-card-title" style="color:#a78bfa">Why AI Makes Bitcoin Rocket</div>
+    <p style="font-size:13px;color:#c7c7d6;line-height:1.65;margin-bottom:14px">When AI agents need to pay for compute, APIs, and data — they can't open bank accounts. They settle in crypto, instantly, 24/7, no permission needed. Microsoft, OpenAI, and hundreds of AI startups are already integrating crypto payment rails. Bitcoin's Lightning Network settles in milliseconds.</p>
+    <p style="font-size:13px;color:#c7c7d6;line-height:1.65;margin-bottom:14px">As AI scales from millions to billions of micro-transactions per day, Bitcoin becomes the settlement backbone of the new economy. That structural demand is separate from speculation — and it didn't exist in any previous cycle.</p>
+    <div style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:12px;font-size:12.5px;color:#e0d6ff;line-height:1.6">
+      <b style="color:#a78bfa">The small guy window:</b> You can move now. No board approval. No committee. The same sat that trillion-dollar institutions are racing to acquire is available on your phone today — in fractions.
+    </div>
+  </div>
+
+</div><!-- end page-intel -->
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
@@ -2664,6 +3068,10 @@
   <div class="nav-item" onclick="showPage('learn',this)">
     <span class="nav-icon">🎓</span>
     <span class="nav-label">Learn</span>
+  </div>
+  <div class="nav-item" onclick="showPage('intel',this)">
+    <span class="nav-icon">🐋</span>
+    <span class="nav-label">Intel</span>
   </div>
 </div>
 
@@ -3029,6 +3437,7 @@ async function fetchPrice() {
     checkAlerts();
     buildExitPlan();
     calcTimeMachine();
+    buildHoldersTable();
   } catch(e) {
     if (!livePrice) document.getElementById('btcPrice').textContent = '$—';
   }
@@ -4388,6 +4797,7 @@ function showPage(name, el) {
     const active = document.querySelector('.learn-section.active');
     if (active && active.id === 'learn-how' && chainAnim) { chainAnim.resize(); animateScarcity(); }
   }
+  if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -4724,6 +5134,276 @@ function buildExitPlan() {
     </div>`;
 }
 
+// ── DONATION WALLET ──────────────────────────────────────────
+const DONATION_ADDR = 'bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f';
+
+function showToast(msg, duration) {
+  const existing = document.querySelector('.toast-msg');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast-msg';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), (duration || 2500));
+}
+
+function copyDonationAddr() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(DONATION_ADDR).then(() => {
+      showToast('₿ Address copied! Every sat counts. 🙏');
+    }).catch(() => fallbackCopy(DONATION_ADDR));
+  } else {
+    fallbackCopy(DONATION_ADDR);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('₿ Copied!'); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function buildDonationQR() {
+  const el = document.getElementById('donationQR');
+  if (!el) return;
+  // Pixel pattern for QR-like visual (decorative, not scannable)
+  const pattern = [
+    1,1,1,1,1,1,1,0,0,0,1,
+    1,0,0,0,0,0,1,0,1,0,0,
+    1,0,1,1,1,0,1,0,0,1,1,
+    1,0,1,1,1,0,1,0,1,1,0,
+    1,0,1,1,1,0,1,0,0,0,1,
+    1,0,0,0,0,0,1,0,1,1,0,
+    1,1,1,1,1,1,1,0,1,0,1,
+    0,0,0,0,0,0,0,0,0,1,0,
+    1,0,1,1,0,1,0,1,1,0,1,
+    0,1,0,0,1,0,0,0,0,1,0,
+    1,1,1,0,1,1,1,0,1,0,1,
+  ];
+  el.innerHTML = pattern.map(b =>
+    `<div class="qr-cell" style="background:${b ? '#000' : '#fff'}"></div>`
+  ).join('');
+}
+
+// ── INSTITUTIONAL HOLDERS TABLE ───────────────────────────────
+const BTC_HOLDERS = [
+  { emoji: '🏦', name: 'BlackRock (IBIT ETF)',   btc: 320000,  pct: 1.524 },
+  { emoji: '📊', name: 'Fidelity (FBTC ETF)',     btc: 172000,  pct: 0.819 },
+  { emoji: '💼', name: 'MicroStrategy',            btc: 214400,  pct: 1.021 },
+  { emoji: '🏛️', name: 'U.S. Government',          btc: 198109,  pct: 0.944 },
+  { emoji: '⛏️', name: 'Marathon Digital',         btc: 25000,   pct: 0.119 },
+  { emoji: '🚗', name: 'Tesla',                    btc: 9720,    pct: 0.046 },
+  { emoji: '◻️', name: 'Block (Square)',            btc: 8027,    pct: 0.038 },
+  { emoji: '🪙', name: 'Coinbase (Corporate)',      btc: 10000,   pct: 0.048 },
+  { emoji: '🌎', name: 'El Salvador (Nation)',      btc: 5800,    pct: 0.028 },
+];
+
+function buildHoldersTable() {
+  const tbody = document.getElementById('intelHoldersTbody');
+  if (!tbody) return;
+  const price = livePrice || 105000;
+  tbody.innerHTML = BTC_HOLDERS.map(h => {
+    const usd = h.btc * price;
+    const usdStr = usd >= 1e9 ? '$' + (usd/1e9).toFixed(1) + 'B' : '$' + (usd/1e6).toFixed(0) + 'M';
+    return `<tr>
+      <td><span style="margin-right:5px">${h.emoji}</span><span class="company-name">${h.name}</span></td>
+      <td style="text-align:right" class="btc-amt">${h.btc.toLocaleString()}</td>
+      <td style="text-align:right" class="usd-val">${usdStr}</td>
+      <td style="text-align:right" class="supply-pct">${h.pct}%</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── WHALE ALERT FEED ─────────────────────────────────────────
+const WHALE_EXCHANGES = ['Binance','Coinbase','Kraken','OKX','Bybit','FTX (Cold)','Unknown Wallet','Bitfinex'];
+const WHALE_TYPES = [
+  'exchange → exchange','unknown → exchange','exchange → unknown','unknown → unknown'
+];
+let whaleEntries = [];
+
+function randBetween(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+function genWhaleEntry() {
+  const btc = randBetween(50, 4800);
+  const price = livePrice || 105000;
+  const usd = btc * price;
+  const minsAgo = randBetween(1, 45);
+  const from = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
+  const to = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
+  const usdStr = usd >= 1e9 ? (usd/1e9).toFixed(2) + 'B' : (usd/1e6).toFixed(1) + 'M';
+  const icon = btc >= 1000 ? '🐋' : btc >= 300 ? '🦈' : '🐟';
+  return `<div class="whale-entry">
+    ${icon} <b style="color:#c7c7d6">${minsAgo}m ago</b> &nbsp;
+    <span class="whale-amount">${btc.toLocaleString()} BTC</span>
+    <span style="color:var(--muted)"> ($<span class="whale-usd">${usdStr}</span>)</span>
+    &nbsp;·&nbsp; <span style="color:var(--muted);font-size:10px">${from} → ${to}</span>
+  </div>`;
+}
+
+function initWhaleAlert() {
+  const feed = document.getElementById('whaleFeed');
+  if (!feed) return;
+  whaleEntries = Array.from({length: 8}, () => genWhaleEntry());
+  feed.innerHTML = whaleEntries.join('');
+  setInterval(() => {
+    if (!document.getElementById('whaleFeed')) return;
+    const newEntry = genWhaleEntry();
+    whaleEntries.unshift(newEntry);
+    if (whaleEntries.length > 12) whaleEntries.pop();
+    feed.innerHTML = whaleEntries.join('');
+  }, 5000);
+}
+
+// ── NEWS FEED ────────────────────────────────────────────────
+const NEWS_ITEMS = [
+  { headline: 'MicroStrategy adds 11,000 BTC to treasury, now holds 214,400 BTC total', source: 'COMPANY NEWS', sentiment: 'bullish', delay: 2 },
+  { headline: 'BlackRock IBIT sees record $1.2B single-day inflow from institutional clients', source: 'ETF TRACKER', sentiment: 'bullish', delay: 4 },
+  { headline: 'Bitcoin Lightning Network capacity crosses 5,000 BTC — payments scaling rapidly', source: 'TECH', sentiment: 'bullish', delay: 6 },
+  { headline: 'El Salvador doubles down: adds 300 BTC to national treasury reserves', source: 'GOVERNMENT', sentiment: 'bullish', delay: 8 },
+  { headline: "Analysts: AI inference costs increasingly settled via crypto rails — Bitcoin cited", source: 'AI × CRYPTO', sentiment: 'bullish', delay: 1 },
+  { headline: 'Bitcoin mining difficulty hits all-time high as global hash rate surges to 740 EH/s', source: 'MINING', sentiment: 'bullish', delay: 3 },
+  { headline: 'Fidelity report: Institutions treating Bitcoin as primary treasury reserve asset', source: 'INSTITUTIONAL', sentiment: 'bullish', delay: 5 },
+  { headline: "Galaxy Digital launches Bitcoin treasury product for Fortune 500 corporates", source: 'INSTITUTIONAL', sentiment: 'bullish', delay: 7 },
+  { headline: "Warren Buffett: 'I still don't own Bitcoin' — Berkshire Hathaway holds cash", source: 'TRADITIONAL FINANCE', sentiment: 'bearish', delay: 9 },
+  { headline: 'SEC approves two more Bitcoin ETF options products — expanding derivatives market', source: 'REGULATION', sentiment: 'bullish', delay: 11 },
+];
+
+function buildNewsFeed() {
+  const el = document.getElementById('newsFeed');
+  if (!el) return;
+  const baseTime = Date.now();
+  el.innerHTML = NEWS_ITEMS.map(item => {
+    const h = Math.floor(item.delay) + 1;
+    const timeStr = h < 60 ? `${h}h ago` : `${Math.floor(h/60)}d ago`;
+    return `<div class="news-item ${item.sentiment}">
+      <div class="news-headline">${item.headline}</div>
+      <div class="news-meta">
+        <span class="news-source">${item.source}</span>
+        <span class="news-time">${timeStr}</span>
+        <span class="news-badge ${item.sentiment}">${item.sentiment.toUpperCase()}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MEMPOOL SIMULATION ────────────────────────────────────────
+const MINING_POOLS = ['Foundry USA','AntPool','F2Pool','ViaBTC','Binance Pool','SBI Crypto','Slushpool','Ocean'];
+let blockHeight = 900245;
+
+function buildBlockList() {
+  const el = document.getElementById('blockList');
+  if (!el) return;
+  const blocks = Array.from({length: 5}, (_, i) => {
+    const pool = MINING_POOLS[randBetween(0, MINING_POOLS.length - 1)];
+    const txs = randBetween(1800, 3200);
+    const minsAgo = (i + 1) * randBetween(8, 12);
+    return `<div class="block-row">
+      <div class="block-num">#${(blockHeight - i).toLocaleString()}</div>
+      <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
+      <div class="block-reward">+3.125 ₿</div>
+    </div>`;
+  });
+  el.innerHTML = blocks.join('');
+}
+
+function initMempoolSim() {
+  const updateMempool = () => {
+    const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    const txs = randBetween(48000, 145000);
+    const fee = randBetween(8, 45);
+    const nextMin = randBetween(0, 9);
+    const nextSec = randBetween(0, 59);
+    const hash = randBetween(700, 800);
+    s('mempoolTxs', txs.toLocaleString());
+    s('mempoolFee', fee + ' sat/vB');
+    s('mempoolNext', nextMin + ':' + String(nextSec).padStart(2,'0'));
+    s('mempoolHash', hash + ' EH/s');
+  };
+  buildBlockList();
+  updateMempool();
+  setInterval(updateMempool, 10000);
+  setInterval(() => { blockHeight++; buildBlockList(); }, 600000);
+}
+
+// ── KONAMI CODE EASTER EGG ────────────────────────────────────
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', (e) => {
+  if (e.key === KONAMI[konamiIdx]) {
+    konamiIdx++;
+    if (konamiIdx === KONAMI.length) {
+      konamiIdx = 0;
+      showOrangePill();
+    }
+  } else {
+    konamiIdx = 0;
+  }
+});
+
+function showOrangePill() {
+  const overlay = document.createElement('div');
+  overlay.className = 'orange-pill-overlay';
+  overlay.id = 'orangePillOverlay';
+  // BTC rain particles
+  const particles = Array.from({length: 20}, (_, i) => {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 3;
+    const duration = 2 + Math.random() * 3;
+    return `<div class="btc-particle" style="left:${left}%;animation-delay:${delay}s;animation-duration:${duration}s">₿</div>`;
+  }).join('');
+  overlay.innerHTML = `
+    ${particles}
+    <div class="op-title">🟠 ORANGE PILL<br>ACTIVATED</div>
+    <div class="op-sub">You found the secret. Satoshi would be proud.</div>
+    <div class="op-msg">Stack sats. Verify, don't trust.<br>The revolution is in your pocket.<br><br>There will only ever be 21,000,000 Bitcoin.<br>Every one that exists is already spoken for.</div>
+    <div class="op-club">⛏️ The 21M Club — you're early.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:20px;font-family:monospace">"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"</div>
+    <div class="op-dismiss" onclick="document.getElementById('orangePillOverlay').remove()">[ dismiss ]</div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+// ── LOGO CLICK EASTER EGG (7 clicks) ──────────────────────────
+let logoClicks = 0, logoTimer = null;
+document.addEventListener('DOMContentLoaded', () => {
+  const logo = document.querySelector('.logo-icon');
+  if (logo) {
+    logo.addEventListener('click', () => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      if (logoClicks >= 7) {
+        logoClicks = 0;
+        showToast('⛓️ Genesis Block: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks" — Satoshi knew.', 5000);
+      } else {
+        logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
+      }
+    });
+  }
+  // Satoshi hash mode
+  if (window.location.hash === '#satoshi') {
+    const banner = document.createElement('div');
+    banner.className = 'satoshi-banner';
+    banner.innerHTML = '🔑 <b>Satoshi Mode:</b> This tool is built by someone who believes in the work. Verify everything. Not your keys, not your coins. The Genesis Block was mined Jan 3, 2009. Stack accordingly.';
+    const container = document.querySelector('.container');
+    if (container) container.prepend(banner);
+  }
+});
+
+// ── INTEL PAGE INIT ───────────────────────────────────────────
+function initIntelPage() {
+  buildHoldersTable();
+  initWhaleAlert();
+  buildNewsFeed();
+  initMempoolSim();
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 updateCycleUI();
 buildSmallChart();
@@ -4753,6 +5433,8 @@ initChainAnim();
 initCycleRing();
 calcTimeMachine();
 buildExitPlan();
+buildDonationQR();
+initIntelPage();
 
 tickDebtCounter();
 setInterval(updateCountdown, 1000);
