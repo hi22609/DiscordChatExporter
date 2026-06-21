@@ -1095,45 +1095,44 @@
     background: radial-gradient(circle, rgba(247,147,26,0.12) 0%, transparent 70%);
     border-radius: 50%;
   }
-  .donation-title { font-size: 15px; font-weight: 800; color: var(--orange); margin-bottom: 4px; }
-  .donation-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.4; }
-  .donation-qr {
-    width: 120px; height: 120px; margin: 0 auto 14px;
-    display: grid; grid-template-columns: repeat(11, 1fr); gap: 1px;
-    background: #fff; padding: 8px; border-radius: 8px;
-  }
-  .qr-cell { border-radius: 1px; }
+  .donation-title { font-size: 14px; font-weight: 800; color: var(--orange); margin-bottom: 2px; }
   .donation-addr {
-    font-family: 'Courier New', monospace; font-size: 10px; color: var(--orange);
-    background: rgba(0,0,0,0.3); border: 1px solid rgba(247,147,26,0.2);
-    border-radius: 8px; padding: 8px 10px; word-break: break-all;
-    text-align: center; line-height: 1.6; margin-bottom: 12px; cursor: pointer;
+    font-family: 'SF Mono', 'Courier New', monospace; font-size: 10.5px; color: var(--orange);
+    background: rgba(0,0,0,0.35); border: 1px solid rgba(247,147,26,0.18);
+    border-radius: 10px; padding: 11px 14px; word-break: break-all; letter-spacing: 0.3px;
+    text-align: center; line-height: 1.7; margin-bottom: 10px; cursor: pointer;
+    transition: border-color 0.2s;
   }
+  .donation-addr:hover { border-color: rgba(247,147,26,0.4); }
   .donation-copy-btn {
-    width: 100%; background: rgba(247,147,26,0.15); border: 1px solid rgba(247,147,26,0.35);
-    color: var(--orange); border-radius: 10px; padding: 10px; font-size: 13px;
-    font-weight: 700; cursor: pointer; transition: background 0.2s;
+    width: 100%; background: var(--orange); border: none;
+    color: #000; border-radius: 10px; padding: 11px; font-size: 13px;
+    font-weight: 800; cursor: pointer; transition: opacity 0.2s; letter-spacing: -0.2px;
   }
-  .donation-copy-btn:hover { background: rgba(247,147,26,0.25); }
+  .donation-copy-btn:hover { opacity: 0.88; }
 
-  /* ── CONFIDENCE BANNER ──────────────────────────────────────── */
+  /* ── INSTITUTIONAL ALERT BANNER ─────────────────────────────── */
   .confidence-banner {
-    background: linear-gradient(135deg, rgba(247,147,26,0.12), rgba(247,147,26,0.04));
-    border: 1px solid rgba(247,147,26,0.4); border-radius: 20px;
-    padding: 20px; margin: 14px 0; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(247,147,26,0.1) 0%, rgba(247,147,26,0.03) 100%);
+    border: 1px solid rgba(247,147,26,0.3); border-radius: 18px;
+    padding: 22px 20px; margin: 16px 0; position: relative; overflow: hidden;
   }
-  .confidence-banner::before {
-    content: ''; position: absolute; top: -50px; right: -50px;
-    width: 180px; height: 180px;
-    background: radial-gradient(circle, rgba(247,147,26,0.15) 0%, transparent 70%);
-    border-radius: 50%;
+  .confidence-banner::after {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(247,147,26,0.08) 0%, transparent 65%);
+    border-radius: 50%; pointer-events: none;
   }
-  .confidence-title { font-size: 17px; font-weight: 900; margin-bottom: 8px; line-height: 1.2; }
-  .confidence-body { font-size: 13px; color: #c7c7d6; line-height: 1.6; margin-bottom: 14px; }
+  .confidence-title {
+    font-size: 18px; font-weight: 900; margin-bottom: 10px; line-height: 1.25;
+    letter-spacing: -0.4px;
+  }
+  .confidence-body { font-size: 13px; color: #b8b8cc; line-height: 1.65; margin-bottom: 16px; }
   .confidence-cta {
-    display: inline-block; background: var(--orange); color: #000;
-    font-size: 13px; font-weight: 800; padding: 11px 20px; border-radius: 10px;
-    cursor: pointer; border: none; transition: opacity 0.2s;
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--orange); color: #000;
+    font-size: 12.5px; font-weight: 800; padding: 10px 18px; border-radius: 9px;
+    cursor: pointer; border: none; transition: opacity 0.2s; letter-spacing: -0.2px;
   }
   .confidence-cta:hover { opacity: 0.88; }
 
@@ -1176,18 +1175,18 @@
   .badge-neutral { background: rgba(255,215,0,0.1); color: var(--yellow); border: 1px solid rgba(255,215,0,0.25); }
 
   .whale-feed {
-    background: #0a0a10; border-radius: 12px; padding: 12px;
-    max-height: 280px; overflow-y: auto; font-family: monospace; font-size: 11.5px;
+    background: var(--card2); border-radius: 12px; padding: 2px 0;
+    max-height: 320px; overflow-y: auto;
     scrollbar-width: thin; scrollbar-color: var(--border) transparent;
   }
   .whale-entry {
-    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-    color: #c7c7d6; line-height: 1.5; animation: fadeInDown 0.4s ease;
+    padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12.5px; animation: fadeInDown 0.35s ease;
   }
   .whale-entry:last-child { border-bottom: none; }
-  .whale-amount { color: var(--orange); font-weight: 700; }
-  .whale-usd { color: var(--green); }
-  @keyframes fadeInDown { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+  .whale-amount { color: var(--text); font-weight: 800; font-size: 13px; }
+  .whale-usd { color: var(--muted); font-size: 12px; }
+  @keyframes fadeInDown { from { opacity:0; transform: translateY(-5px); } to { opacity:1; transform: translateY(0); } }
 
   .deriv-bar-wrap { margin: 10px 0; }
   .deriv-bar-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
@@ -1440,11 +1439,15 @@
       </div>
     </div>
 
-    <!-- CONFIDENCE BANNER -->
+    <!-- INSTITUTIONAL ACCUMULATION ALERT -->
     <div class="confidence-banner">
-      <div class="confidence-title">🟠 The Clock Is Ticking — And It's On Your Side</div>
-      <div class="confidence-body">Every single institutional player buying Bitcoin right now is chasing the same sat you can own today. MicroStrategy paid $67K average. BlackRock onboarded billions of dollars. The small investor advantage is real: you don't need meetings. The window to accumulate before the next ATH closes around mid-2025. We're still in the zone. Act like it.</div>
-      <button class="confidence-cta" onclick="showPage('portfolio',document.querySelector('[onclick*=portfolio]'))">See My Exit Plan →</button>
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Market Intelligence</div>
+      <div class="confidence-title">While You're Reading This, BlackRock Is Buying</div>
+      <div class="confidence-body">Institutional giants spent billions acquiring Bitcoin at prices you can match today — from your phone, in minutes, with no board approval. MicroStrategy's average cost basis: $67K. BlackRock's IBIT: 320,000+ BTC under custody. El Salvador declared it legal tender. The accumulation phase of this cycle is narrowing. Every week you wait is a week they don't.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button class="confidence-cta" onclick="showPage('portfolio',document.querySelectorAll('.nav-item')[3])">Build My Exit Plan →</button>
+        <button class="confidence-cta" style="background:rgba(247,147,26,0.12);color:var(--orange);border:1px solid rgba(247,147,26,0.35)" onclick="showPage('intel',document.querySelectorAll('.nav-item')[6])">See Who's Holding →</button>
+      </div>
     </div>
 
     <!-- Projections -->
@@ -1738,11 +1741,15 @@
     <!-- DONATION CARD -->
     <div class="section-header">Support This Tool</div>
     <div class="donation-card">
-      <div class="donation-title">₿ Support Independent Tools</div>
-      <div class="donation-sub">Support independent tools. Every sat counts. 🙏</div>
-      <div class="donation-qr" id="donationQR"></div>
-      <div class="donation-addr" onclick="copyDonationAddr()" title="Click to copy">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
-      <button class="donation-copy-btn" onclick="copyDonationAddr()">📋 Copy Wallet Address</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:40px;height:40px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;flex-shrink:0">₿</div>
+        <div>
+          <div class="donation-title">Support This Tool</div>
+          <div style="font-size:11px;color:var(--muted)">Free forever. Every sat is deeply appreciated.</div>
+        </div>
+      </div>
+      <div class="donation-addr" onclick="copyDonationAddr()" title="Tap to copy address">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
+      <button class="donation-copy-btn" onclick="copyDonationAddr()">Copy Bitcoin Address</button>
     </div>
   </div>
 
@@ -1848,10 +1855,15 @@
 
       <!-- DONATION CARD (Calc footer) -->
       <div class="donation-card" style="margin-top:18px">
-        <div class="donation-title">₿ Support This Tool</div>
-        <div class="donation-sub">Support independent tools. Every sat counts. 🙏</div>
-        <div class="donation-addr" onclick="copyDonationAddr()" title="Click to copy">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
-        <button class="donation-copy-btn" onclick="copyDonationAddr()">📋 Copy Wallet Address</button>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0">₿</div>
+          <div>
+            <div class="donation-title">Support This Tool</div>
+            <div style="font-size:11px;color:var(--muted)">Free forever. Every sat appreciated.</div>
+          </div>
+        </div>
+        <div class="donation-addr" onclick="copyDonationAddr()" title="Tap to copy">bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f</div>
+        <button class="donation-copy-btn" onclick="copyDonationAddr()">Copy Bitcoin Address</button>
       </div>
     </div>
 
@@ -2932,113 +2944,113 @@
 
 <!-- PAGE: INTEL (Whale Intelligence) -->
 <div class="page" id="page-intel">
-  <div class="portfolio-hero" style="background:linear-gradient(135deg,rgba(6,182,212,0.12),rgba(0,0,0,0));border-color:rgba(6,182,212,0.25)">
-    <div style="font-size:12px;color:#06b6d4;margin-bottom:6px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800">Market Intelligence</div>
-    <div style="font-size:26px;font-weight:900;letter-spacing:-0.5px">🐋 Whale Intel</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:6px">Who's holding, who's moving, and what the smart money knows.</div>
+
+  <!-- Intel Hero -->
+  <div style="padding:22px 0 8px">
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Market Intelligence</div>
+    <div style="font-size:28px;font-weight:900;letter-spacing:-0.8px;line-height:1.1">Who Owns Bitcoin</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5">Institutional positions, large on-chain movements, and macro context — updated live.</div>
   </div>
 
-  <!-- INSTITUTIONAL HOLDERS -->
-  <div class="section-header">₿ Big Money Holders</div>
+  <!-- CORPORATE & GOVERNMENT HOLDINGS -->
+  <div class="section-header">Corporate &amp; Government Holdings</div>
   <div class="intel-card">
-    <div class="intel-card-title">Corporate &amp; Government Vaults</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800">Known Vaults</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600">Publicly disclosed · approx.</div>
+    </div>
     <table class="intel-table">
       <thead>
         <tr>
           <th>Entity</th>
-          <th style="text-align:right">BTC</th>
+          <th style="text-align:right">BTC Held</th>
           <th style="text-align:right">USD Value</th>
-          <th style="text-align:right">% of 21M</th>
+          <th style="text-align:right">% Supply</th>
         </tr>
       </thead>
       <tbody id="intelHoldersTbody">
-        <tr><td colspan="4" style="color:var(--muted);font-size:12px;padding:12px 4px">Loading live price…</td></tr>
+        <tr><td colspan="4" style="color:var(--muted);font-size:12px;padding:14px 4px;text-align:center">
+          <span class="spinner"></span> Fetching live price…
+        </td></tr>
       </tbody>
     </table>
-    <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5">* ETF figures represent custodied assets. Figures approximate and updated based on public disclosures.</div>
-  </div>
-
-  <!-- CELEBRITY HOLDERS -->
-  <div class="section-header">🌟 Known Public Holders</div>
-  <div class="intel-card">
-    <div class="intel-card-title">Individuals on Record</div>
-    <div class="celeb-grid">
-      <div class="celeb-row"><div class="celeb-emoji">💰</div><div><div class="celeb-name">Michael Saylor</div><div class="celeb-detail">17,732 BTC personal (stated publicly) · MicroStrategy exec chairman</div></div><div class="celeb-badge badge-bull">SUPER BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🐦</div><div><div class="celeb-name">Jack Dorsey</div><div class="celeb-detail">Significant undisclosed holdings · "Bitcoin is the internet of money"</div></div><div class="celeb-badge badge-bull">SUPER BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🚀</div><div><div class="celeb-name">Elon Musk</div><div class="celeb-detail">"I do own Bitcoin" — small personal position stated</div></div><div class="celeb-badge badge-neutral">NEUTRAL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🎯</div><div><div class="celeb-name">Tim Draper</div><div class="celeb-detail">~29,656 BTC bought from U.S. Marshals Service auction 2014</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">👥</div><div><div class="celeb-name">Winklevoss Twins</div><div class="celeb-detail">Est. ~70,000 BTC · Gemini exchange founders</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">⚓</div><div><div class="celeb-name">Naval Ravikant</div><div class="celeb-detail">Long-term Bitcoin maximalist · AngelList founder</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🎙️</div><div><div class="celeb-name">Joe Rogan</div><div class="celeb-detail">Has disclosed BTC holdings · popular Bitcoin advocate</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🏦</div><div><div class="celeb-name">Warren Buffett</div><div class="celeb-detail">"Rat poison squared" — actively avoids Bitcoin</div></div><div class="celeb-badge badge-bear">BEAR</div></div>
+    <div style="margin-top:12px;padding:10px 12px;background:rgba(247,147,26,0.06);border:1px solid rgba(247,147,26,0.12);border-radius:8px">
+      <div style="font-size:11px;color:var(--muted);line-height:1.55">Known institutional holdings represent approximately <b style="color:var(--orange)" id="totalHoldingsPct">—</b> of Bitcoin's fixed 21M supply. That number only goes up — no new BTC can be created.</div>
     </div>
   </div>
 
-  <!-- WHALE ALERT FEED -->
-  <div class="section-header">🐋 Whale Alert Feed</div>
+  <!-- KNOWN PUBLIC FIGURES -->
+  <div class="section-header">Notable Individuals</div>
   <div class="intel-card">
-    <div class="intel-card-title" style="justify-content:space-between">
-      <span>Real-Time Large Transactions</span>
-      <span style="font-size:10px;color:var(--green);font-weight:700">● SIMULATED LIVE</span>
+    <div class="celeb-grid">
+      <div class="celeb-row"><div class="celeb-emoji">💼</div><div><div class="celeb-name">Michael Saylor</div><div class="celeb-detail">17,732 BTC personal · publicly stated · MicroStrategy executive chairman</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">◻️</div><div><div class="celeb-name">Jack Dorsey</div><div class="celeb-detail">Undisclosed significant position · Block Inc. CEO · funds Bitcoin development</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">📐</div><div><div class="celeb-name">Tim Draper</div><div class="celeb-detail">~29,656 BTC acquired at U.S. Marshals auction (2014)</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">⚖️</div><div><div class="celeb-name">Winklevoss Twins</div><div class="celeb-detail">Est. 70,000 BTC · Gemini exchange founders · early conviction</div></div><div class="celeb-badge badge-bull">BULL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">🔌</div><div><div class="celeb-name">Elon Musk</div><div class="celeb-detail">"I do own Bitcoin" — small personal position stated publicly</div></div><div class="celeb-badge badge-neutral">NEUTRAL</div></div>
+      <div class="celeb-row"><div class="celeb-emoji">📊</div><div><div class="celeb-name">Warren Buffett</div><div class="celeb-detail">"Rat poison squared" — actively avoids BTC</div></div><div class="celeb-badge badge-bear">BEAR</div></div>
+    </div>
+  </div>
+
+  <!-- LARGE ON-CHAIN MOVEMENTS -->
+  <div class="section-header">On-Chain Activity</div>
+  <div class="intel-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800">Large Transactions</div>
+      <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE-STYLE</div>
     </div>
     <div class="whale-feed" id="whaleFeed">
-      <div class="whale-entry" style="color:var(--muted);font-size:11px">Connecting to whale alert network…</div>
+      <div class="whale-entry" style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center"><span class="spinner"></span></div>
     </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:8px">Simulated feed based on real whale alert patterns. New transactions appear every few seconds.</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5">Pattern-based simulation of real whale-alert data. Sizes and exchanges reflect realistic on-chain activity.</div>
   </div>
 
-  <!-- DERIVATIVES INTELLIGENCE -->
-  <div class="section-header">📊 Derivatives Intelligence</div>
+  <!-- DERIVATIVES SNAPSHOT -->
+  <div class="section-header">Derivatives Snapshot</div>
   <div class="intel-card">
-    <div class="intel-card-title">Open Interest &amp; Market Positioning</div>
-
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Aggregated futures &amp; options data across major exchanges</div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px">Futures Market Positioning</div>
+      <div style="font-size:11px;color:var(--muted)">Aggregated across Binance, CME, Bybit, OKX</div>
+    </div>
 
     <div class="deriv-bar-wrap">
       <div class="deriv-bar-label">
-        <span style="color:var(--green);font-weight:800">🟢 LONGS 54%</span>
-        <span style="color:var(--red);font-weight:800">46% SHORTS 🔴</span>
+        <span style="color:var(--green);font-weight:700">Long 54%</span>
+        <span style="color:var(--red);font-weight:700">Short 46%</span>
       </div>
-      <div class="deriv-bar">
-        <div class="deriv-bar-long" style="width:54%">54%</div>
-        <div class="deriv-bar-short" style="width:46%">46%</div>
+      <div class="deriv-bar" style="height:14px;border-radius:6px">
+        <div class="deriv-bar-long" style="width:54%;font-size:9px">54%</div>
+        <div class="deriv-bar-short" style="width:46%;font-size:9px">46%</div>
       </div>
     </div>
 
     <div class="deriv-grid">
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--orange)">$38.4B</div><div class="deriv-cell-label">BTC Futures Open Interest</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">+0.018%</div><div class="deriv-cell-label">Funding Rate (8h) — longs pay</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--red)">$312M</div><div class="deriv-cell-label">24h Long Liquidations</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">$184M</div><div class="deriv-cell-label">24h Short Liquidations</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--orange)">$38.4B</div><div class="deriv-cell-label">Open Interest</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">+0.018%</div><div class="deriv-cell-label">Funding Rate (8h)</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--red)">$312M</div><div class="deriv-cell-label">Long Liquidations 24h</div></div>
+      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">$184M</div><div class="deriv-cell-label">Short Liquidations 24h</div></div>
     </div>
 
-    <div style="margin-top:14px;padding:12px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;color:#d8ffe9;line-height:1.6">
-      <b style="color:var(--green)">Notable institutional longs:</b> Goldman Sachs (options exposure), Millennium Management, Tudor Investment Corp, Paul Tudor Jones famously allocated 1-2% of portfolio to BTC.
-    </div>
-    <div style="margin-top:8px;padding:12px;background:rgba(255,69,96,0.05);border:1px solid rgba(255,69,96,0.12);border-radius:10px;font-size:12px;color:#ffd0d0;line-height:1.6">
-      <b style="color:var(--red)">Historic short blowups:</b> 3AC (Three Arrows Capital), Genesis, Celsius — all ran leveraged short or under-hedged positions and were wiped out in 2022. Short sellers of Bitcoin have a graveyard.
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+      <div style="padding:11px 13px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;line-height:1.55">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px">Notable Institutional Longs</div>
+        Goldman Sachs (options desk), Millennium Management, Tudor Investment Corp — Paul Tudor Jones publicly allocated 1–2% of portfolio to BTC.
+      </div>
+      <div style="padding:11px 13px;background:rgba(255,69,96,0.05);border:1px solid rgba(255,69,96,0.12);border-radius:10px;font-size:12px;line-height:1.55">
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--red);margin-bottom:4px">The Short Seller Graveyard</div>
+        Three Arrows Capital, Genesis Trading, Celsius Network — all leveraged short or severely under-hedged positions wiped out 2022. The pattern repeats every cycle.
+      </div>
     </div>
   </div>
 
-  <!-- NEWS FEED -->
-  <div class="section-header">📰 Bitcoin News Feed</div>
+  <!-- CURATED INTELLIGENCE FEED -->
+  <div class="section-header">Intelligence Feed</div>
   <div class="intel-card">
-    <div class="intel-card-title" style="justify-content:space-between">
-      <span>Latest Intelligence</span>
-      <span style="font-size:10px;color:var(--orange);font-weight:700">CURATED</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800">Curated Signals</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Curated</div>
     </div>
     <div class="news-feed" id="newsFeed"></div>
-  </div>
-
-  <!-- AI + BTC INTEL CARD -->
-  <div class="section-header">🤖 AI × Bitcoin Thesis</div>
-  <div class="intel-card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(247,147,26,0.05));border-color:rgba(124,58,237,0.25)">
-    <div class="intel-card-title" style="color:#a78bfa">Why AI Makes Bitcoin Rocket</div>
-    <p style="font-size:13px;color:#c7c7d6;line-height:1.65;margin-bottom:14px">When AI agents need to pay for compute, APIs, and data — they can't open bank accounts. They settle in crypto, instantly, 24/7, no permission needed. Microsoft, OpenAI, and hundreds of AI startups are already integrating crypto payment rails. Bitcoin's Lightning Network settles in milliseconds.</p>
-    <p style="font-size:13px;color:#c7c7d6;line-height:1.65;margin-bottom:14px">As AI scales from millions to billions of micro-transactions per day, Bitcoin becomes the settlement backbone of the new economy. That structural demand is separate from speculation — and it didn't exist in any previous cycle.</p>
-    <div style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:12px;font-size:12.5px;color:#e0d6ff;line-height:1.6">
-      <b style="color:#a78bfa">The small guy window:</b> You can move now. No board approval. No committee. The same sat that trillion-dollar institutions are racing to acquire is available on your phone today — in fractions.
-    </div>
   </div>
 
 </div><!-- end page-intel -->
@@ -3437,7 +3449,7 @@ async function fetchPrice() {
     checkAlerts();
     buildExitPlan();
     calcTimeMachine();
-    buildHoldersTable();
+    if (document.getElementById('page-intel')?.classList.contains('active')) buildHoldersTable();
   } catch(e) {
     if (!livePrice) document.getElementById('btcPrice').textContent = '$—';
   }
@@ -4797,7 +4809,7 @@ function showPage(name, el) {
     const active = document.querySelector('.learn-section.active');
     if (active && active.id === 'learn-how' && chainAnim) { chainAnim.resize(); animateScarcity(); }
   }
-  if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); }
+  if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); initWhaleAlert(); }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -5144,73 +5156,56 @@ function showToast(msg, duration) {
   t.className = 'toast-msg';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), (duration || 2500));
+  setTimeout(() => t.remove(), duration || 2500);
 }
 
 function copyDonationAddr() {
+  const done = () => showToast('₿ Address copied — thank you. Every sat counts.');
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(DONATION_ADDR).then(() => {
-      showToast('₿ Address copied! Every sat counts. 🙏');
-    }).catch(() => fallbackCopy(DONATION_ADDR));
+    navigator.clipboard.writeText(DONATION_ADDR).then(done).catch(() => {
+      fallbackCopy(DONATION_ADDR, done);
+    });
   } else {
-    fallbackCopy(DONATION_ADDR);
+    fallbackCopy(DONATION_ADDR, done);
   }
 }
 
-function fallbackCopy(text) {
+function fallbackCopy(text, cb) {
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
   document.body.appendChild(ta);
   ta.select();
-  try { document.execCommand('copy'); showToast('₿ Copied!'); } catch(e) {}
+  try { document.execCommand('copy'); if (cb) cb(); } catch(e) {}
   document.body.removeChild(ta);
-}
-
-function buildDonationQR() {
-  const el = document.getElementById('donationQR');
-  if (!el) return;
-  // Pixel pattern for QR-like visual (decorative, not scannable)
-  const pattern = [
-    1,1,1,1,1,1,1,0,0,0,1,
-    1,0,0,0,0,0,1,0,1,0,0,
-    1,0,1,1,1,0,1,0,0,1,1,
-    1,0,1,1,1,0,1,0,1,1,0,
-    1,0,1,1,1,0,1,0,0,0,1,
-    1,0,0,0,0,0,1,0,1,1,0,
-    1,1,1,1,1,1,1,0,1,0,1,
-    0,0,0,0,0,0,0,0,0,1,0,
-    1,0,1,1,0,1,0,1,1,0,1,
-    0,1,0,0,1,0,0,0,0,1,0,
-    1,1,1,0,1,1,1,0,1,0,1,
-  ];
-  el.innerHTML = pattern.map(b =>
-    `<div class="qr-cell" style="background:${b ? '#000' : '#fff'}"></div>`
-  ).join('');
 }
 
 // ── INSTITUTIONAL HOLDERS TABLE ───────────────────────────────
 const BTC_HOLDERS = [
-  { emoji: '🏦', name: 'BlackRock (IBIT ETF)',   btc: 320000,  pct: 1.524 },
-  { emoji: '📊', name: 'Fidelity (FBTC ETF)',     btc: 172000,  pct: 0.819 },
-  { emoji: '💼', name: 'MicroStrategy',            btc: 214400,  pct: 1.021 },
-  { emoji: '🏛️', name: 'U.S. Government',          btc: 198109,  pct: 0.944 },
-  { emoji: '⛏️', name: 'Marathon Digital',         btc: 25000,   pct: 0.119 },
-  { emoji: '🚗', name: 'Tesla',                    btc: 9720,    pct: 0.046 },
-  { emoji: '◻️', name: 'Block (Square)',            btc: 8027,    pct: 0.038 },
-  { emoji: '🪙', name: 'Coinbase (Corporate)',      btc: 10000,   pct: 0.048 },
-  { emoji: '🌎', name: 'El Salvador (Nation)',      btc: 5800,    pct: 0.028 },
+  { name: 'BlackRock (IBIT ETF)',    btc: 320000, pct: 1.524 },
+  { name: 'MicroStrategy',           btc: 214400, pct: 1.021 },
+  { name: 'U.S. Government',         btc: 198109, pct: 0.944 },
+  { name: 'Fidelity (FBTC ETF)',     btc: 172000, pct: 0.819 },
+  { name: 'Marathon Digital',        btc: 25000,  pct: 0.119 },
+  { name: 'Coinbase (Corporate)',    btc: 10000,  pct: 0.048 },
+  { name: 'Tesla',                   btc: 9720,   pct: 0.046 },
+  { name: 'Block Inc.',              btc: 8027,   pct: 0.038 },
+  { name: 'El Salvador',            btc: 5800,   pct: 0.028 },
 ];
 
 function buildHoldersTable() {
   const tbody = document.getElementById('intelHoldersTbody');
   if (!tbody) return;
-  const price = livePrice || 105000;
+  const price = livePrice;
+  if (!price) return; // wait for live price — spinner stays visible
+  const totalPct = BTC_HOLDERS.reduce((s, h) => s + h.pct, 0);
+  const pctEl = document.getElementById('totalHoldingsPct');
+  if (pctEl) pctEl.textContent = totalPct.toFixed(2) + '%';
   tbody.innerHTML = BTC_HOLDERS.map(h => {
     const usd = h.btc * price;
     const usdStr = usd >= 1e9 ? '$' + (usd/1e9).toFixed(1) + 'B' : '$' + (usd/1e6).toFixed(0) + 'M';
     return `<tr>
-      <td><span style="margin-right:5px">${h.emoji}</span><span class="company-name">${h.name}</span></td>
+      <td class="company-name">${h.name}</td>
       <td style="text-align:right" class="btc-amt">${h.btc.toLocaleString()}</td>
       <td style="text-align:right" class="usd-val">${usdStr}</td>
       <td style="text-align:right" class="supply-pct">${h.pct}%</td>
@@ -5219,187 +5214,171 @@ function buildHoldersTable() {
 }
 
 // ── WHALE ALERT FEED ─────────────────────────────────────────
-const WHALE_EXCHANGES = ['Binance','Coinbase','Kraken','OKX','Bybit','FTX (Cold)','Unknown Wallet','Bitfinex'];
-const WHALE_TYPES = [
-  'exchange → exchange','unknown → exchange','exchange → unknown','unknown → unknown'
-];
-let whaleEntries = [];
+const WHALE_EXCHANGES = ['Binance','Coinbase','Kraken','OKX','Bybit','Unknown Wallet','Bitfinex','Gemini'];
+let _whaleEntries = [];
+let _whaleIntervalId = null;
 
 function randBetween(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
 function genWhaleEntry() {
   const btc = randBetween(50, 4800);
-  const price = livePrice || 105000;
+  const price = livePrice || 100000;
   const usd = btc * price;
-  const minsAgo = randBetween(1, 45);
+  const minsAgo = randBetween(1, 55);
   const from = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
-  const to = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
+  const to   = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
   const usdStr = usd >= 1e9 ? (usd/1e9).toFixed(2) + 'B' : (usd/1e6).toFixed(1) + 'M';
-  const icon = btc >= 1000 ? '🐋' : btc >= 300 ? '🦈' : '🐟';
+  const size = btc >= 1000 ? 'LARGE' : btc >= 300 ? 'MED' : 'SMALL';
+  const sizeColor = btc >= 1000 ? 'var(--orange)' : btc >= 300 ? 'var(--yellow)' : 'var(--muted)';
   return `<div class="whale-entry">
-    ${icon} <b style="color:#c7c7d6">${minsAgo}m ago</b> &nbsp;
-    <span class="whale-amount">${btc.toLocaleString()} BTC</span>
-    <span style="color:var(--muted)"> ($<span class="whale-usd">${usdStr}</span>)</span>
-    &nbsp;·&nbsp; <span style="color:var(--muted);font-size:10px">${from} → ${to}</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div>
+        <span class="whale-amount">${btc.toLocaleString()} BTC</span>
+        <span class="whale-usd"> · $${usdStr}</span>
+      </div>
+      <span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.06);color:${sizeColor}">${size}</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:3px">${from} → ${to} · ${minsAgo}m ago</div>
   </div>`;
 }
 
 function initWhaleAlert() {
   const feed = document.getElementById('whaleFeed');
   if (!feed) return;
-  whaleEntries = Array.from({length: 8}, () => genWhaleEntry());
-  feed.innerHTML = whaleEntries.join('');
-  setInterval(() => {
-    if (!document.getElementById('whaleFeed')) return;
-    const newEntry = genWhaleEntry();
-    whaleEntries.unshift(newEntry);
-    if (whaleEntries.length > 12) whaleEntries.pop();
-    feed.innerHTML = whaleEntries.join('');
+  if (_whaleIntervalId) return; // guard: already running
+  _whaleEntries = Array.from({length: 8}, genWhaleEntry);
+  feed.innerHTML = _whaleEntries.join('');
+  _whaleIntervalId = setInterval(() => {
+    const feed = document.getElementById('whaleFeed');
+    if (!feed) return;
+    _whaleEntries.unshift(genWhaleEntry());
+    if (_whaleEntries.length > 12) _whaleEntries.pop();
+    feed.innerHTML = _whaleEntries.join('');
   }, 5000);
 }
 
 // ── NEWS FEED ────────────────────────────────────────────────
 const NEWS_ITEMS = [
-  { headline: 'MicroStrategy adds 11,000 BTC to treasury, now holds 214,400 BTC total', source: 'COMPANY NEWS', sentiment: 'bullish', delay: 2 },
-  { headline: 'BlackRock IBIT sees record $1.2B single-day inflow from institutional clients', source: 'ETF TRACKER', sentiment: 'bullish', delay: 4 },
-  { headline: 'Bitcoin Lightning Network capacity crosses 5,000 BTC — payments scaling rapidly', source: 'TECH', sentiment: 'bullish', delay: 6 },
-  { headline: 'El Salvador doubles down: adds 300 BTC to national treasury reserves', source: 'GOVERNMENT', sentiment: 'bullish', delay: 8 },
-  { headline: "Analysts: AI inference costs increasingly settled via crypto rails — Bitcoin cited", source: 'AI × CRYPTO', sentiment: 'bullish', delay: 1 },
-  { headline: 'Bitcoin mining difficulty hits all-time high as global hash rate surges to 740 EH/s', source: 'MINING', sentiment: 'bullish', delay: 3 },
-  { headline: 'Fidelity report: Institutions treating Bitcoin as primary treasury reserve asset', source: 'INSTITUTIONAL', sentiment: 'bullish', delay: 5 },
-  { headline: "Galaxy Digital launches Bitcoin treasury product for Fortune 500 corporates", source: 'INSTITUTIONAL', sentiment: 'bullish', delay: 7 },
-  { headline: "Warren Buffett: 'I still don't own Bitcoin' — Berkshire Hathaway holds cash", source: 'TRADITIONAL FINANCE', sentiment: 'bearish', delay: 9 },
-  { headline: 'SEC approves two more Bitcoin ETF options products — expanding derivatives market', source: 'REGULATION', sentiment: 'bullish', delay: 11 },
+  { headline: 'MicroStrategy adds 11,000 BTC — now holds 214,400 BTC in corporate treasury', source: 'CORPORATE', sentiment: 'bullish', h: 2 },
+  { headline: 'BlackRock IBIT records $1.2B single-day inflow — largest since launch', source: 'ETF MARKETS', sentiment: 'bullish', h: 4 },
+  { headline: 'AI inference companies settling compute costs on crypto payment rails', source: 'AI × CRYPTO', sentiment: 'bullish', h: 1 },
+  { headline: 'El Salvador adds 300 BTC — nation-state accumulation continues', source: 'SOVEREIGN', sentiment: 'bullish', h: 7 },
+  { headline: 'Bitcoin mining difficulty hits all-time high — hash rate at 741 EH/s', source: 'MINING', sentiment: 'bullish', h: 3 },
+  { headline: "Fidelity Digital Assets: 'Institutions now treat Bitcoin as primary reserve'", source: 'INSTITUTIONAL', sentiment: 'bullish', h: 5 },
+  { headline: 'Lightning Network capacity passes 5,000 BTC — payment volume accelerating', source: 'LAYER 2', sentiment: 'bullish', h: 6 },
+  { headline: 'Galaxy Digital launches BTC treasury product for Fortune 500 companies', source: 'INSTITUTIONAL', sentiment: 'bullish', h: 8 },
+  { headline: "Warren Buffett: 'I still don't own Bitcoin' — Berkshire maintains cash position", source: 'TRADITIONAL FINANCE', sentiment: 'bearish', h: 11 },
+  { headline: 'SEC approves Bitcoin ETF options expansion — derivatives market deepening', source: 'REGULATION', sentiment: 'bullish', h: 13 },
 ];
+let _newsFeedBuilt = false;
 
 function buildNewsFeed() {
+  if (_newsFeedBuilt) return;
   const el = document.getElementById('newsFeed');
   if (!el) return;
-  const baseTime = Date.now();
   el.innerHTML = NEWS_ITEMS.map(item => {
-    const h = Math.floor(item.delay) + 1;
-    const timeStr = h < 60 ? `${h}h ago` : `${Math.floor(h/60)}d ago`;
+    const timeStr = item.h < 24 ? `${item.h}h ago` : `${Math.floor(item.h/24)}d ago`;
     return `<div class="news-item ${item.sentiment}">
       <div class="news-headline">${item.headline}</div>
       <div class="news-meta">
         <span class="news-source">${item.source}</span>
         <span class="news-time">${timeStr}</span>
-        <span class="news-badge ${item.sentiment}">${item.sentiment.toUpperCase()}</span>
+        <span class="news-badge ${item.sentiment}">${item.sentiment === 'bullish' ? 'BULLISH' : 'BEARISH'}</span>
       </div>
     </div>`;
   }).join('');
+  _newsFeedBuilt = true;
 }
 
 // ── MEMPOOL SIMULATION ────────────────────────────────────────
 const MINING_POOLS = ['Foundry USA','AntPool','F2Pool','ViaBTC','Binance Pool','SBI Crypto','Slushpool','Ocean'];
-let blockHeight = 900245;
+let _blockHeight = 900245;
+let _mempoolRunning = false;
 
 function buildBlockList() {
-  const blockContent = Array.from({length: 5}, (_, i) => {
+  const content = Array.from({length: 5}, (_, i) => {
     const pool = MINING_POOLS[randBetween(0, MINING_POOLS.length - 1)];
-    const txs = randBetween(1800, 3200);
-    const minsAgo = (i + 1) * randBetween(8, 12);
+    const txs  = randBetween(1800, 3200);
+    const mins = (i + 1) * randBetween(8, 12);
     return `<div class="block-row">
-      <div class="block-num">#${(blockHeight - i).toLocaleString()}</div>
-      <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
+      <div class="block-num">#${(_blockHeight - i).toLocaleString()}</div>
+      <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${mins}m ago</div>
       <div class="block-reward">+3.125 ₿</div>
     </div>`;
   }).join('');
-  ['blockList', 'intelBlockList'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = blockContent;
-  });
+  ['blockList'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = content; });
 }
 
 function initMempoolSim() {
-  const updateMempool = () => {
-    const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-    const txs = randBetween(48000, 145000);
-    const fee = randBetween(8, 45);
-    const nextMin = randBetween(0, 9);
-    const nextSec = randBetween(0, 59);
-    const hash = randBetween(700, 800);
-    const txsStr = txs.toLocaleString();
-    const feeStr = fee + ' sat/vB';
-    const nextStr = nextMin + ':' + String(nextSec).padStart(2,'0');
-    const hashStr = hash + ' EH/s';
-    s('mempoolTxs', txsStr); s('intelMempoolTxs', txsStr);
-    s('mempoolFee', feeStr); s('intelMempoolFee', feeStr);
-    s('mempoolNext', nextStr); s('intelMempoolNext', nextStr);
-    s('mempoolHash', hashStr); s('intelMempoolHash', hashStr);
+  if (_mempoolRunning) return; // guard: run once only
+  _mempoolRunning = true;
+  const tick = () => {
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('mempoolTxs',  randBetween(48000, 145000).toLocaleString());
+    set('mempoolFee',  randBetween(8, 45) + ' sat/vB');
+    set('mempoolNext', randBetween(0,9) + ':' + String(randBetween(0,59)).padStart(2,'0'));
+    set('mempoolHash', randBetween(700, 800) + ' EH/s');
   };
   buildBlockList();
-  updateMempool();
-  setInterval(updateMempool, 10000);
-  setInterval(() => { blockHeight++; buildBlockList(); }, 600000);
+  tick();
+  setInterval(tick, 10000);
+  setInterval(() => { _blockHeight++; buildBlockList(); }, 600000);
 }
 
 // ── KONAMI CODE EASTER EGG ────────────────────────────────────
 const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let konamiIdx = 0;
-document.addEventListener('keydown', (e) => {
-  if (e.key === KONAMI[konamiIdx]) {
-    konamiIdx++;
-    if (konamiIdx === KONAMI.length) {
-      konamiIdx = 0;
-      showOrangePill();
-    }
-  } else {
-    konamiIdx = 0;
-  }
+let _konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  _konamiIdx = (e.key === KONAMI[_konamiIdx]) ? _konamiIdx + 1 : 0;
+  if (_konamiIdx === KONAMI.length) { _konamiIdx = 0; showOrangePill(); }
 });
 
 function showOrangePill() {
+  if (document.getElementById('orangePillOverlay')) return;
   const overlay = document.createElement('div');
   overlay.className = 'orange-pill-overlay';
   overlay.id = 'orangePillOverlay';
-  // BTC rain particles
-  const particles = Array.from({length: 20}, (_, i) => {
-    const left = Math.random() * 100;
-    const delay = Math.random() * 3;
-    const duration = 2 + Math.random() * 3;
-    return `<div class="btc-particle" style="left:${left}%;animation-delay:${delay}s;animation-duration:${duration}s">₿</div>`;
+  const particles = Array.from({length: 20}, () => {
+    const l = (Math.random()*100).toFixed(1);
+    const delay = (Math.random()*3).toFixed(2);
+    const dur   = (2 + Math.random()*3).toFixed(2);
+    return `<div class="btc-particle" style="left:${l}%;animation-delay:${delay}s;animation-duration:${dur}s">₿</div>`;
   }).join('');
-  overlay.innerHTML = `
-    ${particles}
-    <div class="op-title">🟠 ORANGE PILL<br>ACTIVATED</div>
+  overlay.innerHTML = `${particles}
+    <div class="op-title">ORANGE PILL<br>ACTIVATED</div>
     <div class="op-sub">You found the secret. Satoshi would be proud.</div>
-    <div class="op-msg">Stack sats. Verify, don't trust.<br>The revolution is in your pocket.<br><br>There will only ever be 21,000,000 Bitcoin.<br>Every one that exists is already spoken for.</div>
-    <div class="op-club">⛏️ The 21M Club — you're early.</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:20px;font-family:monospace">"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"</div>
-    <div class="op-dismiss" onclick="document.getElementById('orangePillOverlay').remove()">[ dismiss ]</div>
-  `;
+    <div class="op-msg">Stack sats. Verify, don't trust.<br>The revolution is in your pocket.<br><br>There will only ever be 21,000,000 Bitcoin.<br>Every one is already spoken for.</div>
+    <div class="op-club">The 21M Club — you're early.</div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:24px;font-family:monospace;max-width:320px;line-height:1.5">"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"</div>
+    <div class="op-dismiss" onclick="document.getElementById('orangePillOverlay').remove()">tap anywhere to dismiss</div>`;
   document.body.appendChild(overlay);
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
+  overlay.addEventListener('click', e => { if (e.target === overlay || e.target.classList.contains('op-dismiss')) overlay.remove(); });
 }
 
-// ── LOGO CLICK EASTER EGG (7 clicks) ──────────────────────────
-let logoClicks = 0, logoTimer = null;
-document.addEventListener('DOMContentLoaded', () => {
+// ── LOGO CLICK EASTER EGG (7 clicks → Genesis Block) ─────────
+let _logoClicks = 0, _logoTimer = null;
+(function wireLogoEgg() {
   const logo = document.querySelector('.logo-icon');
-  if (logo) {
-    logo.addEventListener('click', () => {
-      logoClicks++;
-      clearTimeout(logoTimer);
-      if (logoClicks >= 7) {
-        logoClicks = 0;
-        showToast('⛓️ Genesis Block: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks" — Satoshi knew.', 5000);
-      } else {
-        logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
-      }
-    });
-  }
-  // Satoshi hash mode
+  if (!logo) return;
+  logo.addEventListener('click', () => {
+    _logoClicks++;
+    clearTimeout(_logoTimer);
+    if (_logoClicks >= 7) {
+      _logoClicks = 0;
+      showToast('⛓ Genesis Block: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"', 5000);
+    } else {
+      _logoTimer = setTimeout(() => { _logoClicks = 0; }, 2000);
+    }
+  });
+  // Satoshi URL hash mode
   if (window.location.hash === '#satoshi') {
     const banner = document.createElement('div');
     banner.className = 'satoshi-banner';
-    banner.innerHTML = '🔑 <b>Satoshi Mode:</b> This tool is built by someone who believes in the work. Verify everything. Not your keys, not your coins. The Genesis Block was mined Jan 3, 2009. Stack accordingly.';
-    const container = document.querySelector('.container');
-    if (container) container.prepend(banner);
+    banner.innerHTML = '<b>Satoshi Mode:</b> Verify everything. Not your keys, not your coins. Genesis Block mined Jan 3, 2009. Stack accordingly.';
+    const c = document.querySelector('.container');
+    if (c) c.prepend(banner);
   }
-});
+})();
 
 // ── INTEL PAGE INIT ───────────────────────────────────────────
 function initIntelPage() {
@@ -5438,7 +5417,6 @@ initChainAnim();
 initCycleRing();
 calcTimeMachine();
 buildExitPlan();
-buildDonationQR();
 initIntelPage();
 
 tickDebtCounter();
