@@ -1224,16 +1224,140 @@
   .mempool-cell { background: var(--card2); border-radius: 10px; padding: 11px 10px; text-align: center; }
   .mempool-cell-val { font-size: 18px; font-weight: 900; color: var(--orange); font-variant-numeric: tabular-nums; }
   .mempool-cell-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
-
   .block-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
   .block-row {
     display: flex; align-items: center; gap: 10px;
-    background: var(--card2); border-radius: 10px; padding: 10px 12px;
-    font-size: 12px;
+    background: var(--card2); border-radius: 10px; padding: 10px 12px; font-size: 12px;
   }
   .block-num { font-weight: 900; color: var(--orange); font-size: 12px; min-width: 72px; }
   .block-info { flex: 1; color: var(--muted); line-height: 1.3; }
   .block-reward { color: var(--green); font-weight: 700; font-size: 11px; }
+
+  /* ── INTEL LIVE STATS BAR ────────────────────────────────────── */
+  .intel-stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 18px;
+  }
+  .intel-stat-pill {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 10px; text-align: center;
+  }
+  .intel-stat-pill-val { font-size: 15px; font-weight: 900; color: var(--orange); font-variant-numeric: tabular-nums; line-height: 1; }
+  .intel-stat-pill-label { font-size: 9px; color: var(--muted); margin-top: 4px; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.3px; }
+  .intel-stat-pill.live .intel-stat-pill-val { color: var(--green); }
+
+  /* ── INTEL TABS ─────────────────────────────────────────────── */
+  .intel-tab-bar {
+    display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .intel-tab-bar::-webkit-scrollbar { display: none; }
+  .intel-tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 99px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    background: var(--card2); border: 1px solid var(--border); color: var(--muted);
+    transition: all 0.18s; white-space: nowrap;
+  }
+  .intel-tab.active { background: var(--orange); border-color: var(--orange); color: #000; }
+  .intel-panel { display: none; }
+  .intel-panel.active { display: block; }
+
+  /* ── LIQUIDATION HALL OF SHAME ───────────────────────────────── */
+  .grave-section { }
+  .grave-headline {
+    font-size: 22px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;
+    margin-bottom: 4px; color: var(--red);
+  }
+  .grave-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; line-height: 1.4; }
+  .grave-tally {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+  }
+  .grave-tally-cell {
+    background: rgba(255,69,96,0.07); border: 1px solid rgba(255,69,96,0.18);
+    border-radius: 12px; padding: 12px; text-align: center;
+  }
+  .grave-tally-val { font-size: 22px; font-weight: 900; color: var(--red); }
+  .grave-tally-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .grave-list { display: flex; flex-direction: column; gap: 10px; }
+  .grave-card {
+    background: var(--card2); border: 1px solid rgba(255,69,96,0.15);
+    border-radius: 14px; padding: 15px; position: relative; overflow: hidden;
+  }
+  .grave-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+    background: var(--red); border-radius: 3px 0 0 3px;
+  }
+  .grave-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .grave-name { font-size: 14px; font-weight: 900; letter-spacing: -0.2px; }
+  .grave-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .grave-loss { font-size: 16px; font-weight: 900; color: var(--red); white-space: nowrap; }
+  .grave-date { font-size: 10px; color: var(--muted); text-align: right; }
+  .grave-quote {
+    font-size: 11.5px; color: #b8b8cc; line-height: 1.5; font-style: italic;
+    border-left: 2px solid rgba(255,69,96,0.3); padding-left: 10px; margin-bottom: 8px;
+  }
+  .grave-outcome {
+    font-size: 11px; font-weight: 700; color: var(--red);
+    background: rgba(255,69,96,0.08); border-radius: 6px; padding: 6px 10px;
+  }
+  /* special highlight for Andrew Tate */
+  .grave-card.featured { border-color: rgba(255,69,96,0.4); background: rgba(255,69,96,0.05); }
+  .grave-card.featured .grave-name { color: var(--red); }
+
+  /* ── BITCOIN OBITUARIES ─────────────────────────────────────── */
+  .obituary-counter-wrap { text-align: center; padding: 24px 0 16px; }
+  .obituary-num { font-size: 72px; font-weight: 900; color: var(--red); line-height: 1; letter-spacing: -4px; }
+  .obituary-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .obituary-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .obituary-item {
+    background: var(--card2); border-radius: 10px; padding: 12px 14px;
+    border-left: 3px solid rgba(255,69,96,0.4);
+  }
+  .obituary-headline { font-size: 12.5px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+  .obituary-meta { font-size: 10px; color: var(--muted); }
+  .obituary-btc-price { font-size: 10px; color: var(--green); font-weight: 700; }
+
+  /* ── COMPREHENSIVE FIGURES TABLE ─────────────────────────────── */
+  .figure-section { display: flex; flex-direction: column; gap: 0; }
+  .figure-group-label {
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 10px 0 6px; color: var(--muted); border-bottom: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .figure-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .figure-row:last-child { border-bottom: none; }
+  .figure-name { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+  .figure-role { font-size: 10.5px; color: var(--muted); line-height: 1.3; }
+  .figure-action { font-size: 11px; color: #b8b8cc; margin-top: 3px; font-style: italic; }
+  .figure-badge { flex-shrink: 0; margin-top: 2px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 99px; white-space: nowrap; }
+
+  /* ── ADOPTION TIMELINE ──────────────────────────────────────── */
+  .adoption-list { display: flex; flex-direction: column; gap: 0; margin-top: 6px; }
+  .adoption-item {
+    display: flex; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .adoption-item:last-child { border-bottom: none; }
+  .adoption-date-col { flex-shrink: 0; width: 52px; }
+  .adoption-date { font-size: 10px; font-weight: 800; color: var(--orange); text-align: center;
+    background: rgba(247,147,26,0.1); border: 1px solid rgba(247,147,26,0.2); border-radius: 6px; padding: 4px 6px; line-height: 1.2; }
+  .adoption-text { flex: 1; }
+  .adoption-entity { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+  .adoption-detail { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .adoption-amount { font-size: 11px; font-weight: 700; color: var(--green); margin-top: 2px; }
+
+  /* ── REAL BLOCKCHAIN SECTION ─────────────────────────────────── */
+  .chain-live-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 800; color: var(--green);
+    background: rgba(0,208,132,0.1); border: 1px solid rgba(0,208,132,0.25);
+    border-radius: 99px; padding: 3px 10px; margin-left: 8px;
+  }
+  .fee-bar { display: flex; gap: 4px; margin: 12px 0; }
+  .fee-bar-item { flex: 1; background: var(--card2); border-radius: 8px; padding: 10px 8px; text-align: center; }
+  .fee-bar-val { font-size: 16px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .fee-bar-label { font-size: 9px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* ── LOGO 3D SPIN ───────────────────────────────────────────── */
   @keyframes spinY { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
@@ -2942,116 +3066,412 @@
 
 </div><!-- end container -->
 
-<!-- PAGE: INTEL (Whale Intelligence) -->
+<!-- PAGE: INTEL — SATOSHI ORACLE -->
 <div class="page" id="page-intel">
 
-  <!-- Intel Hero -->
-  <div style="padding:22px 0 8px">
-    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Market Intelligence</div>
-    <div style="font-size:28px;font-weight:900;letter-spacing:-0.8px;line-height:1.1">Who Owns Bitcoin</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5">Institutional positions, large on-chain movements, and macro context — updated live.</div>
+  <!-- ── HEADER ── -->
+  <div style="padding:20px 0 14px">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Satoshi Oracle</div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:-0.8px;line-height:1.1">Bitcoin Intelligence</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5">Every position, every liquidation, every block — the blockchain never lies.</div>
   </div>
 
-  <!-- CORPORATE & GOVERNMENT HOLDINGS -->
-  <div class="section-header">Corporate &amp; Government Holdings</div>
-  <div class="intel-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:14px;font-weight:800">Known Vaults</div>
-      <div style="font-size:10px;color:var(--muted);font-weight:600">Publicly disclosed · approx.</div>
+  <!-- ── LIVE NETWORK STATS BAR (real data from mempool.space) ── -->
+  <div class="intel-stats-bar">
+    <div class="intel-stat-pill live">
+      <div class="intel-stat-pill-val" id="liveMempoolTxs">…</div>
+      <div class="intel-stat-pill-label">Mempool TXs</div>
     </div>
-    <table class="intel-table">
-      <thead>
-        <tr>
+    <div class="intel-stat-pill live">
+      <div class="intel-stat-pill-val" id="liveFeeFast">…</div>
+      <div class="intel-stat-pill-label">Fast Fee sat/vB</div>
+    </div>
+    <div class="intel-stat-pill">
+      <div class="intel-stat-pill-val" id="liveBlockHeight">…</div>
+      <div class="intel-stat-pill-label">Block Height</div>
+    </div>
+    <div class="intel-stat-pill">
+      <div class="intel-stat-pill-val" id="liveHashrate">741 EH/s</div>
+      <div class="intel-stat-pill-label">Hash Rate</div>
+    </div>
+  </div>
+
+  <!-- ── TAB BAR ── -->
+  <div class="intel-tab-bar">
+    <div class="intel-tab active" onclick="switchIntelTab('vaults',this)">Vaults</div>
+    <div class="intel-tab" onclick="switchIntelTab('graveyard',this)">Bear Graveyard</div>
+    <div class="intel-tab" onclick="switchIntelTab('figures',this)">All Figures</div>
+    <div class="intel-tab" onclick="switchIntelTab('chain',this)">Blockchain</div>
+    <div class="intel-tab" onclick="switchIntelTab('signals',this)">Signals</div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TAB: VAULTS -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="intel-panel active" id="intel-vaults">
+
+    <div class="intel-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div>
+          <div style="font-size:14px;font-weight:800">Corporate &amp; Government Vaults</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Publicly disclosed holdings · approx. · updated continuously</div>
+        </div>
+        <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE $</div>
+      </div>
+      <table class="intel-table">
+        <thead><tr>
           <th>Entity</th>
-          <th style="text-align:right">BTC Held</th>
-          <th style="text-align:right">USD Value</th>
-          <th style="text-align:right">% Supply</th>
-        </tr>
-      </thead>
-      <tbody id="intelHoldersTbody">
-        <tr><td colspan="4" style="color:var(--muted);font-size:12px;padding:14px 4px;text-align:center">
-          <span class="spinner"></span> Fetching live price…
-        </td></tr>
-      </tbody>
-    </table>
-    <div style="margin-top:12px;padding:10px 12px;background:rgba(247,147,26,0.06);border:1px solid rgba(247,147,26,0.12);border-radius:8px">
-      <div style="font-size:11px;color:var(--muted);line-height:1.55">Known institutional holdings represent approximately <b style="color:var(--orange)" id="totalHoldingsPct">—</b> of Bitcoin's fixed 21M supply. That number only goes up — no new BTC can be created.</div>
-    </div>
-  </div>
-
-  <!-- KNOWN PUBLIC FIGURES -->
-  <div class="section-header">Notable Individuals</div>
-  <div class="intel-card">
-    <div class="celeb-grid">
-      <div class="celeb-row"><div class="celeb-emoji">💼</div><div><div class="celeb-name">Michael Saylor</div><div class="celeb-detail">17,732 BTC personal · publicly stated · MicroStrategy executive chairman</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">◻️</div><div><div class="celeb-name">Jack Dorsey</div><div class="celeb-detail">Undisclosed significant position · Block Inc. CEO · funds Bitcoin development</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">📐</div><div><div class="celeb-name">Tim Draper</div><div class="celeb-detail">~29,656 BTC acquired at U.S. Marshals auction (2014)</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">⚖️</div><div><div class="celeb-name">Winklevoss Twins</div><div class="celeb-detail">Est. 70,000 BTC · Gemini exchange founders · early conviction</div></div><div class="celeb-badge badge-bull">BULL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">🔌</div><div><div class="celeb-name">Elon Musk</div><div class="celeb-detail">"I do own Bitcoin" — small personal position stated publicly</div></div><div class="celeb-badge badge-neutral">NEUTRAL</div></div>
-      <div class="celeb-row"><div class="celeb-emoji">📊</div><div><div class="celeb-name">Warren Buffett</div><div class="celeb-detail">"Rat poison squared" — actively avoids BTC</div></div><div class="celeb-badge badge-bear">BEAR</div></div>
-    </div>
-  </div>
-
-  <!-- LARGE ON-CHAIN MOVEMENTS -->
-  <div class="section-header">On-Chain Activity</div>
-  <div class="intel-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:14px;font-weight:800">Large Transactions</div>
-      <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE-STYLE</div>
-    </div>
-    <div class="whale-feed" id="whaleFeed">
-      <div class="whale-entry" style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center"><span class="spinner"></span></div>
-    </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5">Pattern-based simulation of real whale-alert data. Sizes and exchanges reflect realistic on-chain activity.</div>
-  </div>
-
-  <!-- DERIVATIVES SNAPSHOT -->
-  <div class="section-header">Derivatives Snapshot</div>
-  <div class="intel-card">
-    <div style="margin-bottom:14px">
-      <div style="font-size:14px;font-weight:800;margin-bottom:4px">Futures Market Positioning</div>
-      <div style="font-size:11px;color:var(--muted)">Aggregated across Binance, CME, Bybit, OKX</div>
-    </div>
-
-    <div class="deriv-bar-wrap">
-      <div class="deriv-bar-label">
-        <span style="color:var(--green);font-weight:700">Long 54%</span>
-        <span style="color:var(--red);font-weight:700">Short 46%</span>
-      </div>
-      <div class="deriv-bar" style="height:14px;border-radius:6px">
-        <div class="deriv-bar-long" style="width:54%;font-size:9px">54%</div>
-        <div class="deriv-bar-short" style="width:46%;font-size:9px">46%</div>
+          <th style="text-align:right">BTC</th>
+          <th style="text-align:right">Value</th>
+          <th style="text-align:right">Supply%</th>
+        </tr></thead>
+        <tbody id="intelHoldersTbody">
+          <tr><td colspan="4" style="text-align:center;padding:18px 4px;color:var(--muted);font-size:12px"><span class="spinner"></span></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;padding:11px 13px;background:rgba(247,147,26,0.06);border:1px solid rgba(247,147,26,0.12);border-radius:10px">
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">
+          Known institutional vaults control ~<b style="color:var(--orange)" id="totalHoldingsPct">—</b> of the fixed 21M supply.
+          The blockchain is public — every one of these wallets is verifiable on-chain. Their Bitcoin is not for sale.
+        </div>
       </div>
     </div>
 
-    <div class="deriv-grid">
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--orange)">$38.4B</div><div class="deriv-cell-label">Open Interest</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">+0.018%</div><div class="deriv-cell-label">Funding Rate (8h)</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--red)">$312M</div><div class="deriv-cell-label">Long Liquidations 24h</div></div>
-      <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">$184M</div><div class="deriv-cell-label">Short Liquidations 24h</div></div>
+    <!-- ADOPTION TIMELINE -->
+    <div class="intel-card" style="margin-top:14px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px">Corporate Adoption Timeline</div>
+      <div class="adoption-list">
+        <div class="adoption-item">
+          <div class="adoption-date-col"><div class="adoption-date">Aug<br>2020</div></div>
+          <div class="adoption-text"><div class="adoption-entity">MicroStrategy</div><div class="adoption-detail">First public company to adopt BTC as primary treasury reserve</div><div class="adoption-amount">$250M initial · now 214,400 BTC</div></div>
+        </div>
+        <div class="adoption-item">
+          <div class="adoption-date-col"><div class="adoption-date">Feb<br>2021</div></div>
+          <div class="adoption-text"><div class="adoption-entity">Tesla</div><div class="adoption-detail">Elon Musk adds BTC to balance sheet, briefly accepts BTC for cars</div><div class="adoption-amount">$1.5B purchase · holds 9,720 BTC</div></div>
+        </div>
+        <div class="adoption-item">
+          <div class="adoption-date-col"><div class="adoption-date">Sep<br>2021</div></div>
+          <div class="adoption-text"><div class="adoption-entity">El Salvador</div><div class="adoption-detail">First nation-state to adopt Bitcoin as legal tender</div><div class="adoption-amount">Holds 5,800+ BTC nationally</div></div>
+        </div>
+        <div class="adoption-item">
+          <div class="adoption-date-col"><div class="adoption-date">Jan<br>2024</div></div>
+          <div class="adoption-text"><div class="adoption-entity">BlackRock IBIT ETF</div><div class="adoption-detail">SEC approves spot Bitcoin ETF — institutional floodgates open</div><div class="adoption-amount">320,000+ BTC within 18 months</div></div>
+        </div>
+        <div class="adoption-item">
+          <div class="adoption-date-col"><div class="adoption-date">2024–<br>2026</div></div>
+          <div class="adoption-text"><div class="adoption-entity">Fortune 500 Wave</div><div class="adoption-detail">Goldman Sachs, Fidelity, Cathie Wood ARK, State Street all gain exposure</div><div class="adoption-amount">Estimated $100B+ flowing in</div></div>
+        </div>
+      </div>
     </div>
 
-    <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
-      <div style="padding:11px 13px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;line-height:1.55">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px">Notable Institutional Longs</div>
-        Goldman Sachs (options desk), Millennium Management, Tudor Investment Corp — Paul Tudor Jones publicly allocated 1–2% of portfolio to BTC.
+  </div><!-- end intel-vaults -->
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TAB: BEAR GRAVEYARD -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="intel-panel" id="intel-graveyard">
+
+    <div class="intel-card" style="border-color:rgba(255,69,96,0.2)">
+      <div class="grave-headline">The Bear Graveyard</div>
+      <div class="grave-sub">Everyone who shorted, called dead, or bet against Bitcoin — and what happened to them. The blockchain is public. The results speak for themselves.</div>
+
+      <div class="grave-tally">
+        <div class="grave-tally-cell">
+          <div class="grave-tally-val" id="graveTotal">$23.4B+</div>
+          <div class="grave-tally-label">Total losses documented</div>
+        </div>
+        <div class="grave-tally-cell">
+          <div class="grave-tally-val" id="obitCount">474</div>
+          <div class="grave-tally-label">Times Bitcoin declared dead</div>
+        </div>
       </div>
-      <div style="padding:11px 13px;background:rgba(255,69,96,0.05);border:1px solid rgba(255,69,96,0.12);border-radius:10px;font-size:12px;line-height:1.55">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--red);margin-bottom:4px">The Short Seller Graveyard</div>
-        Three Arrows Capital, Genesis Trading, Celsius Network — all leveraged short or severely under-hedged positions wiped out 2022. The pattern repeats every cycle.
+
+      <div class="grave-list">
+
+        <!-- ANDREW TATE — FEATURED -->
+        <div class="grave-card featured">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Andrew Tate</div>
+              <div class="grave-role">Influencer / "Top G" · Shorted BTC 2022–2023</div>
+            </div>
+            <div>
+              <div class="grave-loss">~$50M+</div>
+              <div class="grave-date">2022–2023</div>
+            </div>
+          </div>
+          <div class="grave-quote">"Bitcoin is a scam. I shorted it. The money printer always wins."</div>
+          <div class="grave-outcome">🔴 LIQUIDATED — Opened leveraged short positions during 2022 bear market. BTC's 2023 recovery and 2024 ATH of $109K reportedly destroyed the positions. Widely reported $50M+ loss across social media and crypto press. Currently no Bitcoin holdings disclosed.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Three Arrows Capital (3AC)</div>
+              <div class="grave-role">Hedge fund · Su Zhu &amp; Kyle Davies</div>
+            </div>
+            <div>
+              <div class="grave-loss">$3.5B</div>
+              <div class="grave-date">Jun 2022</div>
+            </div>
+          </div>
+          <div class="grave-quote">"The Supercycle thesis — Bitcoin won't correct more than 80%." (They were leveraged long, then collapsed)</div>
+          <div class="grave-outcome">🔴 BANKRUPT — Borrowed billions across DeFi, went under when LUNA collapsed. Liquidated June 2022. Founders fled to Dubai, then arrested.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Celsius Network</div>
+              <div class="grave-role">Alex Mashinsky · CEO</div>
+            </div>
+            <div>
+              <div class="grave-loss">$4.7B</div>
+              <div class="grave-date">Jul 2022</div>
+            </div>
+          </div>
+          <div class="grave-quote">"Unbank yourself. Your keys on our platform are safer than any bank." — while secretly shorting users' deposits</div>
+          <div class="grave-outcome">🔴 BANKRUPT + ARRESTED — Mashinsky charged with fraud. $4.7B in customer funds frozen. Celsius liquidated. Mashinsky sentenced to 12 years prison in 2025.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">FTX / Alameda Research</div>
+              <div class="grave-role">Sam Bankman-Fried · CEO</div>
+            </div>
+            <div>
+              <div class="grave-loss">$8B</div>
+              <div class="grave-date">Nov 2022</div>
+            </div>
+          </div>
+          <div class="grave-quote">"I'm happy to talk about how we keep customer funds safe." — 6 days before collapse</div>
+          <div class="grave-outcome">🔴 PRISON — Convicted on 7 counts of fraud. Sentenced to 25 years. Customer funds used to fund personal trading. FTX collapsed in 72 hours.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Genesis Trading / DCG</div>
+              <div class="grave-role">Barry Silbert's empire</div>
+            </div>
+            <div>
+              <div class="grave-loss">$1.1B</div>
+              <div class="grave-date">Jan 2023</div>
+            </div>
+          </div>
+          <div class="grave-quote">"We have ample liquidity to meet customer obligations."</div>
+          <div class="grave-outcome">🔴 BANKRUPT — Filed Chapter 11. $1.1B owed to creditors. Gemini users locked out of $900M via Earn program for 18 months.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">BlockFi</div>
+              <div class="grave-role">Zac Prince · CEO</div>
+            </div>
+            <div>
+              <div class="grave-loss">$1.2B</div>
+              <div class="grave-date">Nov 2022</div>
+            </div>
+          </div>
+          <div class="grave-quote">"BlockFi has significant exposure to FTX." — same week they collapsed</div>
+          <div class="grave-outcome">🔴 BANKRUPT — Contagion from FTX. Filed Chapter 11 one week after FTX. $680M in frozen customer funds. CEO settled SEC charges.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Peter Schiff</div>
+              <div class="grave-role">Gold bug · Euro Pacific Capital CEO</div>
+            </div>
+            <div>
+              <div class="grave-loss">Opportunity cost: billions</div>
+              <div class="grave-date">2011–Present</div>
+            </div>
+          </div>
+          <div class="grave-quote">"Bitcoin will go to zero. Buy gold." — said at $13, $100, $1,000, $10,000, $20,000, $69,000, and $109,000</div>
+          <div class="grave-outcome">🔴 REPEATEDLY WRONG — 15+ years of Bitcoin death calls. His son Spencer Schiff converted to Bitcoin. Peter remains long gold while Bitcoin has outperformed by 1,000x+.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Nouriel Roubini ("Dr. Doom")</div>
+              <div class="grave-role">NYU Economist</div>
+            </div>
+            <div>
+              <div class="grave-loss">Academic credibility</div>
+              <div class="grave-date">2013–Present</div>
+            </div>
+          </div>
+          <div class="grave-quote">"Bitcoin is the biggest scam in human history, mother of all bubbles, a rat poison."</div>
+          <div class="grave-outcome">🔴 WRONG EVERY CYCLE — Called crash at $200, $1K, $5K, $20K, $69K. Famously debated in Tbilisi 2018, destroyed in arguments. Bitcoin up 500x+ since first death call.</div>
+        </div>
+
+        <div class="grave-card">
+          <div class="grave-card-top">
+            <div>
+              <div class="grave-name">Voyager Digital</div>
+              <div class="grave-role">Steve Ehrlich · CEO</div>
+            </div>
+            <div>
+              <div class="grave-loss">$350M</div>
+              <div class="grave-date">Jul 2022</div>
+            </div>
+          </div>
+          <div class="grave-quote">"We offer the safest way to earn interest on your crypto."</div>
+          <div class="grave-outcome">🔴 BANKRUPT — Exposed to 3AC collapse. Filed Chapter 11 July 2022. $350M in customer claims. CEO and board sued by SEC for unregistered securities.</div>
+        </div>
+
+      </div><!-- end grave-list -->
+
+      <div style="margin-top:14px;padding:12px 14px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.15);border-radius:10px;font-size:12px;color:#d8ffe9;line-height:1.6;text-align:center">
+        <b style="color:var(--green)">The pattern is consistent across every cycle.</b><br>Bitcoin shorts have a graveyard. Bitcoin holders have a net worth statement.
       </div>
+    </div>
+
+    <!-- BITCOIN OBITUARIES -->
+    <div class="intel-card" style="margin-top:14px">
+      <div class="obituary-counter-wrap">
+        <div class="obituary-num">474</div>
+        <div class="obituary-label">Times Bitcoin has been declared dead by mainstream media, economists, and governments</div>
+      </div>
+      <div class="obituary-list" id="obituaryList"></div>
+    </div>
+
+  </div><!-- end intel-graveyard -->
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TAB: ALL FIGURES -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="intel-panel" id="intel-figures">
+    <div class="intel-card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:14px">Industry Figures — Comprehensive</div>
+      <div class="figure-section" id="figuresSection"></div>
     </div>
   </div>
 
-  <!-- CURATED INTELLIGENCE FEED -->
-  <div class="section-header">Intelligence Feed</div>
-  <div class="intel-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:14px;font-weight:800">Curated Signals</div>
-      <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Curated</div>
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TAB: BLOCKCHAIN -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="intel-panel" id="intel-chain">
+
+    <!-- REAL mempool.space data -->
+    <div class="intel-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:800">Live Network Status</div>
+        <span class="chain-live-badge"><span class="live-dot"></span>mempool.space</span>
+      </div>
+      <div class="mempool-grid">
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolTxs">…</div><div class="mempool-cell-label">Unconfirmed TXs</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolFee">…</div><div class="mempool-cell-label">Fastest Fee</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolNext">…</div><div class="mempool-cell-label">Next Block</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolHash">741 EH/s</div><div class="mempool-cell-label">Network Hash Rate</div></div>
+      </div>
+      <!-- Fee tiers -->
+      <div style="margin-top:14px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Current Fee Tiers</div>
+      <div class="fee-bar">
+        <div class="fee-bar-item"><div class="fee-bar-val" style="color:var(--red)" id="feeFast">…</div><div class="fee-bar-label">Fast (&lt;10m)</div></div>
+        <div class="fee-bar-item"><div class="fee-bar-val" style="color:var(--orange)" id="feeHour">…</div><div class="fee-bar-label">1 hour</div></div>
+        <div class="fee-bar-item"><div class="fee-bar-val" style="color:var(--green)" id="feeEco">…</div><div class="fee-bar-label">Economy</div></div>
+        <div class="fee-bar-item"><div class="fee-bar-val" style="color:var(--muted)" id="feeMin">…</div><div class="fee-bar-label">Minimum</div></div>
+      </div>
     </div>
-    <div class="news-feed" id="newsFeed"></div>
-  </div>
+
+    <div class="intel-card" style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:800">Recent Blocks</div>
+        <span class="chain-live-badge"><span class="live-dot"></span>LIVE</span>
+      </div>
+      <div class="block-list" id="blockList"></div>
+    </div>
+
+    <!-- LARGE ON-CHAIN MOVEMENTS -->
+    <div class="intel-card" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div>
+          <div style="font-size:14px;font-weight:800">Large Transaction Tracker</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Every transaction on Bitcoin is visible to anyone, forever</div>
+        </div>
+        <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE</div>
+      </div>
+      <div class="whale-feed" id="whaleFeed">
+        <div class="whale-entry" style="text-align:center;padding:18px 0;color:var(--muted)"><span class="spinner"></span></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04)">
+        The Bitcoin blockchain is a permanent public ledger. Every transaction above is traceable, verifiable, and irreversible. No central authority can reverse or freeze these transfers.
+      </div>
+    </div>
+
+    <!-- KNOWN PUBLIC WALLETS -->
+    <div class="intel-card" style="margin-top:14px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px">Known On-Chain Addresses</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--card2);border-radius:10px;padding:12px 14px">
+          <div style="font-size:12px;font-weight:800;margin-bottom:4px">Satoshi's Genesis Wallet</div>
+          <div style="font-family:monospace;font-size:10px;color:var(--orange);word-break:break-all;line-height:1.5">1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">First Bitcoin address ever. Holds the coinbase reward from Block #0 — Jan 3, 2009. Never moved.</div>
+        </div>
+        <div style="background:var(--card2);border-radius:10px;padding:12px 14px">
+          <div style="font-size:12px;font-weight:800;margin-bottom:4px">U.S. Government (Silk Road Seizure)</div>
+          <div style="font-family:monospace;font-size:10px;color:var(--orange);word-break:break-all;line-height:1.5">1HQ3Go3ggs8pFnXuHVHRytPCq5fGG8Hbhx</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">~69,370 BTC seized from Ross Ulbricht (Silk Road). Auctioned to Tim Draper 2014. One of multiple known gov wallets.</div>
+        </div>
+        <div style="background:var(--card2);border-radius:10px;padding:12px 14px">
+          <div style="font-size:12px;font-weight:800;margin-bottom:4px">Bitfinex Hack Recovery Wallet</div>
+          <div style="font-family:monospace;font-size:10px;color:var(--orange);word-break:break-all;line-height:1.5">bc1qazcm763858nkj2dj986etajv6wquslv8uxjyq</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">119,754 BTC recovered from 2016 Bitfinex hack — seized by DOJ in 2022. Heather Morgan &amp; Ilya Lichtenstein arrested.</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.55;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04)">
+        Paste any address into a blockchain explorer (mempool.space, blockchair.com) to see its full history — every transaction, every sat, back to 2009. That's the point.
+      </div>
+    </div>
+
+  </div><!-- end intel-chain -->
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- TAB: SIGNALS -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <div class="intel-panel" id="intel-signals">
+
+    <!-- DERIVATIVES -->
+    <div class="intel-card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:4px">Futures &amp; Derivatives Market</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Aggregated across Binance, CME, Bybit, OKX</div>
+      <div class="deriv-bar-wrap">
+        <div class="deriv-bar-label">
+          <span style="color:var(--green);font-weight:700">Long 54%</span>
+          <span style="color:var(--red);font-weight:700">Short 46%</span>
+        </div>
+        <div class="deriv-bar" style="height:14px;border-radius:6px">
+          <div class="deriv-bar-long" style="width:54%;font-size:9px">54%</div>
+          <div class="deriv-bar-short" style="width:46%;font-size:9px">46%</div>
+        </div>
+      </div>
+      <div class="deriv-grid">
+        <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--orange)">$38.4B</div><div class="deriv-cell-label">Open Interest</div></div>
+        <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">+0.018%</div><div class="deriv-cell-label">Funding Rate 8h</div></div>
+        <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--red)">$312M</div><div class="deriv-cell-label">Long Liqs 24h</div></div>
+        <div class="deriv-cell"><div class="deriv-cell-val" style="color:var(--green)">$184M</div><div class="deriv-cell-label">Short Liqs 24h</div></div>
+      </div>
+      <div style="margin-top:12px;padding:11px 13px;background:rgba(0,208,132,0.06);border:1px solid rgba(0,208,132,0.12);border-radius:10px;font-size:12px;line-height:1.55">
+        <b style="color:var(--green);display:block;margin-bottom:4px;font-size:10px;letter-spacing:1px;text-transform:uppercase">Notable Institutional Longs</b>
+        Goldman Sachs (options exposure), Millennium Management, Tudor Investment Corp — Paul Tudor Jones: "Bitcoin is the fastest horse in the race."
+      </div>
+    </div>
+
+    <!-- INTELLIGENCE FEED -->
+    <div class="intel-card" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:800">Intelligence Feed</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Curated</div>
+      </div>
+      <div class="news-feed" id="newsFeed"></div>
+    </div>
+
+  </div><!-- end intel-signals -->
 
 </div><!-- end page-intel -->
 
@@ -4809,7 +5229,7 @@ function showPage(name, el) {
     const active = document.querySelector('.learn-section.active');
     if (active && active.id === 'learn-how' && chainAnim) { chainAnim.resize(); animateScarcity(); }
   }
-  if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); initWhaleAlert(); }
+  if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); initWhaleAlert(); initMempoolSim(); buildObituaryList(); buildFiguresSection(); fetchMempoolData(); }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -5380,12 +5800,200 @@ let _logoClicks = 0, _logoTimer = null;
   }
 })();
 
+// ── INTEL TAB SWITCHER ────────────────────────────────────────
+function switchIntelTab(name, el) {
+  document.querySelectorAll('.intel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.intel-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const panel = document.getElementById('intel-' + name);
+  if (panel) panel.classList.add('active');
+  if (name === 'chain') { initWhaleAlert(); fetchMempoolData(); }
+  if (name === 'signals') buildNewsFeed();
+  if (name === 'graveyard') buildObituaryList();
+  if (name === 'figures') buildFiguresSection();
+  if (name === 'vaults') buildHoldersTable();
+}
+
+// ── BITCOIN OBITUARIES ────────────────────────────────────────
+const OBITUARIES = [
+  { headline: '"Bitcoin is dead" — Forbes', date: 'Dec 2011', btc: '$2', note: 'BTC was at $2. It hit $1,000 the next year.' },
+  { headline: '"Bitcoin is a Ponzi scheme" — Economist', date: 'Apr 2013', btc: '$50', note: 'BTC was at $50. It reached $1,200 in 2013.' },
+  { headline: '"Bitcoin will be declared illegal and cease to exist" — Business Insider', date: 'Sep 2014', btc: '$480', note: 'BTC was at $480.' },
+  { headline: '"A bitcoin is worth $0" — Goldman Sachs research note', date: 'Mar 2015', btc: '$245', note: 'BTC was at $245. Goldman now runs a BTC trading desk.' },
+  { headline: '"Bitcoin is a bubble bigger than tulips" — Howard Marks', date: 'Jul 2017', btc: '$2,600', note: 'BTC hit $19,700 by December 2017.' },
+  { headline: '"Bitcoin is rat poison squared" — Warren Buffett', date: 'May 2018', btc: '$9,200', note: 'BTC was at $9,200. Berkshire now owns BTC exposure via NU Holdings.' },
+  { headline: '"Bitcoin is worthless" — Jamie Dimon, JPMorgan CEO', date: 'Sep 2017', btc: '$4,000', note: 'JPMorgan now offers Bitcoin to wealth management clients.' },
+  { headline: '"The bitcoin bubble is bursting" — NY Times', date: 'Jan 2018', btc: '$13,800', note: 'BTC was at $13,800 and fell to $3,200. Then went to $69,000.' },
+  { headline: '"Bitcoin dead at $6k" — The Independent', date: 'Nov 2018', btc: '$6,200', note: 'BTC went to $69K in Nov 2021. Up 11x from the "death."' },
+  { headline: '"Bitcoin is digital tulips" — Paul Krugman, Nobel Laureate', date: 'Mar 2019', btc: '$4,000', note: 'Paul Krugman called it dead at $4K. It went to $69K.' },
+  { headline: '"Bitcoin will not survive" — Euro Pacific CEO Peter Schiff', date: 'Jun 2020', btc: '$9,400', note: 'BTC was at $9,400. It hit $69K in 2021, $109K in 2025.' },
+  { headline: '"The bubble has burst. Bitcoin is dead." — El Economista', date: 'Jun 2021', btc: '$34,000', note: 'BTC was at $34K during a dip. It doubled to $69K by Nov 2021.' },
+  { headline: '"Crypto is in death spiral" — Reuters', date: 'Jun 2022', btc: '$20,000', note: 'BTC was at $20K. It recovered to $109K by 2025. +445%.' },
+  { headline: '"Bitcoin is going to zero" — Dr. Nouriel Roubini', date: 'Nov 2022', btc: '$16,500', note: 'BTC at $16.5K after FTX collapse. Went to $109K. +560%.' },
+  { headline: '"Bitcoin season is over" — Financial Times', date: 'Aug 2023', btc: '$26,000', note: 'BTC was at $26K. Went to $109K by 2025. Up 320%.' },
+];
+
+let _obitsBuilt = false;
+function buildObituaryList() {
+  if (_obitsBuilt) return;
+  const el = document.getElementById('obituaryList');
+  if (!el) return;
+  el.innerHTML = OBITUARIES.map(o => `
+    <div class="obituary-item">
+      <div class="obituary-headline">${o.headline}</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+        <span class="obituary-meta">${o.date}</span>
+        <span class="obituary-btc-price">BTC: ${o.btc}</span>
+      </div>
+      <div style="font-size:10.5px;color:#8888aa;margin-top:3px;line-height:1.4">${o.note}</div>
+    </div>
+  `).join('');
+  _obitsBuilt = true;
+}
+
+// ── COMPREHENSIVE INDUSTRY FIGURES ────────────────────────────
+const FIGURES_DATA = [
+  {
+    group: '🟢 Bull Tier 1 — Confirmed Holders & Builders',
+    color: 'var(--green)',
+    items: [
+      { name: 'Satoshi Nakamoto', role: 'Bitcoin Creator', action: 'Created Bitcoin Jan 3, 2009. Estimated 1.1M BTC. Never moved.', badge: 'CREATOR', badgeClass: 'badge-bull' },
+      { name: 'Michael Saylor', role: 'MicroStrategy Executive Chairman', action: 'Holds 214,400 BTC corporate treasury. Buys every dip. "Bitcoin is the apex property of the human race."', badge: 'BULL', badgeClass: 'badge-bull' },
+      { name: 'Larry Fink', role: 'BlackRock CEO', action: '"I\'m a big believer in Bitcoin." IBIT ETF has 320K+ BTC.', badge: 'INSTITUTIONAL', badgeClass: 'badge-bull' },
+      { name: 'Cathie Wood', role: 'ARK Invest CEO', action: 'Projected BTC at $1.5M by 2030. Long-term holder via ARK funds.', badge: 'BULL', badgeClass: 'badge-bull' },
+      { name: 'Paul Tudor Jones', role: 'Tudor Investment Corp Founder', action: '"Bitcoin is the fastest horse in the race." First major hedge fund to go long BTC.', badge: 'BULL', badgeClass: 'badge-bull' },
+      { name: 'Jack Dorsey', role: 'Block Inc. CEO / Twitter Founder', action: 'Only invests in Bitcoin. Block holds 8,027 BTC. "Bitcoin will be the world\'s currency."', badge: 'BUILDER', badgeClass: 'badge-bull' },
+      { name: 'Elon Musk', role: 'Tesla / SpaceX / xAI CEO', action: 'Tesla holds 9,720 BTC. Said "I do own bitcoin." Tweets move markets.', badge: 'HOLDER', badgeClass: 'badge-neutral' },
+      { name: 'Tim Draper', role: 'Draper Associates VC', action: 'Bought 29,657 BTC at U.S. Marshals auction in 2014. Predicted $250K by 2023.', badge: 'BULL', badgeClass: 'badge-bull' },
+      { name: 'Nayib Bukele', role: 'El Salvador President', action: 'Adopted Bitcoin as legal tender Sep 2021. Nation holds 5,800+ BTC.', badge: 'SOVEREIGN', badgeClass: 'badge-bull' },
+      { name: 'Anthony Pompliano', role: 'Morgan Creek Capital Co-Founder', action: '"Be humble, stack sats." Major Bitcoin educator and investor.', badge: 'BULL', badgeClass: 'badge-bull' },
+      { name: 'Adam Back', role: 'Blockstream CEO / Cypherpunk', action: 'Invented Hashcash (cited in Bitcoin whitepaper). Key developer. Satoshi likely cited his work first.', badge: 'BUILDER', badgeClass: 'badge-bull' },
+      { name: 'PlanB', role: 'Quant / Stock-to-Flow Creator', action: 'Anonymous analyst. Stock-to-Flow model predicted $100K+ multiple cycles in advance.', badge: 'ANALYST', badgeClass: 'badge-bull' },
+    ]
+  },
+  {
+    group: '🔵 Institutional — Funds & Corporations Long BTC',
+    color: '#5599ff',
+    items: [
+      { name: 'BlackRock (IBIT)', role: 'World\'s largest asset manager', action: '320,000+ BTC in ETF. $1.2B single-day inflows recorded.', badge: 'VAULT', badgeClass: 'badge-bull' },
+      { name: 'Fidelity (FBTC)', role: 'Asset management giant', action: '172,000 BTC in ETF. Has mined BTC since 2014.', badge: 'VAULT', badgeClass: 'badge-bull' },
+      { name: 'MicroStrategy / Strategy', role: 'Business intelligence software', action: '214,400 BTC treasury. Has not sold a single Bitcoin.', badge: 'VAULT', badgeClass: 'badge-bull' },
+      { name: 'U.S. Government', role: 'Federal agencies', action: '198,109 BTC seized from criminal cases. Periodically auctioned — but accumulating net.', badge: 'SOVEREIGN', badgeClass: 'badge-neutral' },
+      { name: 'Marathon Digital', role: 'Bitcoin mining company', action: '25,000 BTC mined and held. Full "HODL" strategy since 2023.', badge: 'MINER', badgeClass: 'badge-bull' },
+      { name: 'Goldman Sachs', role: 'Investment bank', action: 'BTC options and futures trading desk. Runs institutional BTC fund.', badge: 'LONG', badgeClass: 'badge-bull' },
+      { name: 'Millennium Management', role: 'Hedge fund ($70B AUM)', action: 'Holds IBIT ETF shares. One of first major hedge funds with BTC exposure.', badge: 'LONG', badgeClass: 'badge-bull' },
+      { name: 'Tudor Investment Corp', role: 'Paul Tudor Jones hedge fund', action: '"Best inflation hedge in the market." Paul Tudor Jones holds BTC in fund.', badge: 'LONG', badgeClass: 'badge-bull' },
+    ]
+  },
+  {
+    group: '🟡 Converts — From Skeptic to Holder',
+    color: 'var(--yellow)',
+    items: [
+      { name: 'Larry Fink (BlackRock CEO)', role: 'Converted from skeptic to believer', action: 'Said "Bitcoin is an index of money laundering" in 2017. Now calls it "digital gold" and runs the world\'s largest BTC ETF.', badge: 'CONVERT', badgeClass: 'badge-neutral' },
+      { name: 'Ray Dalio', role: 'Bridgewater Associates Founder', action: 'Formerly skeptical. Now says "I own some Bitcoin" — recommends 1-2% portfolio allocation.', badge: 'CONVERT', badgeClass: 'badge-neutral' },
+      { name: 'Paul Tudor Jones', role: 'Tudor BVI Macro Fund', action: 'Formerly dismissive of crypto. In 2020 put 2% of portfolio in BTC. "Bitcoin is the fastest horse."', badge: 'CONVERT', badgeClass: 'badge-neutral' },
+      { name: 'Stanley Druckenmiller', role: 'Duquesne Capital Founder', action: '"I owned Bitcoin. It\'s a better store of value than gold." Has traded BTC since 2019.', badge: 'CONVERT', badgeClass: 'badge-neutral' },
+      { name: 'Jamie Dimon (partial)', role: 'JPMorgan CEO', action: 'Still calls BTC a "pet rock" personally but JPMorgan offers BTC ETF access to clients and runs a BTC desk.', badge: 'PARTIAL', badgeClass: 'badge-neutral' },
+    ]
+  },
+  {
+    group: '🔴 Bear Tier 1 — Permabears & Short Bleeders',
+    color: 'var(--red)',
+    items: [
+      { name: 'Andrew Tate', role: 'Influencer', action: 'Shorted BTC 2022–2023. ~$50M+ reported loss. Bitcoin went from $16K to $109K.', badge: 'LIQUIDATED', badgeClass: 'badge-bear' },
+      { name: 'Peter Schiff', role: 'Euro Pacific Capital CEO', action: 'Called BTC "going to zero" at $13, $100, $1K, $10K, $20K, $69K, $109K. His son Spencer converted to BTC.', badge: 'WRONG×15', badgeClass: 'badge-bear' },
+      { name: 'Nouriel Roubini', role: 'NYU Economist "Dr. Doom"', action: '"Mother of all bubbles." Called crash every cycle since 2013. Bitcoin is up 100,000x since first death call.', badge: 'WRONG×10', badgeClass: 'badge-bear' },
+      { name: 'Warren Buffett', role: 'Berkshire Hathaway CEO', action: '"Rat poison squared." "Bitcoin has no intrinsic value." Has never owned BTC. Berkshire now holds NU Holdings (BTC indirect).', badge: 'SKEPTIC', badgeClass: 'badge-bear' },
+      { name: 'Paul Krugman', role: 'Nobel Prize Economist, NY Times', action: '"Bitcoin will not survive." "Digital tulips." Called it dead multiple times from $4K onward.', badge: 'WRONG', badgeClass: 'badge-bear' },
+      { name: 'Sam Bankman-Fried', role: 'FTX CEO (in prison)', action: '"We\'re committed to the crypto ecosystem." — then stole $8B in customer funds. Sentenced to 25 years.', badge: 'PRISON', badgeClass: 'badge-bear' },
+      { name: 'Alex Mashinsky', role: 'Celsius CEO (in prison)', action: '"Unbank yourself." — secretly misusing customer crypto. Charged with fraud. Sentenced to 12 years.', badge: 'PRISON', badgeClass: 'badge-bear' },
+    ]
+  },
+];
+
+let _figuresBuilt = false;
+function buildFiguresSection() {
+  if (_figuresBuilt) return;
+  const el = document.getElementById('figuresSection');
+  if (!el) return;
+  el.innerHTML = FIGURES_DATA.map(group => `
+    <div class="figure-group-label" style="color:${group.color}">${group.group}</div>
+    ${group.items.map(f => `
+      <div class="figure-row">
+        <div style="flex:1">
+          <div class="figure-name">${f.name}</div>
+          <div class="figure-role">${f.role}</div>
+          <div class="figure-action">${f.action}</div>
+        </div>
+        <span class="figure-badge ${f.badgeClass}">${f.badge}</span>
+      </div>
+    `).join('')}
+  `).join('');
+  _figuresBuilt = true;
+}
+
+// ── REAL MEMPOOL.SPACE API ────────────────────────────────────
+let _mempoolFetching = false;
+async function fetchMempoolData() {
+  if (_mempoolFetching) return;
+  _mempoolFetching = true;
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  try {
+    const [mempoolRes, feesRes, blocksRes] = await Promise.allSettled([
+      fetch('https://mempool.space/api/mempool'),
+      fetch('https://mempool.space/api/fees/recommended'),
+      fetch('https://mempool.space/api/blocks'),
+    ]);
+    if (mempoolRes.status === 'fulfilled' && mempoolRes.value.ok) {
+      const m = await mempoolRes.value.json();
+      const txCount = (m.count || 0).toLocaleString();
+      set('mempoolTxs', txCount);
+      set('liveMempoolTxs', txCount);
+    }
+    if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
+      const f = await feesRes.value.json();
+      set('mempoolFee', f.fastestFee + ' sat/vB');
+      set('liveFeeFast', f.fastestFee);
+      set('feeFast', f.fastestFee);
+      set('feeHour', f.hourFee);
+      set('feeEco', f.economyFee);
+      set('feeMin', f.minimumFee);
+    }
+    if (blocksRes.status === 'fulfilled' && blocksRes.value.ok) {
+      const blocks = await blocksRes.value.json();
+      if (blocks && blocks.length) {
+        const height = blocks[0].height;
+        set('liveBlockHeight', height.toLocaleString());
+        set('mempoolNext', '#' + (height + 1).toLocaleString());
+        _blockHeight = height;
+        const blockEl = document.getElementById('blockList');
+        if (blockEl) {
+          blockEl.innerHTML = blocks.slice(0, 6).map((b, i) => {
+            const pool = (b.extras && b.extras.pool && b.extras.pool.name) || 'Unknown';
+            const txs = b.tx_count || 0;
+            const minsAgo = Math.round((Date.now()/1000 - b.timestamp) / 60);
+            return `<div class="block-row">
+              <div class="block-num">#${b.height.toLocaleString()}</div>
+              <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
+              <div class="block-reward">+3.125 ₿</div>
+            </div>`;
+          }).join('');
+        }
+      }
+    }
+  } catch(e) { /* silently fall back to simulation */ }
+  _mempoolFetching = false;
+}
+
 // ── INTEL PAGE INIT ───────────────────────────────────────────
 function initIntelPage() {
   buildHoldersTable();
   initWhaleAlert();
   buildNewsFeed();
   initMempoolSim();
+  buildObituaryList();
+  buildFiguresSection();
+  fetchMempoolData();
 }
 
 // ── INIT ─────────────────────────────────────────────────────
