@@ -5295,9 +5295,7 @@ const MINING_POOLS = ['Foundry USA','AntPool','F2Pool','ViaBTC','Binance Pool','
 let blockHeight = 900245;
 
 function buildBlockList() {
-  const el = document.getElementById('blockList');
-  if (!el) return;
-  const blocks = Array.from({length: 5}, (_, i) => {
+  const blockContent = Array.from({length: 5}, (_, i) => {
     const pool = MINING_POOLS[randBetween(0, MINING_POOLS.length - 1)];
     const txs = randBetween(1800, 3200);
     const minsAgo = (i + 1) * randBetween(8, 12);
@@ -5306,8 +5304,11 @@ function buildBlockList() {
       <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
       <div class="block-reward">+3.125 ₿</div>
     </div>`;
+  }).join('');
+  ['blockList', 'intelBlockList'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = blockContent;
   });
-  el.innerHTML = blocks.join('');
 }
 
 function initMempoolSim() {
@@ -5318,10 +5319,14 @@ function initMempoolSim() {
     const nextMin = randBetween(0, 9);
     const nextSec = randBetween(0, 59);
     const hash = randBetween(700, 800);
-    s('mempoolTxs', txs.toLocaleString());
-    s('mempoolFee', fee + ' sat/vB');
-    s('mempoolNext', nextMin + ':' + String(nextSec).padStart(2,'0'));
-    s('mempoolHash', hash + ' EH/s');
+    const txsStr = txs.toLocaleString();
+    const feeStr = fee + ' sat/vB';
+    const nextStr = nextMin + ':' + String(nextSec).padStart(2,'0');
+    const hashStr = hash + ' EH/s';
+    s('mempoolTxs', txsStr); s('intelMempoolTxs', txsStr);
+    s('mempoolFee', feeStr); s('intelMempoolFee', feeStr);
+    s('mempoolNext', nextStr); s('intelMempoolNext', nextStr);
+    s('mempoolHash', hashStr); s('intelMempoolHash', hashStr);
   };
   buildBlockList();
   updateMempool();
