@@ -952,6 +952,132 @@
   .tm-vs { text-align: center; font-size: 11px; color: var(--muted); padding: 10px 0 6px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 6px; }
   .tm-winner { text-align: center; margin-top: 12px; padding: 12px; background: rgba(0,208,132,0.06); border: 1px solid rgba(0,208,132,0.15); border-radius: 10px; font-size: 13px; color: #d8ffe9; line-height: 1.5; }
 
+  /* ── CALCULATOR LAUNCHER ────────────────────────────────────── */
+  .calc-cat { font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 20px 0 10px; display: flex; align-items: center; gap: 7px; }
+  .calc-cat:first-child { margin-top: 10px; }
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .calc-tile {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 15px 13px; cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .calc-tile:active { transform: scale(0.97); }
+  .calc-tile:hover { border-color: rgba(247,147,26,0.4); background: var(--card2); transform: translateY(-2px); }
+  .calc-tile-icon { font-size: 22px; margin-bottom: 9px; display: block; }
+  .calc-tile-name { font-size: 14px; font-weight: 800; margin-bottom: 3px; letter-spacing: -0.2px; }
+  .calc-tile-desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+  .calc-tile.accent-red:hover   { border-color: rgba(255,69,96,0.4); }
+  .calc-tile.accent-blue:hover  { border-color: rgba(100,149,237,0.4); }
+  .calc-tile.accent-purple:hover{ border-color: rgba(124,58,237,0.4); }
+
+  .calc-back-bar { display: none; align-items: center; gap: 12px; margin: 8px 0 14px; }
+  .calc-back-bar.show { display: flex; }
+  .calc-back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; background: var(--card2); border: 1px solid var(--border);
+    border-radius: 99px; color: var(--text); font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .calc-back-btn:hover { border-color: rgba(247,147,26,0.4); color: var(--orange); }
+  .calc-back-title { font-size: 15px; font-weight: 800; letter-spacing: -0.2px; }
+
+  /* ── DISCLAIMER ─────────────────────────────────────────────── */
+  .disclaimer-bar {
+    max-width: 480px; margin: 28px auto 0; padding: 14px 18px 4px;
+    text-align: center;
+  }
+  .disclaimer-bar .nfa {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+    padding: 4px 10px; border: 1px solid var(--border); border-radius: 99px;
+  }
+  .disclaimer-bar p { font-size: 10.5px; color: #50505f; line-height: 1.5; }
+  .disclaimer-inline {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: rgba(255,69,96,0.05); border: 1px solid rgba(255,69,96,0.15);
+    border-radius: 12px; padding: 11px 13px; margin-top: 14px;
+    font-size: 11px; color: #b89aa0; line-height: 1.5;
+  }
+  .disclaimer-inline b { color: #ff8095; }
+
+  /* ── RED PILL / TRUTH ───────────────────────────────────────── */
+  .learn-subtabs { display: flex; gap: 8px; margin-bottom: 18px; }
+  .learn-subtab {
+    flex: 1; text-align: center; padding: 11px 8px;
+    background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
+    font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer;
+    transition: all 0.18s;
+  }
+  .learn-subtab.active { background: rgba(255,69,96,0.1); border-color: rgba(255,69,96,0.4); color: #ff4560; }
+  .learn-subtab.active.blue { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.4); color: #a78bfa; }
+  .learn-section { display: none; }
+  .learn-section.active { display: block; }
+
+  .redpill-hero { text-align: center; padding: 8px 0 6px; }
+  .redpill-kicker {
+    display: inline-block; background: rgba(255,69,96,0.1); border: 1px solid rgba(255,69,96,0.35);
+    color: #ff4560; font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase; padding: 4px 11px; border-radius: 99px; margin-bottom: 12px;
+  }
+  .redpill-title { font-size: 27px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.12; margin-bottom: 10px; }
+  .redpill-title .hl { color: #ff4560; }
+  .redpill-sub { font-size: 14px; color: var(--muted); line-height: 1.55; max-width: 350px; margin: 0 auto; }
+
+  .printer-card {
+    background: linear-gradient(135deg, rgba(255,69,96,0.08), rgba(124,58,237,0.05));
+    border: 1px solid rgba(255,69,96,0.22); border-radius: 18px; padding: 20px;
+    margin: 18px 0; text-align: center;
+  }
+  .printer-label { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #ff8095; margin-bottom: 8px; }
+  .printer-counter { font-size: 30px; font-weight: 900; color: #ff4560; letter-spacing: -1px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .printer-sub { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  .printer-since { font-size: 11px; color: var(--muted); margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .printer-since b { color: #ff8095; font-variant-numeric: tabular-nums; }
+
+  .truth-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; margin-bottom: 14px;
+  }
+  .truth-card-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+  .truth-card-icon {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 11px;
+    background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .truth-card-title { font-size: 16px; font-weight: 800; line-height: 1.2; }
+  .truth-card p { font-size: 13.5px; color: #c7c7d6; line-height: 1.6; margin-bottom: 10px; }
+  .truth-card p:last-child { margin-bottom: 0; }
+  .truth-card b { color: var(--text); }
+  .genesis-quote {
+    background: #0c0c14; border: 1px solid rgba(247,147,26,0.25); border-radius: 10px;
+    padding: 13px 15px; margin: 4px 0 10px; font-family: monospace; font-size: 12px;
+    color: var(--orange); line-height: 1.5;
+  }
+  .genesis-quote .label { color: var(--muted); font-size: 10px; display: block; margin-bottom: 6px; letter-spacing: 0.5px; }
+
+  .vs-fiat { display: flex; gap: 10px; margin: 4px 0; }
+  .vs-fiat-col { flex: 1; border-radius: 12px; padding: 14px 12px; text-align: center; }
+  .vs-fiat-col.btc  { background: rgba(247,147,26,0.07); border: 1px solid rgba(247,147,26,0.25); }
+  .vs-fiat-col.fiat { background: rgba(255,69,96,0.06); border: 1px solid rgba(255,69,96,0.2); }
+  .vs-fiat-name { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+  .vs-fiat-big { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
+  .vs-fiat-small { font-size: 10px; color: var(--muted); margin-top: 5px; line-height: 1.3; }
+
+  .truth-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0; }
+  .truth-stat {
+    background: var(--card2); border-radius: 11px; padding: 13px 10px; text-align: center;
+  }
+  .truth-stat-num { font-size: 19px; font-weight: 900; color: #ff4560; letter-spacing: -0.4px; }
+  .truth-stat-num.green { color: var(--green); }
+  .truth-stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.3; }
+
+  .timeline-item { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-year { font-size: 13px; font-weight: 900; color: #ff4560; flex-shrink: 0; width: 42px; }
+  .timeline-text { font-size: 12.5px; color: #c7c7d6; line-height: 1.5; }
+  .timeline-text b { color: var(--text); }
+
 </style>
 </head>
 <body>
@@ -1398,23 +1524,103 @@
 
   <!-- PAGE: CALCULATOR -->
   <div class="page" id="page-calc">
-    <div class="section-header">Calculator</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Live math against the current BTC price</div>
 
-    <div class="calc-tabs">
-      <div class="calc-tab active" onclick="showCalcTab('dca',this)">DCA</div>
-      <div class="calc-tab" onclick="showCalcTab('buy',this)">Buy</div>
-      <div class="calc-tab" onclick="showCalcTab('sell',this)">Sell / P&amp;L</div>
-      <div class="calc-tab" onclick="showCalcTab('strategy',this)">⚡ Strategy</div>
-      <div class="calc-tab" onclick="showCalcTab('usd',this)" style="background:rgba(255,69,96,0.12);border-color:rgba(255,69,96,0.3);color:var(--red)">₿ vs $USD</div>
-      <div class="calc-tab" onclick="showCalcTab('sp500',this)" style="background:rgba(100,149,237,0.1);border-color:rgba(100,149,237,0.3);color:#6495ed">₿ vs S&amp;P</div>
-      <div class="calc-tab" onclick="showCalcTab('ladder',this)">Sell Ladder</div>
-      <div class="calc-tab" onclick="showCalcTab('mynum',this)">My #</div>
-      <div class="calc-tab" onclick="showCalcTab('tax',this)">Tax</div>
-      <div class="calc-tab" onclick="showCalcTab('lifestyle',this)">Lifestyle</div>
-      <div class="calc-tab" onclick="showCalcTab('retire',this)">Retire</div>
-      <div class="calc-tab" onclick="showCalcTab('multicycle',this)">2 Cycles</div>
-      <div class="calc-tab" onclick="showCalcTab('timemachine',this)" style="background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.3);color:#a78bfa">⏰ Time Machine</div>
+    <!-- Back bar (shown when a calculator is open) -->
+    <div class="calc-back-bar" id="calcBackBar">
+      <div class="calc-back-btn" onclick="closeCalcView()">← All Tools</div>
+      <div class="calc-back-title" id="calcBackTitle">Calculator</div>
+    </div>
+
+    <!-- Launcher grid -->
+    <div id="calcLauncher">
+      <div class="section-header" style="margin-bottom:2px">The Toolkit</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Every number you need — live against the current BTC price. Pick a tool.</div>
+
+      <div class="calc-cat">📈 Accumulate · Build Your Stack</div>
+      <div class="calc-grid">
+        <div class="calc-tile" onclick="openCalc('dca','Dollar-Cost Average')">
+          <span class="calc-tile-icon">💵</span>
+          <div class="calc-tile-name">DCA Plan</div>
+          <div class="calc-tile-desc">Auto-invest weekly → projected stack at ATH</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('buy','Buy Calculator')">
+          <span class="calc-tile-icon">🛒</span>
+          <div class="calc-tile-name">Buy Now</div>
+          <div class="calc-tile-desc">What $X buys today &amp; its future value</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('mynum','My Number')">
+          <span class="calc-tile-icon">🎯</span>
+          <div class="calc-tile-name">My Number</div>
+          <div class="calc-tile-desc">Exactly how much BTC to hit your goal</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('retire','Retirement')">
+          <span class="calc-tile-icon">🏖️</span>
+          <div class="calc-tile-name">Retire on BTC</div>
+          <div class="calc-tile-desc">Weekly buy needed to retire by your age</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('multicycle','2-Cycle Projector')">
+          <span class="calc-tile-icon">🔄</span>
+          <div class="calc-tile-name">2 Cycles</div>
+          <div class="calc-tile-desc">Compound through 2 full cycles to 2033</div>
+        </div>
+      </div>
+
+      <div class="calc-cat">💰 Take Profit · The Exit</div>
+      <div class="calc-grid">
+        <div class="calc-tile" onclick="openCalc('sell','Sell / Profit')">
+          <span class="calc-tile-icon">📊</span>
+          <div class="calc-tile-name">Sell / P&amp;L</div>
+          <div class="calc-tile-desc">Your profit at any sell price</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('ladder','Sell Ladder')">
+          <span class="calc-tile-icon">🪜</span>
+          <div class="calc-tile-name">Sell Ladder</div>
+          <div class="calc-tile-desc">Staged exit plan, no panic selling</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('tax','Capital Gains Tax')">
+          <span class="calc-tile-icon">🧾</span>
+          <div class="calc-tile-name">Tax</div>
+          <div class="calc-tile-desc">What you actually keep after the IRS</div>
+        </div>
+        <div class="calc-tile" onclick="openCalc('lifestyle','Lifestyle')">
+          <span class="calc-tile-icon">🌴</span>
+          <div class="calc-tile-name">Lifestyle</div>
+          <div class="calc-tile-desc">What income your stack can fund</div>
+        </div>
+      </div>
+
+      <div class="calc-cat">🌍 Reality Check · Compare</div>
+      <div class="calc-grid">
+        <div class="calc-tile accent-red" onclick="openCalc('usd','Bitcoin vs Dollar')">
+          <span class="calc-tile-icon">🔥</span>
+          <div class="calc-tile-name">₿ vs $USD</div>
+          <div class="calc-tile-desc">What the dollar is doing to your savings</div>
+        </div>
+        <div class="calc-tile accent-blue" onclick="openCalc('sp500','Bitcoin vs S&amp;P 500')">
+          <span class="calc-tile-icon">📉</span>
+          <div class="calc-tile-name">₿ vs S&amp;P</div>
+          <div class="calc-tile-desc">Beat the index? Run the numbers</div>
+        </div>
+        <div class="calc-tile accent-purple" onclick="openCalc('timemachine','Time Machine')">
+          <span class="calc-tile-icon">⏰</span>
+          <div class="calc-tile-name">Time Machine</div>
+          <div class="calc-tile-desc">What if you'd bought on the dip</div>
+        </div>
+      </div>
+
+      <div class="calc-cat">⚡ Playbook · What To Do Now</div>
+      <div class="calc-grid">
+        <div class="calc-tile" onclick="openCalc('strategy','Strategy Engine')" style="grid-column:1 / -1">
+          <span class="calc-tile-icon">⚡</span>
+          <div class="calc-tile-name">Strategy Engine</div>
+          <div class="calc-tile-desc">Your phase-locked playbook — exactly what to do at this point in the cycle</div>
+        </div>
+      </div>
+
+      <div class="disclaimer-inline">
+        <span>⚠️</span>
+        <div><b>Not financial advice.</b> These tools are projections built on a historical cycle model and live price data — not predictions, guarantees, or personalized advice. Bitcoin is volatile and you can lose money. Do your own research and never invest more than you can afford to lose.</div>
+      </div>
     </div>
 
     <!-- TIME MACHINE CALCULATOR -->
@@ -1478,7 +1684,7 @@
     </div>
 
     <!-- DCA CALCULATOR -->
-    <div class="calc-panel active" id="calc-dca">
+    <div class="calc-panel" id="calc-dca">
       <div class="proj-card" style="margin-top:8px">
         <div class="proj-title">Dollar-Cost Average Projection</div>
 
@@ -2177,6 +2383,121 @@
   <!-- PAGE: LEARN (Blockchain Explainer) -->
   <div class="page" id="page-learn">
 
+    <div class="learn-subtabs">
+      <div class="learn-subtab active" id="subtab-redpill" onclick="showLearnSection('redpill',this)">🔴 The Red Pill</div>
+      <div class="learn-subtab blue" id="subtab-how" onclick="showLearnSection('how',this)">⛓ How It Works</div>
+    </div>
+
+    <!-- ════════ SECTION: THE RED PILL ════════ -->
+    <div class="learn-section active" id="learn-redpill">
+
+      <div class="redpill-hero">
+        <div class="redpill-kicker">The Part They Skip In School</div>
+        <div class="redpill-title">They Never Taught You <span class="hl">How Money Works</span></div>
+        <div class="redpill-sub">The system isn't broken. It's working exactly as designed — just not for the people holding the dollars. Here's the part nobody explained.</div>
+      </div>
+
+      <!-- LIVE MONEY PRINTER -->
+      <div class="printer-card">
+        <div class="printer-label">🖨️ U.S. National Debt — Right Now</div>
+        <div class="printer-counter" id="debtCounter">$0</div>
+        <div class="printer-sub">Climbing about <b>$5 billion every single day.</b> Every dollar borrowed dilutes the ones already in your pocket — that's the hidden tax called inflation.</div>
+        <div class="printer-since">Dollars created since you opened this page: <b id="printedSince">$0</b></div>
+      </div>
+
+      <!-- 1971 -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">📅</div>
+          <div class="truth-card-title">1971 — The Year Money Changed</div>
+        </div>
+        <p>Until 1971, every dollar was backed by gold — the government couldn't just print more. On <b>August 15, 1971</b>, that link was cut. From that day, money could be created infinitely, out of thin air.</p>
+        <p>Watch what happened to ordinary life the moment money stopped being scarce:</p>
+        <div class="truth-stat-grid">
+          <div class="truth-stat"><div class="truth-stat-num">−87%</div><div class="truth-stat-label">Dollar's purchasing power lost since 1971</div></div>
+          <div class="truth-stat"><div class="truth-stat-num">16x</div><div class="truth-stat-label">Home prices vs. wages — gap exploded</div></div>
+          <div class="truth-stat"><div class="truth-stat-num">flat</div><div class="truth-stat-label">Real wages — barely moved in 50 years</div></div>
+          <div class="truth-stat"><div class="truth-stat-num green">∞</div><div class="truth-stat-label">Dollars that can now be printed</div></div>
+        </div>
+        <p style="margin-top:12px;font-size:12px;color:var(--muted)">You're not bad with money. You're swimming against a current that was switched on before you were born.</p>
+      </div>
+
+      <!-- GENESIS BLOCK -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">⛓️</div>
+          <div class="truth-card-title">Bitcoin's First Words</div>
+        </div>
+        <p>On <b>January 3, 2009</b> — in the middle of the bank bailouts — an anonymous creator mined the very first Bitcoin block. Buried in its code, permanent and unchangeable, was a message:</p>
+        <div class="genesis-quote">
+          <span class="label">▸ EMBEDDED IN THE GENESIS BLOCK</span>
+          "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+        </div>
+        <p>It was a headline from that morning's newspaper — proof of the date, and a statement of intent. Bitcoin was <b>built as the exit</b> from a system that prints money to rescue the powerful and hands the bill to everyone else.</p>
+      </div>
+
+      <!-- 21M vs INFINITY -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">⚖️</div>
+          <div class="truth-card-title">21 Million vs. Infinity</div>
+        </div>
+        <div class="vs-fiat">
+          <div class="vs-fiat-col btc">
+            <div class="vs-fiat-name" style="color:var(--orange)">₿ BITCOIN</div>
+            <div class="vs-fiat-big" style="color:var(--orange)">21M</div>
+            <div class="vs-fiat-small">Hard cap. Written in code. Can never change. Everyone can verify it.</div>
+          </div>
+          <div class="vs-fiat-col fiat">
+            <div class="vs-fiat-name" style="color:#ff4560">💵 THE DOLLAR</div>
+            <div class="vs-fiat-big" style="color:#ff4560">∞</div>
+            <div class="vs-fiat-small">No limit. Created at will. You're never told how much, or when.</div>
+          </div>
+        </div>
+        <p style="margin-top:12px">One is a fixed pie you own a slice of. The other is a pie that gets baked bigger every year — quietly shrinking your slice while the number in your account stays the same.</p>
+      </div>
+
+      <!-- BAILOUT TIMELINE -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">🏦</div>
+          <div class="truth-card-title">Who Gets Bailed Out?</div>
+        </div>
+        <div class="timeline-item"><div class="timeline-year">2008</div><div class="timeline-text"><b>$700B</b> printed to rescue the banks that caused the crash. Homeowners got foreclosed.</div></div>
+        <div class="timeline-item"><div class="timeline-year">2020</div><div class="timeline-text"><b>~40% of all U.S. dollars in existence</b> were created in a single 18-month span. Asset prices soared; savers fell behind.</div></div>
+        <div class="timeline-item"><div class="timeline-year">2023</div><div class="timeline-text">Banks fail again (SVB, Signature). New backstops appear overnight — funded, as always, by the printer.</div></div>
+        <p style="margin-top:12px">When the system breaks, it's rescued with money created from nothing — and the cost shows up as higher prices in <b>your</b> life. Bitcoin has no bailout button. Nobody can print your savings away.</p>
+      </div>
+
+      <!-- THE BANK FACT -->
+      <div class="truth-card">
+        <div class="truth-card-head">
+          <div class="truth-card-icon">🔓</div>
+          <div class="truth-card-title">You Don't Actually Own Your Bank Balance</div>
+        </div>
+        <p>Legally, the moment you deposit money, it becomes <b>the bank's money</b> — you're just an unsecured creditor with an IOU. They lend it out, freeze it, or limit withdrawals at their discretion.</p>
+        <p>Bitcoin held in self-custody is the opposite: <b>you hold it directly.</b> No middleman, no permission, no off-switch. For the first time in history, anyone on Earth can hold savings nobody else can touch.</p>
+      </div>
+
+      <div class="learn-takeaway">
+        <div class="learn-takeaway-title" style="color:#ff4560">🔴 The Whole Point</div>
+        <div class="learn-takeaway-text">Bitcoin isn't a stock or a lottery ticket. It's an opt-out — a fixed-supply, borderless money that no government, bank, or CEO can inflate, freeze, or seize. The cycle tracker tells you <i>when</i>. This is <i>why</i> people refuse to look away once they see it.</div>
+      </div>
+
+      <div class="disclaimer-inline">
+        <span>⚠️</span>
+        <div><b>Not financial advice.</b> This is educational commentary on monetary history and economics — not a recommendation to buy anything. Figures are widely-cited approximations. Form your own view and only ever risk what you can afford to lose.</div>
+      </div>
+
+      <div style="text-align:center;margin-top:20px">
+        <div class="learn-subtab blue" style="display:inline-block;padding:12px 22px" onclick="showLearnSection('how',document.getElementById('subtab-how'))">⛓ Okay, but how does it actually work? →</div>
+      </div>
+
+    </div>
+
+    <!-- ════════ SECTION: HOW IT WORKS ════════ -->
+    <div class="learn-section" id="learn-how">
+
     <div class="learn-hero">
       <div class="learn-kicker">Bitcoin for Humans</div>
       <div class="learn-title">What Is Bitcoin, <span class="hl">Really?</span></div>
@@ -2306,6 +2627,14 @@
       <div class="learn-takeaway-text">Bitcoin is money that runs on math instead of trust. No company, no CEO, no off-switch — just a fixed-supply ledger that anyone can use and no one can control. The cycle tracker tells you <i>when</i>. This page tells you <i>why it's worth tracking.</i></div>
     </div>
 
+    </div><!-- end learn-how section -->
+
+  </div>
+
+  <!-- GLOBAL DISCLAIMER -->
+  <div class="disclaimer-bar">
+    <div class="nfa">⚠️ Not Financial Advice</div>
+    <p>This app is an educational tool, not investment advice. Projections are based on a historical cycle model and live data — they are not predictions or guarantees. Bitcoin is highly volatile; you can lose money. Nothing here is personalized advice. Do your own research. © 2026 Cycle Tracker.</p>
   </div>
 
 </div><!-- end container -->
@@ -3991,11 +4320,59 @@ function updateWeeklyBrief() {
   setEl('briefMindset', '"' + phase.desc + '"');
 }
 
-function showCalcTab(name, el) {
+// ── CALCULATOR LAUNCHER ───────────────────────────────────────
+const CALC_FNS = {
+  dca: calcDCA, buy: calcBuy, sell: calcSell, strategy: buildStrategy,
+  usd: calcVsUSD, sp500: calcSP500, ladder: calcLadder, mynum: calcMyNumber,
+  tax: calcTax, lifestyle: calcLifestyle, retire: calcRetire,
+  multicycle: calcMultiCycle, timemachine: calcTimeMachine,
+};
+function openCalc(name, title) {
+  document.getElementById('calcLauncher').style.display = 'none';
+  document.getElementById('calcBackBar').classList.add('show');
+  document.getElementById('calcBackTitle').innerHTML = title;
   document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('calc-' + name).classList.add('active');
-  el.classList.add('active');
+  const panel = document.getElementById('calc-' + name);
+  if (panel) panel.classList.add('active');
+  if (CALC_FNS[name]) { try { CALC_FNS[name](); } catch(e) {} }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function closeCalcView() {
+  document.getElementById('calcLauncher').style.display = 'block';
+  document.getElementById('calcBackBar').classList.remove('show');
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── LEARN SECTIONS (Red Pill / How It Works) ──────────────────
+function showLearnSection(name, el) {
+  document.querySelectorAll('.learn-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.learn-subtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('learn-' + name).classList.add('active');
+  const tab = document.getElementById('subtab-' + (name === 'how' ? 'how' : 'redpill'));
+  if (tab) tab.classList.add('active');
+  if (name === 'how' && chainAnim) chainAnim.resize();
+  if (name === 'how') animateScarcity();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── LIVE DEBT / MONEY-PRINTER COUNTER ─────────────────────────
+// Widely-cited approximations: U.S. debt ≈ $37.2T mid-2026, growing ~$5B/day.
+const DEBT_BASE      = 37_200_000_000_000;
+const DEBT_ANCHOR_TS = Date.UTC(2026, 5, 21);      // 2026-06-21
+const DEBT_PER_SEC   = 5_000_000_000 / 86400;       // ≈ $57,870 / second
+const SESSION_START  = Date.now();
+function fmtBigUSD(n) { return '$' + Math.floor(n).toLocaleString('en-US'); }
+function tickDebtCounter() {
+  const debtEl = document.getElementById('debtCounter');
+  if (!debtEl) return;
+  const elapsed = (Date.now() - DEBT_ANCHOR_TS) / 1000;
+  debtEl.textContent = fmtBigUSD(DEBT_BASE + elapsed * DEBT_PER_SEC);
+  const sinceEl = document.getElementById('printedSince');
+  if (sinceEl) {
+    const printed = (Date.now() - SESSION_START) / 1000 * DEBT_PER_SEC;
+    sinceEl.textContent = fmtBigUSD(printed);
+  }
 }
 
 // ── NAV ──────────────────────────────────────────────────────
@@ -4005,9 +4382,12 @@ function showPage(name, el) {
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
   if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); }
-  if (name === 'calc') { calcDCA(); calcBuy(); calcSell(); calcVsUSD(); calcSP500(); calcLadder(); calcMyNumber(); calcTax(); calcLifestyle(); calcRetire(); calcMultiCycle(); buildStrategy(); }
+  if (name === 'calc') { closeCalcView(); }
   if (name === 'alerts') updateWeeklyBrief();
-  if (name === 'learn') { if (chainAnim) chainAnim.resize(); animateScarcity(); }
+  if (name === 'learn') {
+    const active = document.querySelector('.learn-section.active');
+    if (active && active.id === 'learn-how' && chainAnim) { chainAnim.resize(); animateScarcity(); }
+  }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -4374,9 +4754,11 @@ initCycleRing();
 calcTimeMachine();
 buildExitPlan();
 
+tickDebtCounter();
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
 setInterval(fetchFearGreed, 600000); // Fear & Greed updates ~hourly; poll every 10 min
+setInterval(tickDebtCounter, 70);     // live money-printer counter on the Red Pill page
 setTimeout(maybeShowEmailModal, 30000); // show email capture after 30s on first visit
 </script>
 </body>
