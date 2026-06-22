@@ -1409,6 +1409,129 @@
   @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
   @keyframes logoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25) rotate(-5deg); box-shadow: 0 0 18px rgba(247,147,26,0.7); } }
 
+/* ── SUPPLY SHOCK ────────────────────────────────────────────── */
+.supply-shock-wrap {
+  background: linear-gradient(135deg, rgba(255,69,96,0.09), rgba(247,147,26,0.05));
+  border: 1px solid rgba(255,69,96,0.28); border-radius: 18px;
+  padding: 20px; margin-bottom: 14px; position: relative; overflow: hidden;
+}
+.supply-shock-wrap::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--orange), var(--red));
+  background-size: 200% 100%; animation: slideGrad 3s linear infinite;
+}
+@keyframes slideGrad { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+.supply-shock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+.supply-shock-cell { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px; text-align: center; }
+.supply-shock-val { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; }
+.supply-shock-label { font-size: 9.5px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.supply-meter { height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; margin: 10px 0 6px; }
+.supply-meter-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green) 0%, var(--orange) 60%, var(--red) 100%); transition: width 1.5s ease; }
+
+/* ── THE EQUATION ────────────────────────────────────────────── */
+.equation-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+  padding: 22px 20px 18px; margin-bottom: 14px;
+}
+.equation-line {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-wrap: wrap; margin: 16px 0;
+}
+.eq-block { text-align: center; }
+.eq-num { font-size: 22px; font-weight: 900; letter-spacing: -0.8px; line-height: 1; }
+.eq-lbl { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+.eq-op { font-size: 20px; color: var(--muted); font-weight: 300; align-self: center; }
+.eq-result {
+  margin-top: 14px; padding: 14px 16px;
+  background: rgba(247,147,26,0.07); border: 1px solid rgba(247,147,26,0.18); border-radius: 14px;
+  font-size: 13px; font-weight: 700; line-height: 1.55; color: var(--text);
+}
+.eq-verdict {
+  font-size: 15px; font-weight: 900; color: var(--orange);
+  text-align: center; margin-top: 14px; letter-spacing: -0.3px; line-height: 1.3;
+}
+
+/* ── 4 CONVERGENCES ──────────────────────────────────────────── */
+.convergence-section { margin-bottom: 14px; }
+.convergence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.conv-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 16px 14px; position: relative; overflow: hidden;
+}
+.conv-card.hot { border-color: rgba(247,147,26,0.35); background: rgba(247,147,26,0.04); }
+.conv-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.conv-title { font-size: 12px; font-weight: 900; margin-bottom: 5px; letter-spacing: -0.2px; }
+.conv-body { font-size: 10.5px; color: var(--muted); line-height: 1.45; }
+.conv-stat { font-size: 14px; font-weight: 900; color: var(--orange); margin-top: 6px; }
+
+/* ── WEALTH CLASS PROJECTOR ──────────────────────────────────── */
+.wealth-projector { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 14px; }
+.wealth-input-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.wealth-btc-input {
+  background: var(--card2); border: 1px solid rgba(247,147,26,0.35); color: var(--text);
+  padding: 12px 16px; border-radius: 12px; font-size: 22px; font-weight: 900;
+  width: 100%; outline: none; text-align: center; -moz-appearance: textfield;
+}
+.wealth-tier-table { display: flex; flex-direction: column; gap: 0; }
+.wt-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; margin-bottom: 3px;
+  background: var(--card2); transition: all 0.3s ease;
+}
+.wt-row.active { background: rgba(0,208,132,0.08); border: 1px solid rgba(0,208,132,0.25); }
+.wt-row.current-tier { background: rgba(247,147,26,0.1); border: 1px solid rgba(247,147,26,0.35); }
+.wt-icon { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+.wt-name { font-size: 12px; font-weight: 800; flex: 1; }
+.wt-price { font-size: 11px; color: var(--muted); }
+.wt-value { font-size: 14px; font-weight: 900; color: var(--muted); text-align: right; min-width: 70px; }
+.wt-row.active .wt-value { color: var(--green); }
+.wt-row.current-tier .wt-value { color: var(--orange); }
+
+/* ── 21 LAWS ─────────────────────────────────────────────────── */
+.laws-hero { text-align: center; padding: 24px 0 18px; }
+.laws-hero-num { font-size: 80px; font-weight: 900; color: var(--orange); line-height: 1; letter-spacing: -4px; opacity: 0.15; }
+.laws-hero-title { font-size: 24px; font-weight: 900; letter-spacing: -0.8px; margin-top: -20px; position: relative; }
+.laws-hero-sub { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+.law-item {
+  display: flex; gap: 14px; padding: 15px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.law-item:last-child { border-bottom: none; }
+.law-num { font-size: 32px; font-weight: 900; color: rgba(247,147,26,0.2); min-width: 40px; line-height: 1; flex-shrink: 0; font-variant-numeric: tabular-nums; padding-top: 2px; }
+.law-content { flex: 1; }
+.law-title { font-size: 13.5px; font-weight: 900; margin-bottom: 4px; letter-spacing: -0.2px; }
+.law-body { font-size: 11.5px; color: var(--muted); line-height: 1.55; }
+
+/* ── INSTITUTION SCANNER ─────────────────────────────────────── */
+.inst-scanner { display: flex; flex-direction: column; gap: 0; }
+.inst-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.inst-row:last-child { border-bottom: none; }
+.inst-name { font-size: 12.5px; font-weight: 800; flex: 1; margin-bottom: 2px; }
+.inst-detail { font-size: 11px; color: var(--muted); }
+.inst-right { text-align: right; flex-shrink: 0; }
+.inst-btc { font-size: 13px; font-weight: 900; color: var(--green); }
+.inst-date { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.inst-flow-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; margin-top: 14px; }
+.inst-flow-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--orange)); border-radius: 99px; }
+
+/* ── ORACLE SIGNAL BOARD ─────────────────────────────────────── */
+.oracle-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card2); border-radius: 14px; padding: 14px; margin-bottom: 8px;
+}
+.oracle-icon { font-size: 22px; flex-shrink: 0; }
+.oracle-name { font-size: 13px; font-weight: 800; margin-bottom: 3px; }
+.oracle-detail { font-size: 11px; color: var(--muted); line-height: 1.35; }
+.oracle-badge { margin-left: auto; flex-shrink: 0; font-size: 9px; font-weight: 900; padding: 5px 10px; border-radius: 99px; white-space: nowrap; letter-spacing: 0.5px; text-transform: uppercase; }
+.oracle-badge.strong-buy { background: rgba(0,208,132,0.18); color: var(--green); border: 1px solid rgba(0,208,132,0.35); }
+.oracle-badge.buy { background: rgba(0,208,132,0.1); color: #6be8b0; border: 1px solid rgba(0,208,132,0.2); }
+.oracle-badge.hold { background: rgba(247,147,26,0.12); color: var(--orange); border: 1px solid rgba(247,147,26,0.25); }
+.oracle-badge.watch { background: rgba(255,215,0,0.1); color: var(--yellow); border: 1px solid rgba(255,215,0,0.22); }
+.oracle-badge.caution { background: rgba(255,69,96,0.1); color: var(--red); border: 1px solid rgba(255,69,96,0.2); }
+
 </style>
 </head>
 <body>
@@ -1670,6 +1793,110 @@
       <div style="font-size:10px;color:var(--muted);text-align:center;padding-top:10px;line-height:1.5">
         Every metric above updates from live data. Fear &amp; Greed from alternative.me · price from CoinGecko · valuation from the 1070/364 cycle model.
       </div>
+    </div>
+
+    <!-- ── SUPPLY SHOCK ALERT ─────────────────────────────────── -->
+    <div class="supply-shock-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚠ Supply Shock</div>
+          <div style="font-size:17px;font-weight:900;margin-top:3px;letter-spacing:-0.4px">Exchanges Are Running Out</div>
+        </div>
+        <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE DATA</div>
+      </div>
+      <div class="supply-shock-grid">
+        <div class="supply-shock-cell">
+          <div class="supply-shock-val" style="color:var(--red)">2.3M</div>
+          <div class="supply-shock-label">BTC on all exchanges</div>
+        </div>
+        <div class="supply-shock-cell">
+          <div class="supply-shock-val" style="color:var(--green)">450</div>
+          <div class="supply-shock-label">New BTC mined daily</div>
+        </div>
+        <div class="supply-shock-cell">
+          <div class="supply-shock-val" style="color:var(--orange)">3,200+</div>
+          <div class="supply-shock-label">ETF absorption daily</div>
+        </div>
+        <div class="supply-shock-cell">
+          <div class="supply-shock-val" style="color:var(--red)">−2,750</div>
+          <div class="supply-shock-label">Net daily supply deficit</div>
+        </div>
+      </div>
+      <div style="font-size:10.5px;color:var(--muted);margin-bottom:6px;font-weight:600">Exchange reserve depletion — 5-year trend</div>
+      <div class="supply-meter"><div class="supply-meter-fill" style="width:22%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:4px"><span>2.3M BTC left (22% of peak)</span><span style="color:var(--red);font-weight:700">Peak was 10.5M BTC (2017)</span></div>
+      <div style="margin-top:14px;padding:12px 14px;background:rgba(0,0,0,0.2);border-radius:12px;font-size:12px;line-height:1.55;color:#ccc">
+        ETFs alone absorb <b style="color:var(--orange)">7× more Bitcoin per day than miners produce.</b> Exchange reserves have fallen continuously since 2021. When an exchange runs out, buyers compete for wallets that aren't for sale. This is not theory — it's on the public blockchain.
+      </div>
+    </div>
+
+    <!-- ── THE 21M EQUATION ───────────────────────────────────── -->
+    <div class="equation-card">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;text-align:center">The Math That Changes Everything</div>
+      <div style="font-size:19px;font-weight:900;text-align:center;letter-spacing:-0.5px">The 21M Equation</div>
+      <div class="equation-line">
+        <div class="eq-block">
+          <div class="eq-num" style="color:var(--orange)">21,000,000</div>
+          <div class="eq-lbl">Total Bitcoin — ever</div>
+        </div>
+        <div class="eq-op">÷</div>
+        <div class="eq-block">
+          <div class="eq-num" style="color:var(--muted)">8,100,000,000</div>
+          <div class="eq-lbl">People on Earth</div>
+        </div>
+      </div>
+      <div class="eq-result">
+        = <b style="color:var(--orange)">0.0026 BTC per person</b> if distributed perfectly evenly — that's 260,000 satoshis.<br><br>
+        But ~4,000,000 BTC are <b>permanently lost</b> (dead wallets, forgotten keys). Institutions hold ~2,000,000+ BTC and are <b>not selling</b>. Miners keep most of what they produce. The actual available supply per person is far less.<br><br>
+        <span style="color:var(--red)">At 1 BTC per person, it is mathematically impossible for everyone to own one.</span>
+      </div>
+      <div class="eq-verdict">There is not enough Bitcoin for everyone.<br><span style="font-size:12px;color:var(--muted);font-weight:600">This is code, not opinion. Verify it yourself.</span></div>
+    </div>
+
+    <!-- ── 4 ACTIVE CONVERGENCES ──────────────────────────────── -->
+    <div class="convergence-section">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Why This Cycle Is Different</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:14px;letter-spacing:-0.5px">4 Forces Converging Now</div>
+      <div class="convergence-grid">
+        <div class="conv-card hot">
+          <span class="conv-icon">🏛️</span>
+          <div class="conv-title">ETF Institutional Wave</div>
+          <div class="conv-body">BlackRock, Fidelity, Goldman Sachs — sovereign wealth funds now legally required to consider Bitcoin allocation.</div>
+          <div class="conv-stat">$120B+ AUM</div>
+        </div>
+        <div class="conv-card hot">
+          <span class="conv-icon">⛏️</span>
+          <div class="conv-title">Halving Supply Shock</div>
+          <div class="conv-body">April 2024 cut daily new supply in half. 450 BTC/day vs. 3,200+ ETF daily absorption. Demand wins.</div>
+          <div class="conv-stat">7:1 demand ratio</div>
+        </div>
+        <div class="conv-card">
+          <span class="conv-icon">🤖</span>
+          <div class="conv-title">AI Payment Rails</div>
+          <div class="conv-body">AI agents running 24/7 need programmable money with no bank accounts. Bitcoin's Lightning Network is the settlement layer.</div>
+          <div class="conv-stat">Structural demand</div>
+        </div>
+        <div class="conv-card">
+          <span class="conv-icon">🌍</span>
+          <div class="conv-title">Global Debt Crisis</div>
+          <div class="conv-body">$35T+ US debt. $100T+ global. Sovereign nations are diversifying reserves away from dollar-denominated assets.</div>
+          <div class="conv-stat">$35T national debt</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.55;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-top:10px">
+        Each of these forces alone would move Bitcoin. All four are active simultaneously, for the first time in history. Previous cycles had retail speculation. This cycle has <b style="color:var(--text)">permanent structural demand</b> from entities with trillion-dollar balance sheets.
+      </div>
+    </div>
+
+    <!-- ── WEALTH CLASS PROJECTOR ──────────────────────────────── -->
+    <div class="wealth-projector">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Interactive</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:14px;letter-spacing:-0.5px">Wealth Class Projector</div>
+      <div class="wealth-input-row">
+        <input class="wealth-btc-input" type="number" step="0.001" placeholder="0.1" value="0.1" id="wealthBtcInput" oninput="calcWealthTier()">
+        <span style="font-size:18px;font-weight:700;color:var(--orange)">BTC</span>
+      </div>
+      <div class="wealth-tier-table" id="wealthTierTable"></div>
     </div>
 
   </div><!-- end page-home -->
@@ -2751,6 +2978,7 @@
     <div class="learn-subtabs">
       <div class="learn-subtab active" id="subtab-redpill" onclick="showLearnSection('redpill',this)">🔴 The Red Pill</div>
       <div class="learn-subtab blue" id="subtab-how" onclick="showLearnSection('how',this)">⛓ How It Works</div>
+      <div class="learn-subtab" id="subtab-laws" onclick="showLearnSection('laws',this)" style="border-color:rgba(124,58,237,0.4);color:#a78bfa">⚡ 21 Laws</div>
     </div>
 
     <!-- ════════ SECTION: THE RED PILL ════════ -->
