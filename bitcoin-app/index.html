@@ -1409,6 +1409,93 @@
   @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
   @keyframes logoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25) rotate(-5deg); box-shadow: 0 0 18px rgba(247,147,26,0.7); } }
 
+  /* ── PARTICLE BACKGROUND ─────────────────────────────────────── */
+  #particleBg { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.28; }
+  .container, .bottom-nav, .header { position:relative;z-index:1; }
+
+  /* ── MISSION CONTROL DATA TICKER ─────────────────────────────── */
+  .data-ticker {
+    background: rgba(6,6,12,0.92); border-bottom: 1px solid rgba(247,147,26,0.18);
+    padding: 5px 0; overflow: hidden; white-space: nowrap; position: sticky;
+    top: 69px; z-index: 99; backdrop-filter: blur(12px);
+    font-family: 'SF Mono','Fira Code','Fira Mono',monospace;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .ticker-track { display:inline-flex; animation: tickerScroll 50s linear infinite; }
+  .ticker-track:hover { animation-play-state:paused; }
+  @keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .t-item { display:inline-block; padding:0 22px; color:#5a5a7a; }
+  .t-label { color:#3a3a58; margin-right:5px; }
+  .t-orange { color:var(--orange); }
+  .t-green  { color:var(--green); }
+  .t-red    { color:var(--red); }
+  .t-sep    { color:#2a2a40; margin:0 4px; }
+
+  /* ── CHART PAGE ORBIT RING ───────────────────────────────────── */
+  .orbit-section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 16px; margin-bottom: 14px; text-align:center; overflow:hidden;
+    position:relative;
+  }
+  .orbit-section::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 120%, rgba(247,147,26,0.06) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  #orbitCanvas { display:block; margin:0 auto; max-width:100%; }
+
+  /* ── PRICE SIMULATOR ─────────────────────────────────────────── */
+  .price-sim-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 22px 20px; margin-bottom: 14px;
+  }
+  .price-sim-target {
+    font-size: 52px; font-weight: 900; letter-spacing: -3px; text-align:center;
+    color: var(--orange); line-height:1; margin: 14px 0 4px;
+    text-shadow: 0 0 30px rgba(247,147,26,0.5);
+  }
+  input[type=range].sim-slider {
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:6px; border-radius:99px; outline:none; cursor:pointer;
+    background: linear-gradient(90deg,var(--green),var(--orange),var(--red));
+    margin:16px 0 8px;
+  }
+  input[type=range].sim-slider::-webkit-slider-thumb {
+    -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:var(--card); border:3px solid var(--orange);
+    box-shadow: 0 0 12px rgba(247,147,26,0.6); cursor:pointer;
+  }
+  input[type=range].sim-slider::-moz-range-thumb {
+    width:24px; height:24px; border-radius:50%; background:var(--card);
+    border:3px solid var(--orange); cursor:pointer;
+  }
+  .sim-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+  .sim-cell { background:var(--card2); border-radius:14px; padding:14px; text-align:center; }
+  .sim-val  { font-size:20px; font-weight:900; line-height:1; }
+  .sim-lbl  { font-size:10px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
+
+  /* ── CHART GLOW ──────────────────────────────────────────────── */
+  .chart-wrap canvas { filter: drop-shadow(0 0 6px rgba(247,147,26,0.25)); }
+
+  /* ── 3D CARD HOVER ───────────────────────────────────────────── */
+  .intel-card, .proj-card, .dca-card {
+    transition: box-shadow 0.3s ease, transform 0.25s ease;
+  }
+  .intel-card:hover, .proj-card:hover {
+    box-shadow: 0 0 0 1px rgba(247,147,26,0.18), 0 10px 40px rgba(0,0,0,0.5);
+    transform: translateY(-2px);
+  }
+
+  /* ── NEON STAT PULSE ─────────────────────────────────────────── */
+  @keyframes neonPulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
+  .live-neon { animation: neonPulse 2.4s ease-in-out infinite; }
+
+  /* ── CHART PAGE HEADER ───────────────────────────────────────── */
+  .chart-page-header { padding:20px 0 14px; }
+  .chart-page-header-kicker { font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px; }
+  .chart-page-header-title { font-size:26px;font-weight:900;letter-spacing:-0.8px;line-height:1.1; }
+  .chart-page-header-sub { font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.5; }
+
 /* ── SUPPLY SHOCK ────────────────────────────────────────────── */
 .supply-shock-wrap {
   background: linear-gradient(135deg, rgba(255,69,96,0.09), rgba(247,147,26,0.05));
@@ -1536,6 +1623,9 @@
 </head>
 <body>
 
+<!-- Particle network background -->
+<canvas id="particleBg"></canvas>
+
 <!-- Phase-reactive background glow — shifts color with cycle phase -->
 <div id="phaseGlow"></div>
 
@@ -1551,6 +1641,53 @@
   <div class="header-price">
     <div class="btc-price" id="btcPrice"><span class="spinner"></span></div>
     <div class="btc-change" id="btcChange">&nbsp;</div>
+  </div>
+</div>
+
+<!-- MISSION CONTROL TICKER -->
+<div class="data-ticker" id="dataTicker">
+  <div class="ticker-track">
+    <span class="t-item"><span class="t-label">BTC/USD</span><span class="t-orange" id="tickerPriceA">—</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">SUPPLY</span><span class="t-red">450 BTC/DAY MINED</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">ETF FLOW</span><span class="t-green">+5,000 BTC/DAY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">DEFICIT</span><span class="t-red">−4,550 BTC/DAY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">EXCHANGES</span><span class="t-red">2.3M BTC REMAINING</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">HASHRATE</span><span class="t-green">741 EH/s</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">BLOCK HEIGHT</span><span class="t-orange" id="tickerBlockA">LIVE</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">NODES</span><span class="t-green">~17,500 GLOBAL</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">LIGHTNING</span><span class="t-green">5,200 BTC CAPACITY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">SUPPLY CAP</span><span class="t-orange">21,000,000 BTC — IMMUTABLE</span></span>
+    <span class="t-item t-sep">·</span>
+    <!-- duplicate for seamless loop -->
+    <span class="t-item"><span class="t-label">BTC/USD</span><span class="t-orange" id="tickerPriceB">—</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">SUPPLY</span><span class="t-red">450 BTC/DAY MINED</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">ETF FLOW</span><span class="t-green">+5,000 BTC/DAY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">DEFICIT</span><span class="t-red">−4,550 BTC/DAY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">EXCHANGES</span><span class="t-red">2.3M BTC REMAINING</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">HASHRATE</span><span class="t-green">741 EH/s</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">BLOCK HEIGHT</span><span class="t-orange" id="tickerBlockB">LIVE</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">NODES</span><span class="t-green">~17,500 GLOBAL</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">LIGHTNING</span><span class="t-green">5,200 BTC CAPACITY</span></span>
+    <span class="t-item t-sep">·</span>
+    <span class="t-item"><span class="t-label">SUPPLY CAP</span><span class="t-orange">21,000,000 BTC — IMMUTABLE</span></span>
+    <span class="t-item t-sep">·</span>
   </div>
 </div>
 
@@ -1903,10 +2040,57 @@
 
   <!-- PAGE: CHART -->
   <div class="page" id="page-chart">
-    <div class="section-header">Full Cycle Timeline</div>
-    <div class="chart-card" style="margin-top:8px">
+
+    <div class="chart-page-header">
+      <div class="chart-page-header-kicker">Satoshi Oracle · Chart Intelligence</div>
+      <div class="chart-page-header-title">Cycle Command Center</div>
+      <div class="chart-page-header-sub">Real-time cycle position, price projection, and interactive scenario modeling — every data point, live.</div>
+    </div>
+
+    <!-- ── ORBIT RING: 3D CYCLE VISUALIZER ── -->
+    <div class="orbit-section">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Cycle Accelerator Ring</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Your current position in the 1,434-day Bitcoin cycle</div>
+      <canvas id="orbitCanvas" width="340" height="300"></canvas>
+      <div id="orbitPhaseLabel" style="font-size:13px;font-weight:800;color:var(--orange);margin-top:8px">Loading phase...</div>
+      <div id="orbitDayLabel" style="font-size:11px;color:var(--muted);margin-top:2px">—</div>
+    </div>
+
+    <!-- ── INTERACTIVE PRICE SIMULATOR ── -->
+    <div class="price-sim-card">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Interactive</div>
+      <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;margin-bottom:2px">Price Scenario Simulator</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Drag to any Bitcoin price — see your stack value update live</div>
+      <div class="price-sim-target" id="simTargetPrice">$200K</div>
+      <div style="display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);padding:0 2px">
+        <span>$50K</span><span>$250K</span><span>$500K</span><span>$750K</span><span>$1M</span>
+      </div>
+      <input type="range" class="sim-slider" id="priceSimSlider" min="50" max="1000" value="200" step="5" oninput="updatePriceSim()">
+      <div class="sim-grid">
+        <div class="sim-cell">
+          <div class="sim-val" style="color:var(--orange)" id="simPortVal">—</div>
+          <div class="sim-lbl">Your Stack Value</div>
+        </div>
+        <div class="sim-cell">
+          <div class="sim-val" style="color:var(--green)" id="simMultiplier">—</div>
+          <div class="sim-lbl">Return from today</div>
+        </div>
+        <div class="sim-cell">
+          <div class="sim-val" style="color:var(--text)" id="simPctGain">—</div>
+          <div class="sim-lbl">% Gain</div>
+        </div>
+        <div class="sim-cell">
+          <div class="sim-val" style="color:var(--muted)" id="simInvested">—</div>
+          <div class="sim-lbl">Your Cost Basis</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">Your BTC amount synced from the Stack tab · <span style="color:var(--orange)" id="simBtcDisplay">0.1 BTC</span></div>
+    </div>
+
+    <!-- ── FULL CYCLE CHART ── -->
+    <div class="chart-card" style="margin-top:0">
       <div class="chart-title">Bear / Base / Bull — Bottom-Anchored 1070/364 Cycle</div>
-      <div class="chart-caption">Same idea, zoomed out across the whole cycle: bottom (Nov 2022) → top (Oct 2025) → next bottom (Oct 2026) → next top (~2029). Each line is a different guess for how high or low price goes. The dashed white line shows where we are right now.</div>
+      <div class="chart-caption">The full cycle zoomed out: bottom (Nov 2022) → ATH (~Oct 2025) → next bottom (Oct 2026) → next ATH (~2029). Dashed white = today.</div>
       <div class="chart-wrap" style="height:260px">
         <canvas id="bigChart"></canvas>
       </div>
@@ -4293,6 +4477,8 @@ async function fetchPrice() {
     buildExitPlan();
     calcTimeMachine();
     if (document.getElementById('page-intel')?.classList.contains('active')) buildHoldersTable();
+    updateTicker(livePrice);
+    updatePriceSim();
   } catch(e) {
     if (!livePrice) document.getElementById('btcPrice').textContent = '$—';
   }
@@ -4382,21 +4568,41 @@ const TOOLTIP_DOLLAR = {
   callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString('en-US') }
 };
 
+// Chart.js glow plugin — adds neon shadow to dataset lines
+const glowPlugin = {
+  id: 'glow',
+  beforeDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(247,147,26,0.45)';
+  },
+  afterDatasetsDraw(chart) { chart.ctx.restore(); }
+};
+
+function makeGrad(ctx, chart, top, bottom) {
+  if (!chart.chartArea) return 'transparent';
+  const g = ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
+  g.addColorStop(0, top); g.addColorStop(1, bottom); return g;
+}
+
 function buildSmallChart() {
-  const ctx = document.getElementById('projChart').getContext('2d');
+  const canvas = document.getElementById('projChart');
+  const ctx = canvas.getContext('2d');
   projChart = new Chart(ctx, {
     type: 'line',
-    plugins: [todayLinePlugin],
+    plugins: [todayLinePlugin, glowPlugin],
     data: {
       labels: PROJ_DATA.map(d => d.month),
       datasets: [
-        { label: 'Bull (best case)', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
-        { label: 'Base (most likely)', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.05)', borderWidth: 2.5, pointRadius: 0, tension: 0.4 },
-        { label: 'Bear (worst case)', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.05)', borderWidth: 2, pointRadius: 0, tension: 0.4 },
+        { label: 'Bull', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(0,208,132,0.18)', 'rgba(0,208,132,0.01)'), borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true },
+        { label: 'Base', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(247,147,26,0.22)', 'rgba(247,147,26,0.01)'), borderWidth: 2.5, pointRadius: 0, tension: 0.4, fill: true },
+        { label: 'Bear', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(255,69,96,0.12)', 'rgba(255,69,96,0.01)'), borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: { duration: 1200, easing: 'easeInOutQuart' },
       plugins: {
         legend: { display: true, position: 'top', labels: { color: '#e8e8f0', font: { size: 10 }, boxWidth: 10, padding: 8 } },
         tooltip: TOOLTIP_DOLLAR
@@ -4410,23 +4616,34 @@ function buildSmallChart() {
 }
 
 function buildBigChart() {
-  const ctx = document.getElementById('bigChart').getContext('2d');
+  const canvas = document.getElementById('bigChart');
+  const ctx = canvas.getContext('2d');
   bigChart = new Chart(ctx, {
     type: 'line',
-    plugins: [todayLinePlugin],
+    plugins: [todayLinePlugin, glowPlugin],
     data: {
       labels: PROJ_DATA.map(d => d.month),
       datasets: [
-        { label: 'Bull (best case)', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: 'rgba(0,208,132,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
-        { label: 'Base (most likely)', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,0.08)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#f7931a', tension: 0.4, fill: false },
-        { label: 'Bear (worst case)', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: 'rgba(255,69,96,0.08)', borderWidth: 2, pointRadius: 0, tension: 0.4, fill: false },
+        { label: 'Bull (best case)', data: PROJ_DATA.map(d => d.bull), borderColor: '#00d084', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(0,208,132,0.2)', 'rgba(0,208,132,0.01)'), borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true },
+        { label: 'Base (most likely)', data: PROJ_DATA.map(d => d.base), borderColor: '#f7931a', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(247,147,26,0.25)', 'rgba(247,147,26,0.01)'), borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#f7931a', pointHoverRadius: 7, tension: 0.4, fill: true },
+        { label: 'Bear (worst case)', data: PROJ_DATA.map(d => d.bear), borderColor: '#ff4560', backgroundColor: ctx => makeGrad(ctx.chart.ctx, ctx.chart, 'rgba(255,69,96,0.14)', 'rgba(255,69,96,0.01)'), borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true },
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      animation: { duration: 1600, easing: 'easeInOutQuart' },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { labels: { color: '#e8e8f0', font: { size: 11 }, boxWidth: 10, padding: 10 } },
-        tooltip: TOOLTIP_DOLLAR
+        tooltip: {
+          backgroundColor: 'rgba(10,10,20,0.95)',
+          borderColor: 'rgba(247,147,26,0.3)', borderWidth: 1,
+          titleColor: '#f7931a', bodyColor: '#e8e8f0',
+          padding: 12, cornerRadius: 10,
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString('en-US')
+          }
+        }
       },
       scales: {
         x: { ticks: { color: '#6b6b80', font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.04)' } },
@@ -5645,7 +5862,8 @@ function showPage(name, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
-  if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); }
+  if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); updatePriceSim(); }
+  if (name === 'chart') { updatePriceSim(); }
   if (name === 'calc') { closeCalcView(); }
   if (name === 'alerts') updateWeeklyBrief();
   if (name === 'learn') {
@@ -6323,6 +6541,245 @@ function updateOraclePhaseSignal() {
   badgeEl.className    = `oracle-badge ${cls}`;
 }
 
+// ── PARTICLE NETWORK BACKGROUND ──────────────────────────────
+function initParticleNetwork() {
+  const canvas = document.getElementById('particleBg');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], raf;
+  const N = 70;
+  const MAX_DIST = 130;
+
+  const resize = () => {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.4 + 0.4,
+      pulse: Math.random() * Math.PI * 2,
+    });
+  }
+
+  const draw = () => {
+    raf = requestAnimationFrame(draw);
+    ctx.clearRect(0, 0, W, H);
+    const t = Date.now() / 1000;
+
+    for (let i = 0; i < N; i++) {
+      const p = particles[i];
+      for (let j = i + 1; j < N; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < MAX_DIST) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(247,147,26,${(1 - d/MAX_DIST) * 0.12})`;
+          ctx.lineWidth = 0.6;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+        }
+      }
+      const alpha = 0.25 + 0.15 * Math.sin(t * 1.2 + p.pulse);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(247,147,26,${alpha})`;
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+    }
+  };
+  draw();
+}
+
+// ── ORBIT RING VISUALIZER (3D CYCLE RING) ────────────────────
+function initOrbitRing() {
+  const canvas = document.getElementById('orbitCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const CYCLE_LEN = 1434;
+  const ANCHOR = new Date('2022-11-01');
+
+  const RING_PHASES = [
+    { name:'Accumulation', frac:180/1434, color:'#7c3aed' },
+    { name:'Recovery',     frac:170/1434, color:'#3b82f6' },
+    { name:'Early Bull',   frac:200/1434, color:'#06b6d4' },
+    { name:'Momentum',     frac:200/1434, color:'#22c55e' },
+    { name:'Late Bull',    frac:150/1434, color:'#eab308' },
+    { name:'ATH Zone',     frac:100/1434, color:'#f97316' },
+    { name:'Distribution', frac:100/1434, color:'#ef4444' },
+    { name:'Bear',         frac:150/1434, color:'#dc2626' },
+    { name:'Deep Bear',    frac:184/1434, color:'#7f1d1d' },
+  ];
+
+  let rot = -Math.PI * 0.08; // slow rotation offset
+  let frame = 0;
+
+  const draw = () => {
+    requestAnimationFrame(draw);
+    frame++;
+    rot += 0.0004;
+
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth || 340;
+    const H = canvas.offsetHeight || 300;
+    if (canvas.width !== W * dpr) { canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Starfield
+    ctx.save();
+    const starSeed = 42;
+    for (let i = 0; i < 60; i++) {
+      const sx = ((Math.sin(i * 137.5 + starSeed) * 0.5 + 0.5)) * W;
+      const sy = ((Math.cos(i * 97.3 + starSeed) * 0.5 + 0.5)) * H;
+      const sr = 0.4 + (i % 3) * 0.3;
+      const sa = 0.2 + 0.3 * Math.sin(frame * 0.02 + i);
+      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,200,255,${sa})`; ctx.fill();
+    }
+    ctx.restore();
+
+    const dayInCycle = Math.floor((Date.now() - ANCHOR.getTime()) / 86400000) % CYCLE_LEN;
+    const cx = W / 2, cy = H * 0.52;
+    const rx = W * 0.40, ry = rx * 0.36; // perspective ellipse
+    const lineW = Math.max(12, rx * 0.14);
+
+    // Draw ring segments (each phase)
+    let cursor = 0;
+    RING_PHASES.forEach(ph => {
+      const startFrac = cursor;
+      const endFrac   = cursor + ph.frac;
+      cursor = endFrac;
+      const steps = Math.max(20, Math.floor(ph.frac * 200));
+      ctx.beginPath();
+      for (let k = 0; k <= steps; k++) {
+        const frac = startFrac + (endFrac - startFrac) * k / steps;
+        const angle = frac * Math.PI * 2 - Math.PI / 2 + rot;
+        const x = cx + rx * Math.cos(angle);
+        const y = cy + ry * Math.sin(angle);
+        k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = ph.color;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'butt';
+      ctx.shadowColor = ph.color;
+      ctx.shadowBlur = 12;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+
+    // Track outline
+    ctx.save();
+    ctx.beginPath();
+    for (let k = 0; k <= 120; k++) {
+      const angle = (k / 120) * Math.PI * 2 - Math.PI / 2 + rot;
+      const x = cx + (rx + lineW/2 + 1) * Math.cos(angle);
+      const y = cy + (ry + lineW/2 * 0.36 + 1) * Math.sin(angle);
+      k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.restore();
+
+    // Current position "particle"
+    const posAngle = (dayInCycle / CYCLE_LEN) * Math.PI * 2 - Math.PI / 2 + rot;
+    const dotX = cx + rx * Math.cos(posAngle);
+    const dotY = cy + ry * Math.sin(posAngle);
+    const pulse = 1 + 0.3 * Math.sin(frame * 0.08);
+
+    // Outer halo
+    const halo = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, 36 * pulse);
+    halo.addColorStop(0, 'rgba(255,255,255,0.8)');
+    halo.addColorStop(0.35, 'rgba(247,147,26,0.5)');
+    halo.addColorStop(1, 'rgba(247,147,26,0)');
+    ctx.beginPath(); ctx.arc(dotX, dotY, 36 * pulse, 0, Math.PI * 2);
+    ctx.fillStyle = halo; ctx.fill();
+
+    // Core
+    ctx.beginPath(); ctx.arc(dotX, dotY, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#fff'; ctx.shadowBlur = 22;
+    ctx.fill(); ctx.shadowBlur = 0;
+
+    // Center text
+    ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
+    ctx.font = `900 ${Math.floor(W * 0.072)}px -apple-system,sans-serif`;
+    ctx.shadowColor = 'rgba(247,147,26,0.6)'; ctx.shadowBlur = 18;
+    ctx.fillText('Day ' + dayInCycle, cx, cy - 6);
+    ctx.shadowBlur = 0;
+    ctx.font = `600 ${Math.floor(W * 0.033)}px -apple-system,sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('of ' + CYCLE_LEN + '-day cycle', cx, cy + 14);
+
+    // Update labels
+    const phaseLabel = document.getElementById('orbitPhaseLabel');
+    const dayLabel   = document.getElementById('orbitDayLabel');
+    if (phaseLabel && !phaseLabel._set) {
+      phaseLabel._set = true;
+      let phaseName = 'Unknown';
+      let cursor2 = 0;
+      for (const ph of RING_PHASES) {
+        if (dayInCycle / CYCLE_LEN >= cursor2 && dayInCycle / CYCLE_LEN < cursor2 + ph.frac) { phaseName = ph.name; break; }
+        cursor2 += ph.frac;
+      }
+      phaseLabel.textContent = '⬤ ' + phaseName + ' Phase';
+      if (dayLabel) dayLabel.textContent = `Day ${dayInCycle} of ${CYCLE_LEN} · ${Math.round((1 - dayInCycle/CYCLE_LEN)*100)}% of cycle remaining`;
+    }
+  };
+  draw();
+}
+
+// ── INTERACTIVE PRICE SIMULATOR ───────────────────────────────
+function updatePriceSim() {
+  const slider = document.getElementById('priceSimSlider');
+  if (!slider) return;
+  const targetK = parseInt(slider.value);
+  const targetPrice = targetK * 1000;
+  const btc = parseFloat(document.getElementById('btcInput')?.value) || 0.1;
+  const cost = parseFloat(document.getElementById('costInput')?.value) || 65000;
+  const current = livePrice || 100000;
+
+  const portVal = btc * targetPrice;
+  const mult = (targetPrice / current);
+  const pctGain = ((targetPrice / current) - 1) * 100;
+  const invested = btc * cost;
+
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('simTargetPrice', '$' + (targetK >= 1000 ? (targetK/1000).toFixed(2) + 'M' : targetK + 'K'));
+  set('simPortVal',    portVal >= 1e9 ? '$' + (portVal/1e9).toFixed(2) + 'B' : portVal >= 1e6 ? '$' + (portVal/1e6).toFixed(2) + 'M' : fmtUSD(portVal));
+  set('simMultiplier', mult.toFixed(2) + 'x');
+  set('simPctGain',    (pctGain >= 0 ? '+' : '') + pctGain.toFixed(0) + '%');
+  set('simInvested',   fmtUSD(invested));
+  set('simBtcDisplay', btc + ' BTC');
+
+  const portEl = document.getElementById('simPortVal');
+  if (portEl) portEl.style.color = pctGain >= 0 ? 'var(--green)' : 'var(--red)';
+  const multEl = document.getElementById('simMultiplier');
+  if (multEl) multEl.style.color = mult >= 1 ? 'var(--green)' : 'var(--red)';
+}
+
+// ── TICKER PRICE UPDATE ────────────────────────────────────────
+function updateTicker(price, blockHeight) {
+  const fmt = price ? '$' + price.toLocaleString('en-US') : '—';
+  ['tickerPriceA', 'tickerPriceB'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = fmt;
+  });
+  if (blockHeight) {
+    ['tickerBlockA', 'tickerBlockB'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '#' + blockHeight.toLocaleString();
+    });
+  }
+}
+
 // ── INTEL TAB SWITCHER ────────────────────────────────────────
 function switchIntelTab(name, el) {
   document.querySelectorAll('.intel-tab').forEach(t => t.classList.remove('active'));
@@ -6487,6 +6944,7 @@ async function fetchMempoolData() {
       if (blocks && blocks.length) {
         const height = blocks[0].height;
         set('liveBlockHeight', height.toLocaleString());
+        updateTicker(livePrice, height);
         set('mempoolNext', '#' + (height + 1).toLocaleString());
         _blockHeight = height;
         const blockEl = document.getElementById('blockList');
@@ -6551,6 +7009,9 @@ calcTimeMachine();
 buildExitPlan();
 initIntelPage();
 calcWealthTier();
+initParticleNetwork();
+initOrbitRing();
+updatePriceSim();
 
 tickDebtCounter();
 setInterval(updateCountdown, 1000);
