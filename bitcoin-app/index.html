@@ -43,27 +43,24 @@
 
   /* HEADER */
   .header {
-    background: linear-gradient(180deg, #0f0f1a 0%, var(--bg) 100%);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(20px);
   }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--orange);
-    border-radius: 10px;
+    width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 900; color: #fff;
+    font-size: 24px; font-weight: 900;
   }
-  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; }
+  .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 1px; display: flex; align-items: center; gap: 5px; }
   .header-price { text-align: right; }
   .btc-price { font-size: 22px; font-weight: 800; color: var(--orange); }
   .btc-change { font-size: 12px; font-weight: 600; margin-top: 2px; }
@@ -1415,24 +1412,6 @@
   #particleBg { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.28; }
   .container, .bottom-nav, .header { position:relative;z-index:1; }
 
-  /* ── MISSION CONTROL DATA TICKER ─────────────────────────────── */
-  .data-ticker {
-    background: rgba(6,6,12,0.92); border-bottom: 1px solid rgba(247,147,26,0.18);
-    padding: 5px 0; overflow: hidden; white-space: nowrap; position: sticky;
-    top: 69px; z-index: 99; backdrop-filter: blur(12px);
-    font-family: 'SF Mono','Fira Code','Fira Mono',monospace;
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px;
-  }
-  .ticker-track { display:inline-flex; animation: tickerScroll 50s linear infinite; }
-  .ticker-track:hover { animation-play-state:paused; }
-  @keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .t-item { display:inline-block; padding:0 22px; color:#5a5a7a; }
-  .t-label { color:#3a3a58; margin-right:5px; }
-  .t-orange { color:var(--orange); }
-  .t-green  { color:var(--green); }
-  .t-red    { color:var(--red); }
-  .t-sep    { color:#2a2a40; margin:0 4px; }
-
   /* ── CHART PAGE ORBIT RING ───────────────────────────────────── */
   .orbit-section {
     background: var(--card); border: 1px solid var(--border); border-radius: 18px;
@@ -1629,7 +1608,6 @@
   /* Honour user's motion preference — disable heavy animations */
   @media (prefers-reduced-motion: reduce) {
     #particleBg { display: none; }
-    .ticker-track { animation: none !important; }
     .orbit-canvas { display: none !important; }
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
@@ -1755,60 +1733,13 @@
   <div class="logo">
     <div class="logo-icon">₿</div>
     <div>
-      <div class="logo-text">Cycle Tracker</div>
-      <div class="logo-sub"><span class="live-dot"></span><span class="live-label">LIVE</span></div>
+      <div class="logo-text">BTC Cycle Tracker</div>
+      <div class="logo-sub"><span class="live-dot"></span>Live · Updated every 60s</div>
     </div>
   </div>
   <div class="header-price">
     <div class="btc-price" id="btcPrice"><span class="spinner"></span></div>
     <div class="btc-change" id="btcChange">&nbsp;</div>
-  </div>
-</div>
-
-<!-- MISSION CONTROL TICKER -->
-<div class="data-ticker" id="dataTicker">
-  <div class="ticker-track">
-    <span class="t-item"><span class="t-label">BTC/USD</span><span class="t-orange" id="tickerPriceA">—</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">SUPPLY</span><span class="t-red">450 BTC/DAY MINED</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">ETF FLOW</span><span class="t-green">+5,000 BTC/DAY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">DEFICIT</span><span class="t-red">−4,550 BTC/DAY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">EXCHANGES</span><span class="t-red">2.3M BTC REMAINING</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">HASHRATE</span><span class="t-green">741 EH/s</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">BLOCK HEIGHT</span><span class="t-orange" id="tickerBlockA">LIVE</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">NODES</span><span class="t-green">~17,500 GLOBAL</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">LIGHTNING</span><span class="t-green">5,200 BTC CAPACITY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">SUPPLY CAP</span><span class="t-orange">21,000,000 BTC — IMMUTABLE</span></span>
-    <span class="t-item t-sep">·</span>
-    <!-- duplicate for seamless loop -->
-    <span class="t-item"><span class="t-label">BTC/USD</span><span class="t-orange" id="tickerPriceB">—</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">SUPPLY</span><span class="t-red">450 BTC/DAY MINED</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">ETF FLOW</span><span class="t-green">+5,000 BTC/DAY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">DEFICIT</span><span class="t-red">−4,550 BTC/DAY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">EXCHANGES</span><span class="t-red">2.3M BTC REMAINING</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">HASHRATE</span><span class="t-green">741 EH/s</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">BLOCK HEIGHT</span><span class="t-orange" id="tickerBlockB">LIVE</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">NODES</span><span class="t-green">~17,500 GLOBAL</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">LIGHTNING</span><span class="t-green">5,200 BTC CAPACITY</span></span>
-    <span class="t-item t-sep">·</span>
-    <span class="t-item"><span class="t-label">SUPPLY CAP</span><span class="t-orange">21,000,000 BTC — IMMUTABLE</span></span>
-    <span class="t-item t-sep">·</span>
   </div>
 </div>
 
@@ -6938,18 +6869,7 @@ function updatePriceSim() {
   if (multEl) multEl.style.color = mult >= 1 ? 'var(--green)' : 'var(--red)';
 }
 
-// ── TICKER PRICE UPDATE ────────────────────────────────────────
-function updateTicker(price, blockHeight) {
-  const fmt = price ? '$' + price.toLocaleString('en-US') : '—';
-  ['tickerPriceA', 'tickerPriceB'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.textContent = fmt;
-  });
-  if (blockHeight) {
-    ['tickerBlockA', 'tickerBlockB'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.textContent = '#' + blockHeight.toLocaleString();
-    });
-  }
-}
+function updateTicker() {} // ticker removed
 
 // ── INTEL TAB SWITCHER ────────────────────────────────────────
 function switchIntelTab(name, el) {
