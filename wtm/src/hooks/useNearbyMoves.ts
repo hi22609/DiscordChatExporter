@@ -1,0 +1,45 @@
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import { queryKeys } from '@/lib/queryClient';
+import { useLocationStore } from '@/store/locationStore';
+import { useFilterStore } from '@/store/filterStore';
+import type { NearbyMove } from '@/types/app';
+
+const PAGE_SIZE = 20;
+
+async function fetchNearbyMoves(
+  lat: number,
+  lng: number,
+  radiusMeters: number,
+  category: string | null,
+  page: number
+): Promise<NearbyMove[]> {
+  const { data, error } = await supabase.rpc('nearby_moves', {
+    lat,
+    lng,
+    radius_m: radiusMeters,
+    filter_cat: category,
+    page_offset: page * PAGE_SIZE,
+    page_size: PAGE_SIZE,
+  });
+
+  if (error) throw error;
+  return (data ?? []) as NearbyMove[];
+}
+
+export function useNearbyMoves() {
+  const getCoords = useLocationStore((s) => s.getCoords);
+  const { category, radiusMeters } = useFilterStore();
+
+  const { lat, lng } = getCoords();
+
+  return useInfiniteQuery({
+    queryKey: queryKeys.moves.nearby(lat, lng, radiusMeters, category),
+    queryFn: ({ pageParam = 0 }) =>
+      fetchNearbyMoves(lat, lng, radiusMeters, category, pageParam as number),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PAGE_SIZE ? allPages.length : undefined,
+    initialPageParam: 0,
+    staleTime: 1000 * 60,
+  });
+}
