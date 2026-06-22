@@ -1407,6 +1407,7 @@
   }
   @keyframes toastIn { from { opacity:0; transform: translate(-50%, 10px); } to { opacity:1; transform: translate(-50%, 0); } }
   @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+  @keyframes logoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25) rotate(-5deg); box-shadow: 0 0 18px rgba(247,147,26,0.7); } }
 
 </style>
 </head>
@@ -5568,11 +5569,14 @@ const DONATION_ADDR = 'bc1qaq2yqa6s6a9hlf3vc8z9dud7tt6su3q0klww6f';
 function showToast(msg, duration) {
   const existing = document.querySelector('.toast-msg');
   if (existing) existing.remove();
+  const d = duration || 2500;
+  const fadeDelay = Math.max(d - 400, 300);
   const t = document.createElement('div');
   t.className = 'toast-msg';
   t.textContent = msg;
+  t.style.animation = `toastIn 0.3s ease, toastOut 0.35s ease ${fadeDelay}ms forwards`;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), duration || 2500);
+  setTimeout(() => t.remove(), d);
 }
 
 function copyDonationAddr() {
@@ -5741,24 +5745,17 @@ function initMempoolSim() {
   setInterval(() => { _blockHeight++; buildBlockList(); }, 600000);
 }
 
-// ── KONAMI CODE EASTER EGG ────────────────────────────────────
-const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let _konamiIdx = 0;
-document.addEventListener('keydown', e => {
-  _konamiIdx = (e.key === KONAMI[_konamiIdx]) ? _konamiIdx + 1 : 0;
-  if (_konamiIdx === KONAMI.length) { _konamiIdx = 0; showOrangePill(); }
-});
-
+// ── EASTER EGG: ORANGE PILL ───────────────────────────────────
 function showOrangePill() {
   if (document.getElementById('orangePillOverlay')) return;
   const overlay = document.createElement('div');
   overlay.className = 'orange-pill-overlay';
   overlay.id = 'orangePillOverlay';
-  const particles = Array.from({length: 20}, () => {
-    const l = (Math.random()*100).toFixed(1);
-    const delay = (Math.random()*3).toFixed(2);
-    const dur   = (2 + Math.random()*3).toFixed(2);
-    return `<div class="btc-particle" style="left:${l}%;animation-delay:${delay}s;animation-duration:${dur}s">₿</div>`;
+  const particles = Array.from({length: 24}, () => {
+    const l = (Math.random() * 100).toFixed(1);
+    const delay = (Math.random() * 3).toFixed(2);
+    const dur   = (2.5 + Math.random() * 3).toFixed(2);
+    return `<div class="btc-particle" style="left:${l}%;top:-40px;animation-delay:${delay}s;animation-duration:${dur}s">₿</div>`;
   }).join('');
   overlay.innerHTML = `${particles}
     <div class="op-title">ORANGE PILL<br>ACTIVATED</div>
@@ -5766,27 +5763,54 @@ function showOrangePill() {
     <div class="op-msg">Stack sats. Verify, don't trust.<br>The revolution is in your pocket.<br><br>There will only ever be 21,000,000 Bitcoin.<br>Every one is already spoken for.</div>
     <div class="op-club">The 21M Club — you're early.</div>
     <div style="font-size:10px;color:var(--muted);margin-bottom:24px;font-family:monospace;max-width:320px;line-height:1.5">"The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"</div>
-    <div class="op-dismiss" onclick="document.getElementById('orangePillOverlay').remove()">tap anywhere to dismiss</div>`;
+    <div class="op-dismiss">tap anywhere to dismiss</div>`;
   document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if (e.target === overlay || e.target.classList.contains('op-dismiss')) overlay.remove(); });
+  overlay.addEventListener('click', () => overlay.remove());
 }
 
-// ── LOGO CLICK EASTER EGG (7 clicks → Genesis Block) ─────────
+// ── EASTER EGG: KONAMI (desktop) ─────────────────────────────
+const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let _konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  _konamiIdx = (e.key === KONAMI[_konamiIdx]) ? _konamiIdx + 1 : 0;
+  if (_konamiIdx === KONAMI.length) { _konamiIdx = 0; showOrangePill(); }
+});
+
+// ── EASTER EGG: LONG-PRESS BTC PRICE (mobile) ────────────────
+(function wireLongPress() {
+  const priceEl = document.getElementById('btcPrice');
+  if (!priceEl) return;
+  let _lpTimer = null;
+  const start = () => { _lpTimer = setTimeout(() => { showOrangePill(); _lpTimer = null; }, 1500); };
+  const cancel = () => { clearTimeout(_lpTimer); _lpTimer = null; };
+  priceEl.addEventListener('touchstart', start, { passive: true });
+  priceEl.addEventListener('touchend',   cancel);
+  priceEl.addEventListener('touchmove',  cancel, { passive: true });
+  priceEl.style.cursor = 'pointer';
+})();
+
+// ── EASTER EGG: LOGO 7-CLICK → GENESIS BLOCK ─────────────────
 let _logoClicks = 0, _logoTimer = null;
 (function wireLogoEgg() {
   const logo = document.querySelector('.logo-icon');
   if (!logo) return;
+  const pulse = () => {
+    logo.style.animation = 'logoPulse 0.35s ease';
+    setTimeout(() => { logo.style.animation = ''; }, 350);
+  };
   logo.addEventListener('click', () => {
     _logoClicks++;
     clearTimeout(_logoTimer);
+    pulse();
     if (_logoClicks >= 7) {
       _logoClicks = 0;
+      logo.style.background = 'var(--green)';
+      setTimeout(() => { logo.style.background = ''; }, 600);
       showToast('⛓ Genesis Block: "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"', 5000);
     } else {
-      _logoTimer = setTimeout(() => { _logoClicks = 0; }, 2000);
+      _logoTimer = setTimeout(() => { _logoClicks = 0; }, 2500);
     }
   });
-  // Satoshi URL hash mode
   if (window.location.hash === '#satoshi') {
     const banner = document.createElement('div');
     banner.className = 'satoshi-banner';
