@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BTC Cycle Tracker</title>
 
 <!-- PWA / Add to Home Screen support -->
@@ -29,13 +29,14 @@
     --red: #ff4560;
     --yellow: #ffd700;
     --text: #e8e8f0;
-    --muted: #6b6b80;
+    --muted: #8f8fa8;
     --accent: #7c3aed;
   }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    font-size: 15px;
     min-height: 100vh;
     padding-bottom: 40px;
   }
@@ -92,7 +93,7 @@
   }
   .phase-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--orange); text-transform: uppercase; }
   .phase-name { font-size: 24px; font-weight: 900; margin: 4px 0 2px; letter-spacing: -0.5px; }
-  .phase-desc { font-size: 13px; color: var(--muted); }
+  .phase-desc { font-size: 14px; color: var(--muted); }
   .phase-day { position: absolute; top: 18px; right: 20px; text-align: right; }
   .phase-day-num { font-size: 36px; font-weight: 900; color: var(--orange); line-height: 1; }
   .phase-day-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -132,7 +133,7 @@
     padding: 18px 20px;
     margin: 16px 0;
   }
-  .countdown-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .countdown-title { font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
   .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .countdown-unit {
     background: var(--card2);
@@ -151,7 +152,7 @@
     border-radius: 14px;
     padding: 14px 16px;
   }
-  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
   .stat-value { font-size: 20px; font-weight: 800; margin-top: 4px; }
   .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
@@ -210,7 +211,7 @@
     margin: 16px 0;
   }
   .chart-title { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-  .chart-caption { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+  .chart-caption { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
   .chart-wrap { position: relative; height: 200px; }
 
   /* SIGNALS */
@@ -370,19 +371,20 @@
   .bottom-nav::-webkit-scrollbar { display: none; }
   .nav-item {
     flex-shrink: 0;
-    min-width: 60px;
-    padding: 12px 8px 20px;
+    min-width: 72px;
+    min-height: 56px;
+    padding: 10px 8px 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.45;
     transition: opacity 0.2s;
   }
   .nav-item.active { opacity: 1; }
-  .nav-icon { font-size: 22px; }
-  .nav-label { font-size: 10px; font-weight: 600; color: var(--text); }
+  .nav-icon { font-size: 26px; }
+  .nav-label { font-size: 12px; font-weight: 700; color: var(--text); }
   .nav-item.active .nav-label { color: var(--orange); }
 
   /* PULSE ANIMATION */
@@ -1010,7 +1012,7 @@
   /* ── RED PILL / TRUTH ───────────────────────────────────────── */
   .learn-subtabs { display: flex; gap: 8px; margin-bottom: 18px; }
   .learn-subtab {
-    flex: 1; text-align: center; padding: 11px 8px;
+    flex: 1; text-align: center; padding: 13px 8px;
     background: var(--card2); border: 1px solid var(--border); border-radius: 12px;
     font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer;
     transition: all 0.18s;
@@ -1146,17 +1148,17 @@
     font-size: 15px; font-weight: 800; margin-bottom: 14px;
     display: flex; align-items: center; gap: 8px;
   }
-  .intel-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .intel-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .intel-table th {
-    text-align: left; color: var(--muted); font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 4px; border-bottom: 1px solid var(--border);
+    text-align: left; color: var(--muted); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 4px; border-bottom: 1px solid var(--border);
   }
-  .intel-table td { padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  .intel-table td { padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
   .intel-table tr:last-child td { border-bottom: none; }
-  .intel-table .company-name { font-weight: 700; font-size: 12.5px; }
+  .intel-table .company-name { font-weight: 700; font-size: 13px; }
   .intel-table .btc-amt { color: var(--orange); font-weight: 800; font-variant-numeric: tabular-nums; }
-  .intel-table .usd-val { color: var(--muted); font-size: 11px; }
-  .intel-table .supply-pct { color: var(--green); font-size: 11px; font-weight: 600; }
+  .intel-table .usd-val { color: var(--muted); font-size: 12px; }
+  .intel-table .supply-pct { color: var(--green); font-size: 12px; font-weight: 600; }
 
   .celeb-grid { display: flex; flex-direction: column; gap: 10px; }
   .celeb-row {
@@ -1252,8 +1254,8 @@
   }
   .intel-tab-bar::-webkit-scrollbar { display: none; }
   .intel-tab {
-    flex-shrink: 0; padding: 8px 16px; border-radius: 99px;
-    font-size: 12px; font-weight: 700; cursor: pointer;
+    flex-shrink: 0; padding: 10px 16px; border-radius: 99px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
     background: var(--card2); border: 1px solid var(--border); color: var(--muted);
     transition: all 0.18s; white-space: nowrap;
   }
@@ -1619,6 +1621,29 @@
 .oracle-badge.watch { background: rgba(255,215,0,0.1); color: var(--yellow); border: 1px solid rgba(255,215,0,0.22); }
 .oracle-badge.caution { background: rgba(255,69,96,0.1); color: var(--red); border: 1px solid rgba(255,69,96,0.2); }
 
+
+  /* ── ACCESSIBILITY ─────────────────────────────────────────────── */
+  /* Prevent iOS Safari from zooming on input focus */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* Honour user's motion preference — disable heavy animations */
+  @media (prefers-reduced-motion: reduce) {
+    #particleBg { display: none; }
+    .ticker-track { animation: none !important; }
+    .orbit-canvas { display: none !important; }
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  /* Larger tap targets for buttons / interactive elements */
+  button, .btn, .cta-btn, .confidence-cta, .chip, .alert-chip,
+  .tab-btn, .intel-tab, .learn-tab, .nav-item {
+    min-height: 44px;
+  }
+
+  /* Boost base line-height for readability */
+  p, .phase-desc, .learn-body, .confidence-body, .card-desc,
+  .obituary-desc, .figure-quote { line-height: 1.65; }
+
 </style>
 </head>
 <body>
@@ -1746,6 +1771,7 @@
       <div class="phase-label" id="phaseTag">CURRENT PHASE</div>
       <div class="phase-name" id="phaseName">—</div>
       <div class="phase-desc" id="phaseDesc">Loading...</div>
+      <div id="phaseAction" style="margin-top:8px;font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.5px;"></div>
       <div class="phase-day">
         <div class="phase-day-num" id="cycleDay">—</div>
         <div class="phase-day-label">Day in Cycle</div>
@@ -2168,39 +2194,39 @@
   <div class="page" id="page-portfolio">
 
     <div style="padding:20px 0 14px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Your Position</div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Your Position</div>
       <div style="font-size:26px;font-weight:900;letter-spacing:-0.8px">Stack Calculator</div>
-      <div style="font-size:12.5px;color:var(--muted);margin-top:5px">Enter your numbers. See exactly where you stand.</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:5px">Enter your numbers. See exactly where you stand.</div>
     </div>
 
     <!-- INPUTS -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div>
-          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Your BTC</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Your BTC</div>
           <input id="btcInput" type="number" step="0.001" placeholder="0.00" value="0.1"
             style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:12px;font-size:20px;font-weight:900;text-align:center;outline:none;-moz-appearance:textfield"
             oninput="updatePortfolio();savePortfolio()">
-          <div style="font-size:10px;color:var(--muted);margin-top:5px;text-align:center">How much you hold</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:5px;text-align:center">How many coins you own</div>
         </div>
         <div>
-          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Avg Buy Price</div>
+          <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Avg Buy Price</div>
           <div style="position:relative">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;font-weight:700">$</span>
             <input id="costInput" type="number" step="1" placeholder="65000" value="65000"
               style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:12px 14px 12px 26px;border-radius:12px;font-size:18px;font-weight:900;outline:none;-moz-appearance:textfield"
               oninput="updatePnl();savePnl()">
           </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:5px;text-align:center">Your average cost basis</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:5px;text-align:center">What you paid per coin</div>
         </div>
       </div>
     </div>
 
     <!-- LIVE VALUE -->
     <div style="background:linear-gradient(135deg,rgba(247,147,26,0.12),rgba(247,147,26,0.04));border:1px solid rgba(247,147,26,0.25);border-radius:18px;padding:24px 20px;margin-bottom:14px;text-align:center">
-      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--orange);margin-bottom:8px">Current Value · Live</div>
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--orange);margin-bottom:8px">Current Value · Live Price</div>
       <div id="portValue" style="font-size:42px;font-weight:900;letter-spacing:-1.5px;color:var(--text);line-height:1">$0.00</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Based on live BTC price · updates every 60s</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">Based on live BTC price · refreshes every 60 seconds</div>
     </div>
 
     <!-- P&L -->
@@ -4018,7 +4044,7 @@
     <!-- ORACLE SIGNAL BOARD -->
     <div class="intel-card" style="margin-top:14px">
       <div style="font-size:14px;font-weight:800;margin-bottom:4px">Oracle Signal Board</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Cycle-model signals based on live on-chain data, price, and phase position</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">Plain-English cycle signals — tells you what the data says to do right now.</div>
       <div class="oracle-row">
         <span class="oracle-icon">📉</span>
         <div>
@@ -4412,10 +4438,11 @@ function updateCycleUI() {
   const evDaysLeft = Math.max(0, Math.ceil((ev.date - new Date()) / DAY_MS));
   const inAscent = day <= ASCENT_DAYS;
 
-  document.getElementById('phaseName').textContent = phase.emoji ? phase.emoji + ' ' + phase.name : phase.name;
   document.getElementById('phaseName').textContent = phase.name;
   document.getElementById('phaseDesc').textContent = phase.desc;
   document.getElementById('phaseTag').textContent = (inAscent ? 'ASCENT (1070d)' : 'DESCENT (364d)') + ' · CURRENT PHASE';
+  const actionEl = document.getElementById('phaseAction');
+  if (actionEl) actionEl.textContent = '→ What to do: ' + phase.dca;
   const setEl2 = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
   setEl2('cycleDay', day);
   setEl2('arcPct', pct + '%');
