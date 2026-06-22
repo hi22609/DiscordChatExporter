@@ -1644,9 +1644,105 @@
   p, .phase-desc, .learn-body, .confidence-body, .card-desc,
   .obituary-desc, .figure-quote { line-height: 1.65; }
 
+  /* ── TIP SHEET (jargon explainer) ──────────────────────────────── */
+  .tip-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 1000; backdrop-filter: blur(4px);
+  }
+  .tip-backdrop.open { display: block; }
+  .tip-sheet {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 1001;
+    background: var(--card); border-top: 1px solid var(--border);
+    border-radius: 22px 22px 0 0; padding: 8px 0 40px;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.22,1,0.36,1);
+  }
+  .tip-sheet.open { transform: translateY(0); }
+  .tip-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 20px; }
+  .tip-title { font-size: 22px; font-weight: 900; padding: 0 24px 10px; letter-spacing: -0.4px; }
+  .tip-body { font-size: 16px; color: var(--muted); line-height: 1.7; padding: 0 24px 16px; }
+  .tip-example { background: var(--card2); border-left: 3px solid var(--orange); border-radius: 0 10px 10px 0;
+    padding: 12px 16px; margin: 0 24px 12px; font-size: 14px; color: var(--text); line-height: 1.6; }
+  .tip-close { display: block; margin: 10px 24px 0; padding: 14px; background: var(--card2);
+    border: 1px solid var(--border); border-radius: 12px; text-align: center;
+    font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; }
+  .help-btn {
+    background: none; border: 1.5px solid var(--border); border-radius: 50%;
+    width: 20px; height: 20px; min-height: 20px; color: var(--muted);
+    font-size: 11px; font-weight: 900; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    vertical-align: middle; margin-left: 5px; flex-shrink: 0; line-height: 1;
+    transition: all 0.18s; padding: 0;
+  }
+  .help-btn:hover, .help-btn:active { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+
+  /* ── VERDICT CARD ───────────────────────────────────────────────── */
+  .verdict-card {
+    margin: 16px 0 14px;
+    border-radius: 20px;
+    padding: 22px 20px 18px;
+    position: relative; overflow: hidden; cursor: pointer;
+    border: 1.5px solid;
+    transition: transform 0.15s;
+    user-select: none;
+  }
+  .verdict-card:active { transform: scale(0.98); }
+  .verdict-kicker { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; opacity: 0.75; margin-bottom: 6px; }
+  .verdict-q { font-size: 14px; font-weight: 700; opacity: 0.6; margin-bottom: 4px; }
+  .verdict-answer { font-size: 34px; font-weight: 900; letter-spacing: -0.8px; line-height: 1; margin-bottom: 10px; }
+  .verdict-reason { font-size: 14px; font-weight: 500; line-height: 1.55; opacity: 0.82; }
+  .verdict-tap { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 12px; opacity: 0.5; }
+  .verdict-badge {
+    position: absolute; top: 18px; right: 18px;
+    font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 99px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  /* ── GLOSSARY DRAWER ────────────────────────────────────────────── */
+  .glossary-fab {
+    position: fixed; bottom: 90px; right: 16px; z-index: 200;
+    width: 48px; height: 48px;
+    background: var(--card2); border: 1px solid var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .glossary-fab:active { transform: scale(0.9); }
+
+  /* ── SIGNAL ROW PLAIN ENGLISH ────────────────────────────────────── */
+  .signal-explain { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 500; line-height: 1.4; flex-basis: 100%; padding-top: 2px; }
+  .signal-row { flex-wrap: wrap; }
+
+  /* ── PHASE BANNER EXPAND ─────────────────────────────────────────── */
+  .phase-expand {
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(247,147,26,0.2);
+    display: none;
+  }
+  .phase-expand.open { display: block; }
+  .phase-expand-row { display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+  .phase-expand-row:last-child { border-bottom: none; }
+  .phase-expand-label { color: var(--muted); font-weight: 600; }
+  .phase-expand-val { font-weight: 700; }
+  .phase-tap-hint { font-size: 11px; color: var(--orange); font-weight: 700; letter-spacing: 0.5px; margin-top: 10px; cursor: pointer; text-align: right; }
+
 </style>
 </head>
 <body>
+
+<!-- TIP SHEET — universal jargon explainer -->
+<div class="tip-backdrop" id="tipBackdrop" onclick="closeTip()"></div>
+<div class="tip-sheet" id="tipSheet">
+  <div class="tip-handle"></div>
+  <div class="tip-title" id="tipTitle"></div>
+  <div class="tip-body" id="tipBody"></div>
+  <div class="tip-example" id="tipExample" style="display:none"></div>
+  <button class="tip-close" onclick="closeTip()">Got it ✓</button>
+</div>
+
+<!-- GLOSSARY FAB -->
+<button class="glossary-fab" onclick="openGlossary()" title="Bitcoin glossary">📖</button>
 
 <!-- Particle network background -->
 <canvas id="particleBg"></canvas>
@@ -1733,55 +1829,90 @@
 
     <!-- THE SIGNAL -->
     <div class="signal-hero" id="signalHero" style="background:rgba(0,208,132,0.09);border:1px solid rgba(0,208,132,0.25)">
-      <div class="signal-today">The Signal — Right Now</div>
-      <div class="signal-verdict" id="signalVerdict" style="color:var(--green)">🟢 BUY</div>
-      <div class="signal-reason" id="signalReason">Loading cycle analysis...</div>
-      <div class="signal-chips">
-        <div class="signal-chip">Score: <span id="signalScore" style="color:var(--green)">—</span></div>
-        <div class="signal-chip"><span id="signalDays">—</span> days to event</div>
-        <div class="signal-chip" id="signalPhase">—</div>
-        <div class="signal-chip" id="signalValuation" style="display:none">—</div>
+      <div class="signal-today">The Cycle Model Says Right Now:</div>
+      <div class="signal-verdict" id="signalVerdict" style="color:var(--green);font-size:38px">🟢 BUY</div>
+      <div class="signal-reason" id="signalReason" style="font-size:15px;margin-bottom:16px">Loading cycle analysis...</div>
+
+      <!-- PLAIN ENGLISH EXPAND -->
+      <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Breaking it down for you:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px">Cycle Score <button class="help-btn" onclick="event.stopPropagation();showTip('cycle-score')">?</button></div>
+            <div style="font-size:22px;font-weight:900" id="signalScore">—</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">out of 100</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px">Current Phase</div>
+            <div style="font-size:16px;font-weight:800" id="signalPhase">—</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px" id="signalDays">— days to event</div>
+          </div>
+        </div>
+        <div id="signalValuation" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:13px;color:var(--muted)">Price vs model: <span id="signalValuationVal" style="font-weight:700"></span></div>
       </div>
+
+      <!-- QUICK CALCULATOR -->
       <div class="quick-box">
-        <div class="quick-box-label">If I invest this much today →</div>
+        <div class="quick-box-label" style="font-size:13px;font-weight:700;margin-bottom:10px">💰 If I put in this much today, what could it be worth at the next peak?</div>
         <div class="quick-row">
-          <span style="font-size:16px;color:var(--muted)">$</span>
-          <input class="quick-input" type="number" id="quickInvestAmt" value="100" oninput="updateQuickCalc()">
-          <span style="font-size:13px;color:var(--muted)">right now</span>
+          <span style="font-size:18px;color:var(--muted);font-weight:700">$</span>
+          <input class="quick-input" type="number" id="quickInvestAmt" value="100" oninput="updateQuickCalc()" style="font-size:22px;font-weight:900;width:120px">
+          <span style="font-size:14px;color:var(--muted)">right now</span>
         </div>
         <div class="quick-results">
           <div class="quick-result-item">
             <div class="quick-result-val" style="color:var(--red)" id="qrBear">—</div>
-            <div class="quick-result-label">Bear ATH</div>
+            <div class="quick-result-label" style="font-size:11px">Worst case</div>
           </div>
           <div class="quick-result-item">
             <div class="quick-result-val" style="color:var(--orange)" id="qrBase">—</div>
-            <div class="quick-result-label">Base ATH</div>
+            <div class="quick-result-label" style="font-size:11px">Most likely</div>
           </div>
           <div class="quick-result-item">
             <div class="quick-result-val" style="color:var(--green)" id="qrBull">—</div>
-            <div class="quick-result-label">Bull ATH</div>
+            <div class="quick-result-label" style="font-size:11px">Best case</div>
           </div>
         </div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5">These are projections, not guarantees. Bitcoin is volatile. <button class="help-btn" onclick="showTip('ath')">?</button></div>
       </div>
     </div>
 
     <!-- Phase Banner -->
-    <div class="phase-banner">
-      <div class="phase-label" id="phaseTag">CURRENT PHASE</div>
+    <div class="phase-banner" onclick="togglePhaseExpand()" style="cursor:pointer">
+      <div class="phase-label" id="phaseTag">CURRENT PHASE <button class="help-btn" onclick="event.stopPropagation();showTip('phase')" style="border-color:rgba(247,147,26,0.4);color:rgba(247,147,26,0.7)">?</button></div>
       <div class="phase-name" id="phaseName">—</div>
       <div class="phase-desc" id="phaseDesc">Loading...</div>
-      <div id="phaseAction" style="margin-top:8px;font-size:13px;font-weight:700;color:var(--orange);letter-spacing:0.5px;"></div>
+      <div id="phaseAction" style="margin-top:8px;font-size:14px;font-weight:800;color:var(--orange);letter-spacing:0.5px;"></div>
       <div class="phase-day">
         <div class="phase-day-num" id="cycleDay">—</div>
         <div class="phase-day-label">Day in Cycle</div>
       </div>
+      <!-- Tap-to-expand plain-English breakdown -->
+      <div class="phase-expand" id="phaseExpand">
+        <div class="phase-expand-row">
+          <span class="phase-expand-label">Risk Level</span>
+          <span class="phase-expand-val" id="phaseExpandRisk">—</span>
+        </div>
+        <div class="phase-expand-row">
+          <span class="phase-expand-label">Typical Price Move</span>
+          <span class="phase-expand-val" id="phaseExpandMove">—</span>
+        </div>
+        <div class="phase-expand-row">
+          <span class="phase-expand-label">What smart money is doing</span>
+          <span class="phase-expand-val" id="phaseExpandSmart">—</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6" id="phaseExpandContext"></div>
+      </div>
+      <div style="font-size:11px;color:rgba(247,147,26,0.6);font-weight:700;letter-spacing:0.5px;margin-top:8px;text-align:right" id="phaseExpandHint">TAP FOR DETAILS ↓</div>
     </div>
 
     <!-- Cycle Ring (replaces flat progress bar) -->
     <div class="cycle-ring-section">
       <canvas id="cycleRingCanvas" width="260" height="260"></canvas>
       <div class="cycle-ring-legend" id="cycleRingLegend"></div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);font-weight:600;margin-top:4px;letter-spacing:0.3px">
+        👆 Tap any segment of the ring to learn about that phase
+      </div>
     </div>
 
     <!-- Countdown -->
@@ -1834,16 +1965,16 @@
     <!-- Cycle Score -->
     <div class="score-card">
       <div class="score-header">
-        <div class="score-title">Cycle Score</div>
+        <div class="score-title">Cycle Score <button class="help-btn" onclick="showTip('cycle-score')">?</button></div>
         <div class="score-num" id="scoreNum" style="color:var(--yellow)">72</div>
       </div>
       <div class="score-bar-track">
         <div class="score-bar-fill" id="scoreBar" style="width:72%; background: linear-gradient(90deg,#00d084,#ffd700,#ff4560);"></div>
       </div>
       <div class="score-labels">
-        <span>Buy Zone (0–40)</span>
-        <span>Hold (41–60)</span>
-        <span>Exit Zone (61–100)</span>
+        <span style="color:var(--green)">🟢 Buy (0–40)</span>
+        <span style="color:var(--yellow)">🟡 Hold (41–65)</span>
+        <span style="color:var(--red)">🔴 Sell (66–100)</span>
       </div>
       <div class="score-action" id="scoreAction" style="background:rgba(255,215,0,0.1); color:var(--yellow);">
         ⚠ Overvalued — Consider taking partial profits
@@ -1897,7 +2028,7 @@
     </div>
 
     <div class="proj-card">
-      <div class="proj-title">Next Cycle ATH Targets · ~Sep 2029</div>
+      <div class="proj-title">Next Cycle All-Time High Targets · ~Sep 2029 <button class="help-btn" onclick="showTip('ath')">?</button></div>
       <div class="proj-row">
         <div class="proj-scenario">
           <div class="proj-dot" style="background:var(--red)"></div>
@@ -1932,29 +2063,39 @@
 
     <!-- Live Signals -->
     <div class="signals-card">
-      <div class="proj-title">Live Market Signals</div>
+      <div class="proj-title">Live Market Signals
+        <span style="font-size:11px;font-weight:500;color:var(--muted);margin-left:6px">What the data says right now</span>
+      </div>
       <div class="signal-row">
-        <div class="signal-name">Fear &amp; Greed Index <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-name">Fear &amp; Greed <span style="font-size:9px;color:var(--green)">● LIVE</span> <button class="help-btn" onclick="showTip('fear-greed')">?</button>
+          <div class="signal-explain">When fear is high = often a bargain. Greed = be careful.</div>
+        </div>
         <div class="signal-val" id="fgValue">—</div>
         <div class="signal-badge badge-hold" id="fgBadge">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">Live Price vs Model <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-name">Price vs Fair Value <span style="font-size:9px;color:var(--green)">● LIVE</span> <button class="help-btn" onclick="showTip('valuation')">?</button>
+          <div class="signal-explain">Is Bitcoin cheap or expensive right now vs. the model?</div>
+        </div>
         <div class="signal-val" id="sigValRatio">—</div>
         <div class="signal-badge badge-hold" id="sigValBadge">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">Cycle Day <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-name">Where in the Cycle <span style="font-size:9px;color:var(--green)">● LIVE</span> <button class="help-btn" onclick="showTip('cycle')">?</button>
+          <div class="signal-explain">Day number within the current 4-year pattern (1,434 days total).</div>
+        </div>
         <div class="signal-val" id="sigCycleDay">—</div>
         <div class="signal-badge badge-hold" id="sigCyclePhase">…</div>
       </div>
       <div class="signal-row">
-        <div class="signal-name">Days to Next Event <span style="font-size:9px;color:var(--green)">● LIVE</span></div>
+        <div class="signal-name">Next Big Event <span style="font-size:9px;color:var(--green)">● LIVE</span>
+          <div class="signal-explain">Days until the next projected cycle peak or bottom.</div>
+        </div>
         <div class="signal-val" id="sigDaysEvent">—</div>
         <div class="signal-badge badge-watch" id="sigEventName">…</div>
       </div>
-      <div style="font-size:10px;color:var(--muted);text-align:center;padding-top:10px;line-height:1.5">
-        Every metric above updates from live data. Fear &amp; Greed from alternative.me · price from CoinGecko · valuation from the 1070/364 cycle model.
+      <div style="font-size:11px;color:var(--muted);text-align:center;padding-top:12px;line-height:1.6">
+        Live data: Fear &amp; Greed from alternative.me · price from CoinGecko · cycle model is bottom-anchored Nov 2022
       </div>
     </div>
 
@@ -1962,7 +2103,7 @@
     <div class="supply-shock-wrap">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div>
-          <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚠ Supply Shock</div>
+          <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚠ Supply Shock <button class="help-btn" onclick="showTip('supply-shock')" style="border-color:rgba(255,69,96,0.4);color:rgba(255,69,96,0.7)">?</button></div>
           <div style="font-size:17px;font-weight:900;margin-top:3px;letter-spacing:-0.4px">Exchanges Are Running Out</div>
         </div>
         <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE DATA</div>
@@ -4449,7 +4590,9 @@ function updateCycleUI() {
   setEl2('arcDaysLeft', evDaysLeft + ' days to ' + (inAscent ? 'ATH' : 'bottom'));
   setEl2('halvingDays', day);
 
-  applyPhaseTheme(PHASES.indexOf(phase));
+  const phaseIdx = PHASES.indexOf(phase);
+  applyPhaseTheme(phaseIdx);
+  if (typeof populatePhaseExpand === 'function') populatePhaseExpand(phaseIdx, phase);
 
   // Score — driven by the SAME brain as the Signal (one source of truth).
   document.getElementById('scoreNum').textContent = score;
@@ -5451,20 +5594,21 @@ function updateSignal() {
   const rEl = document.getElementById('signalReason');
   if (rEl) rEl.textContent = cfg.reason;
   const sEl = document.getElementById('signalScore');
-  if (sEl) { sEl.textContent = score + '/100'; sEl.style.color = cfg.color; }
+  if (sEl) { sEl.textContent = score; sEl.style.color = cfg.color; }
   const dEl = document.getElementById('signalDays');
-  if (dEl) dEl.textContent = daysToEvent;
+  if (dEl) dEl.textContent = daysToEvent + ' days to ' + ev.name;
   const pEl = document.getElementById('signalPhase');
   if (pEl) pEl.textContent = phase.name;
-  // Live valuation chip — proves the score reacts to real price, not just the clock.
+  // Live valuation
   const vEl2 = document.getElementById('signalValuation');
+  const vvEl = document.getElementById('signalValuationVal');
   const vr = getValuationRead();
   if (vEl2) {
     if (getValuationRatio() === null) { vEl2.style.display = 'none'; }
     else {
       vEl2.style.display = '';
-      vEl2.textContent = (vr.pct >= 0 ? '+' : '') + vr.pct + '% vs model';
-      vEl2.style.color = vr.color;
+      const pct = (vr.pct >= 0 ? '+' : '') + vr.pct + '% vs model';
+      if (vvEl) { vvEl.textContent = pct; vvEl.style.color = vr.color; }
     }
   }
   updateQuickCalc();
@@ -7046,6 +7190,189 @@ setInterval(fetchPrice, 60000);
 setInterval(fetchFearGreed, 600000); // Fear & Greed updates ~hourly; poll every 10 min
 setInterval(tickDebtCounter, 70);     // live money-printer counter on the Red Pill page
 setTimeout(maybeShowEmailModal, 30000); // show email capture after 30s on first visit
+
+// ── TIP / JARGON EXPLAINER SYSTEM ────────────────────────────────
+const TIPS = {
+  'cycle-score': {
+    title: '📊 What is the Cycle Score?',
+    body: 'A number from 0 to 100 that tells you where Bitcoin is in its 4-year pattern right now.\n\n0–40 = Green zone. Good time to buy. Bitcoin is cheap relative to the cycle.\n41–65 = Yellow zone. Hold what you have. Not a screaming deal, not overpriced.\n66–100 = Red zone. Bitcoin is expensive. Think about locking in gains.',
+    example: 'Think of it like a temperature gauge. Cold (low score) = good time to stock up. Hot (high score) = the market is running hot, be careful.'
+  },
+  'fear-greed': {
+    title: '😱 Fear & Greed Index',
+    body: 'A daily score that measures how nervous or excited people are about Bitcoin right now. Runs from 0 (Extreme Fear) to 100 (Extreme Greed).\n\nWhen everyone is scared (low number), prices are often cheap — because people are panic-selling.\nWhen everyone is greedy (high number), prices can drop soon — because buyers are already all-in.',
+    example: '"Be fearful when others are greedy, and greedy when others are fearful." — Warren Buffett. This index measures exactly that.'
+  },
+  'ath': {
+    title: '🏆 All-Time High (ATH)',
+    body: "ATH means the highest price Bitcoin has ever reached. Bitcoin has broken its all-time high in every single cycle since 2009.\n\nThis app shows three guesses for what the NEXT all-time high might be, based on the historical 4-year pattern.",
+    example: "Bitcoin's last ATH was ~$109,000 in January 2025. The model projects the next peak could reach $250,000–$700,000 by around 2029."
+  },
+  'dca': {
+    title: '💰 Dollar-Cost Averaging (DCA)',
+    body: "DCA means buying a fixed dollar amount on a regular schedule — like $50 every Friday — instead of trying to time the perfect moment.\n\nWhy it works: you automatically buy MORE Bitcoin when the price is low and LESS when it's high. Over time, this lowers your average cost.",
+    example: 'Example: Instead of waiting and buying $2,600 all at once, you put in $50/week for a year. You end up with more Bitcoin because you bought heavily during dips.'
+  },
+  'halving': {
+    title: '✂️ The Bitcoin Halving',
+    body: 'Every ~4 years, the amount of new Bitcoin created each day gets cut in half. This is programmed into Bitcoin\'s code and has happened 4 times since 2009.\n\nLess new supply coming in + steady demand = price tends to rise. Big bull runs have followed every halving within 12–18 months.',
+    example: "Like if all the gold mines in the world suddenly cut production in half. Less new gold entering the market means what's already out there gets more valuable."
+  },
+  'cycle': {
+    title: '🔄 The 4-Year Bitcoin Cycle',
+    body: "Bitcoin follows a repeating pattern roughly every 4 years:\n\n1. BOTTOM — prices are low, most people have given up\n2. CLIMB — slow rise, then faster\n3. PEAK — everyone is excited, prices are highest\n4. DROP — falls 60–80% back toward the bottom\n\nThen the cycle repeats.",
+    example: 'Last bottom: Nov 2022 (~$16K). Last peak: Jan 2025 (~$109K). Next projected bottom: Oct 2026. Next projected peak: ~2029.'
+  },
+  'valuation': {
+    title: '📏 Price vs. Fair Value',
+    body: "This compares Bitcoin's current price to where the cycle model says it 'should' be right now based on historical patterns.\n\nAbove the model = Bitcoin may be overvalued (getting expensive)\nBelow the model = Bitcoin may be undervalued (possibly a bargain)\nAt the model = fairly priced",
+    example: "If the model says BTC should be $80,000 but it's at $104,000 right now, that's +30% above — a sign to be more cautious. If it were at $60,000, that would be -25% below — historically a strong buy signal."
+  },
+  'phase': {
+    title: '🗺 What is a Cycle Phase?',
+    body: "The 4-year Bitcoin cycle is broken into 9 named phases. Each phase has a name, a description of what's happening in the market, and a recommended action.\n\nAccumulation → Re-Awakening → Momentum Build → Parabolic Advance → Blow-Off Top → Denial → Capitulation → Despair → Stealth Bottom → (repeat)\n\nYou are currently in the phase shown on the banner.",
+    example: 'Right now the banner tells you exactly what phase we are in and what the model recommends you do.'
+  },
+  'mempool': {
+    title: '⏳ What is the Mempool?',
+    body: 'The mempool is the "waiting room" for Bitcoin transactions. When you send Bitcoin, your transaction sits in the mempool until miners pick it up and add it to the blockchain.\n\nBusy mempool = lots of activity, higher fees to jump the queue.\nEmpty mempool = quiet market, cheap fees.',
+    example: 'Like waiting at a restaurant. Small mempool = no wait, seated right away. Large mempool = busy night, takes longer, might tip more to get faster service.'
+  },
+  'supply-shock': {
+    title: '⚡ What is a Supply Shock?',
+    body: "A supply shock happens when the amount of Bitcoin available to buy on exchanges drops sharply. With less Bitcoin for sale and demand staying steady (or rising), the price tends to go up.\n\nRight now, institutions like BlackRock are pulling Bitcoin off exchanges into their own wallets — reducing supply available to everyday buyers.",
+    example: "Imagine if all the supermarkets in your city suddenly had half the usual inventory of a popular item. Same demand, less supply = higher price. That's what a supply shock looks like for Bitcoin."
+  }
+};
+
+function showTip(key) {
+  const t = TIPS[key];
+  if (!t) return;
+  document.getElementById('tipTitle').textContent = t.title;
+  document.getElementById('tipBody').style.whiteSpace = 'pre-line';
+  document.getElementById('tipBody').textContent = t.body;
+  const ex = document.getElementById('tipExample');
+  if (t.example) { ex.textContent = t.example; ex.style.display = ''; }
+  else ex.style.display = 'none';
+  document.getElementById('tipBackdrop').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('tipSheet').classList.add('open'));
+}
+
+function closeTip() {
+  document.getElementById('tipSheet').classList.remove('open');
+  document.getElementById('tipBackdrop').classList.remove('open');
+}
+
+// ── GLOSSARY DRAWER ───────────────────────────────────────────────
+const GLOSSARY_ENTRIES = [
+  { key: 'cycle',        label: '🔄 The 4-Year Cycle' },
+  { key: 'phase',        label: '🗺 Cycle Phases' },
+  { key: 'cycle-score',  label: '📊 Cycle Score (0–100)' },
+  { key: 'ath',          label: '🏆 All-Time High (ATH)' },
+  { key: 'dca',          label: '💰 Dollar-Cost Averaging (DCA)' },
+  { key: 'halving',      label: '✂️ The Halving' },
+  { key: 'fear-greed',   label: '😱 Fear & Greed Index' },
+  { key: 'valuation',    label: '📏 Price vs. Fair Value' },
+  { key: 'mempool',      label: '⏳ The Mempool' },
+  { key: 'supply-shock', label: '⚡ Supply Shock' },
+];
+
+function openGlossary() {
+  document.getElementById('tipTitle').textContent = '📖 Plain-English Bitcoin Guide';
+  const items = GLOSSARY_ENTRIES.map(e =>
+    `<button onclick="closeTip();setTimeout(()=>showTip('${e.key}'),80)" style="display:block;width:100%;text-align:left;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;min-height:50px">${e.label} →</button>`
+  ).join('');
+  document.getElementById('tipBody').innerHTML = '<div style="margin-bottom:10px;font-size:13px;color:var(--muted)">Tap any term below to get a plain-English explanation — no jargon.</div>' + items;
+  document.getElementById('tipExample').style.display = 'none';
+  document.getElementById('tipBackdrop').classList.add('open');
+  requestAnimationFrame(() => document.getElementById('tipSheet').classList.add('open'));
+}
+
+// ── PHASE BANNER EXPAND ───────────────────────────────────────────
+const PHASE_SMART_MONEY = [
+  'Whales quietly accumulating', 'Institutions adding to positions', 'Smart money buying dips',
+  'Pros reducing new buys, holding', 'Pros holding, watching for exit signals',
+  'Exit ladders activating', 'Final profit-taking by big players',
+  'Patient money waiting on sidelines', 'First movers quietly re-entering'
+];
+const PHASE_TYPICAL_MOVE = [
+  '+50% to +150% from bottom', '+80% to +250% from bottom', '+150% to +400% from bottom',
+  '+300% to +800% from bottom', 'Near or at cycle peak',
+  '-20% to -40% from ATH', '-40% to -65% from ATH', '-60% to -80% from ATH', 'Bottoming range'
+];
+const PHASE_CONTEXT = [
+  'The market looks dead. The news is quiet. This is historically when the best entries are made — before anyone knows what is coming.',
+  'Crypto is slowly making headlines again. Early adopters are excited. Retail is just starting to pay attention.',
+  'The old all-time high has been broken. Price discovery is happening. This feels scary but is historically the middle of the run.',
+  'Price is going exponential. Your neighbor is asking you about Bitcoin. This is the most exciting — and most dangerous — phase.',
+  'Euphoria is everywhere. Everyone "knows" Bitcoin is going to a million dollars. This is historically the best time to sell.',
+  'The ATH is in but nobody believes it. People say "just a correction." Patience is required — the worst is not over yet.',
+  'Panic selling. Bad news everywhere. Long-time holders are questioning everything. The bottom is getting closer but not yet here.',
+  'Complete silence. Nobody talks about crypto. This is historically when the best buys of the cycle become available.',
+  'The very bottom is forming. Quiet accumulation is happening again. A new cycle is about to begin.'
+];
+
+function togglePhaseExpand() {
+  const ex = document.getElementById('phaseExpand');
+  const hint = document.getElementById('phaseExpandHint');
+  if (!ex) return;
+  const isOpen = ex.classList.toggle('open');
+  if (hint) hint.textContent = isOpen ? 'TAP TO COLLAPSE ↑' : 'TAP FOR DETAILS ↓';
+}
+
+function populatePhaseExpand(phaseIdx, phase) {
+  const setEx = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  setEx('phaseExpandRisk', phase.risk + ' — ' + (phase.risk === 'LOW' ? 'historically safe to buy' : phase.risk === 'MED' ? 'moderate — be selective' : phase.risk === 'HIGH' ? 'volatile, proceed carefully' : 'take profits now'));
+  const rEl = document.getElementById('phaseExpandRisk');
+  if (rEl) rEl.style.color = phase.riskColor;
+  setEx('phaseExpandMove', PHASE_TYPICAL_MOVE[phaseIdx] || '—');
+  setEx('phaseExpandSmart', PHASE_SMART_MONEY[phaseIdx] || '—');
+  const ctx = document.getElementById('phaseExpandContext');
+  if (ctx) ctx.textContent = PHASE_CONTEXT[phaseIdx] || '';
+}
+
+// hook into updateCycleUI to populate the expand panel
+const _origUpdateCycleUI = updateCycleUI;
+// We can't wrap easily, so just call populatePhaseExpand from updateCycleUI
+// Instead, patch it by extending updateCycleUI at call-time via a flag
+
+// ── CYCLE RING TAP INTERACTION ────────────────────────────────────
+function initCycleRingTap() {
+  const canvas = document.getElementById('cycleRingCanvas');
+  if (!canvas) return;
+  canvas.style.cursor = 'pointer';
+  const handleTap = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx = cx * scaleX;
+    const my = cy * scaleY;
+    const centerX = canvas.width / 2, centerY = canvas.height / 2;
+    const dx = mx - centerX, dy = my - centerY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const innerR = canvas.width * 0.28, outerR = canvas.width * 0.46;
+    if (dist < innerR || dist > outerR) return;
+    let angle = Math.atan2(dy, dx) + Math.PI / 2;
+    if (angle < 0) angle += Math.PI * 2;
+    const pct = angle / (Math.PI * 2);
+    const day = Math.round(pct * 1434);
+    const phase = getPhase(day);
+    const phaseIdx = PHASES.indexOf(phase);
+    const tipKey = 'phase-ring-' + phaseIdx;
+    TIPS[tipKey] = {
+      title: phase.name,
+      body: 'Day range: ' + phase.start + '–' + phase.end + ' of the 1,434-day cycle.\n\n' + phase.desc + '\n\nRisk level: ' + phase.risk + '\nRecommended action: ' + phase.dca,
+      example: PHASE_CONTEXT[phaseIdx] || ''
+    };
+    showTip(tipKey);
+  };
+  canvas.addEventListener('click', handleTap);
+  canvas.addEventListener('touchend', (e) => { e.preventDefault(); handleTap(e.changedTouches ? {clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY} : e); }, { passive: false });
+  canvas.title = 'Tap any segment to learn about that phase';
+}
+setTimeout(initCycleRingTap, 600);
 </script>
 </body>
 </html>
