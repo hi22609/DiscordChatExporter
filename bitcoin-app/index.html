@@ -5175,38 +5175,37 @@ function initCoin3D() {
     return `rgb(${rr|0},${gg|0},${bb|0})`;
   }
 
-  // Draw one disc of the coin, oriented by the affine matrix m = [a,b,c,d,e,f]
-  // which maps local disc coords (radius R) onto the tilted, rotated screen
-  // ellipse. The ₿ is drawn in that same local frame so it stays glued to the
-  // surface and foreshortens correctly through a full revolution.
-  function drawDisc(R, m, shade, withGlyph, rim) {
-    ctx.save();
-    ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    const g = ctx.createRadialGradient(-R*0.30, -R*0.34, R*0.06, 0, 0, R*1.12);
-    g.addColorStop(0, gold(Math.min(1, 0.98*shade + 0.04)));
-    g.addColorStop(0.40, gold(0.74*shade));
-    g.addColorStop(0.75, gold(0.50*shade));
-    g.addColorStop(1, gold(0.30*shade));
-    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI*2);
+  // Draw one circular coin FACE as an axis-aligned ellipse centred at (xc,cy)
+  // with horizontal semi-axis aX and vertical semi-axis aY. `fore` is the
+  // signed foreshorten factor (cosθ): its sign mirrors the ₿ when we're seeing
+  // the back of the coin; its magnitude squishes it to match the ellipse.
+  function drawFace(xc, cy, aX, aY, R, fore, bright, withGlyph) {
+    const g = ctx.createRadialGradient(xc - aX*0.3, cy - aY*0.34, aY*0.06, xc, cy, aY*1.18);
+    g.addColorStop(0, gold(Math.min(1, 0.95*bright + 0.05)));
+    g.addColorStop(0.40, gold(0.72*bright));
+    g.addColorStop(0.75, gold(0.50*bright));
+    g.addColorStop(1, gold(0.32*bright));
+    ctx.beginPath(); ctx.ellipse(xc, cy, Math.max(aX,0.5), aY, 0, 0, Math.PI*2);
     ctx.fillStyle = g; ctx.fill();
-    if (rim) {
-      ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI*2);
-      ctx.strokeStyle = 'rgba(255,240,190,0.7)'; ctx.lineWidth = R*0.025; ctx.stroke();
-    }
-    if (withGlyph) {
-      // raised inner ring
+    if (withGlyph && aX > 1.5) {
+      ctx.save();
+      ctx.translate(xc, cy);
+      ctx.scale(fore, aY / R);           // foreshorten + mirror, match the ellipse
       ctx.beginPath(); ctx.arc(0, 0, R*0.80, 0, Math.PI*2);
       ctx.strokeStyle = 'rgba(255,235,170,0.45)'; ctx.lineWidth = R*0.02; ctx.stroke();
       ctx.beginPath(); ctx.arc(0, 0, R*0.76, 0, Math.PI*2);
       ctx.strokeStyle = 'rgba(90,50,8,0.4)'; ctx.lineWidth = R*0.012; ctx.stroke();
-      // embossed ₿
       ctx.font = `900 ${R*1.16}px -apple-system,'SF Pro Display',Georgia,serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(70,38,4,0.5)';   ctx.fillText('₿',  R*0.03,  R*0.04);
+      ctx.fillStyle = 'rgba(70,38,4,0.5)';      ctx.fillText('₿',  R*0.03,  R*0.04);
       ctx.fillStyle = 'rgba(255,240,190,0.95)'; ctx.fillText('₿', -R*0.015, -R*0.02);
-      ctx.fillStyle = gold(0.6);              ctx.fillText('₿', 0, 0);
+      ctx.fillStyle = gold(0.6);                ctx.fillText('₿', 0, 0);
+      ctx.restore();
     }
-    ctx.restore();
+    if (withGlyph) {
+      ctx.beginPath(); ctx.ellipse(xc, cy, Math.max(aX,0.5), aY, 0, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,240,190,0.7)'; ctx.lineWidth = 1.4; ctx.stroke();
+    }
   }
 
   function draw() {
@@ -5228,11 +5227,6 @@ function initCoin3D() {
     const cy = H * 0.46;
     const R  = Math.min(W * 0.30, 118) * (0.6 + 0.4*intro);
 
-    // Tilt the spin axis toward the camera so the coin is always a 3D ellipse
-    // (never a flat line) — this is what makes one full turn read as a clean,
-    // continuous revolution instead of a 2D squish that pops back.
-    const TILT = 0.42;                         // ~24° camera tilt
-    const sinP = Math.sin(TILT), cosP = Math.cos(TILT);
     const cosT = Math.cos(angle), sinT = Math.sin(angle);
 
     // ── ambient halo behind the coin ──
@@ -5256,64 +5250,50 @@ function initCoin3D() {
       ctx.fill();
     }
 
-    // Affine basis for the coin's face plane (local unit coords → screen px):
-    //   local +x → (cosθ, sinθ·sinφ) ,  local +y → (0, cosφ)
-    // Screen-space normal (image of local +z) → used to offset the thickness.
-    const nX = sinT, nY = -cosT * sinP;
-    const T  = R * 0.30;                        // edge thickness in px
+    // ── COIN FLIP about the vertical axis (axis-aligned ⇒ artifact-free) ──
+    // The coin is two circular faces of a cylinder of thickness T. Project
+    // them as axis-aligned ellipses:
+    //   horizontal semi-axis  aX = R·|cosθ|   (foreshortens as it turns)
+    //   vertical   semi-axis  aY = R·0.97     (a hair of perspective)
+    // The two faces sit at ± a horizontal offset that grows with the turn, so
+    // at edge-on they're T apart and you see the rim.
+    const T   = R * 0.28;                         // thickness
+    const aX  = Math.abs(cosT) * R;
+    const aY  = R * 0.97;
+    const sep = (T * 0.5) * Math.abs(sinT);       // half-gap between the faces
+    const dir = cosT >= 0 ? 1 : -1;               // which side faces the camera
+    const xNear = cx + sep * dir;
+    const xFar  = cx - sep * dir;
+    const xL = Math.min(xNear, xFar), xR = Math.max(xNear, xFar);
 
-    // ── solid coin BODY (the milled edge) ──────────────────────────────
-    // A single continuous silhouette ellipse. Its horizontal half-width is
-    // R·|cosθ| (the foreshortened face) plus half the thickness — so it
-    // shrinks smoothly to a thin bar at edge-on and NEVER hits a constant
-    // floor. No clamp ⇒ no frozen "stop", and it never vanishes because the
-    // edge bar is always at least T wide. The faces are painted on top.
-    // match the real silhouette of the offset disc stack (face width + the
-    // horizontal spread of the thickness) so the body never pokes past the
-    // discs as a dark rim — it only shows through at edge-on.
-    const bodyHW = Math.abs(cosT) * R + 0.5 * T * Math.abs(sinT);
-    const bodyVH = R * cosP;
-    const bg = ctx.createLinearGradient(cx - bodyHW, 0, cx + bodyHW, 0);
-    bg.addColorStop(0,    gold(0.30));
-    bg.addColorStop(0.45, gold(0.74));
-    bg.addColorStop(0.55, gold(0.80));
-    bg.addColorStop(1,    gold(0.32));
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, Math.max(bodyHW, 0.5), bodyVH, 0, 0, Math.PI*2);
-    ctx.fillStyle = bg; ctx.fill();
-    // a few reeding ticks so the edge reads as a milled coin rim
-    if (Math.abs(cosT) < 0.6) {
-      ctx.save(); ctx.globalAlpha = 0.35 * (1 - Math.abs(cosT));
-      for (let k = -7; k <= 7; k++) {
-        const ty = cy + (k / 7) * bodyVH * 0.9;
-        const hw = Math.sqrt(Math.max(0, 1 - Math.pow((ty - cy) / bodyVH, 2))) * bodyHW;
-        ctx.beginPath(); ctx.moveTo(cx - hw, ty); ctx.lineTo(cx + hw, ty);
-        ctx.strokeStyle = (k % 2 === 0) ? 'rgba(120,68,10,0.6)' : 'rgba(255,225,150,0.5)';
+    // 1) SOLID BODY = union(far ellipse, near ellipse, connecting band).
+    //    This is exactly the silhouette — one gap-free shape — so it can NEVER
+    //    blink (it's a solid T-wide bar at edge-on) and NEVER pokes out (the
+    //    faces are drawn within it).
+    const eg = ctx.createLinearGradient(cx - (aX + sep), 0, cx + (aX + sep), 0);
+    eg.addColorStop(0,   gold(0.36));
+    eg.addColorStop(0.5, gold(0.84));
+    eg.addColorStop(1,   gold(0.36));
+    ctx.fillStyle = eg;
+    ctx.beginPath(); ctx.ellipse(xFar,  cy, Math.max(aX,0.5), aY, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(xNear, cy, Math.max(aX,0.5), aY, 0, 0, Math.PI*2); ctx.fill();
+    if (xR - xL > 0.5) ctx.fillRect(xL, cy - aY, xR - xL, aY * 2);
+
+    // milled reeding on the edge, fading out as it turns face-on
+    if (Math.abs(cosT) < 0.75 && sep > 1) {
+      ctx.save(); ctx.globalAlpha = 0.30 * (1 - Math.abs(cosT));
+      for (let k = -8; k <= 8; k++) {
+        const ty = cy + (k / 8) * aY * 0.92;
+        ctx.beginPath(); ctx.moveTo(xL, ty); ctx.lineTo(xR, ty);
+        ctx.strokeStyle = (k % 2 === 0) ? 'rgba(110,62,8,0.6)' : 'rgba(255,228,150,0.55)';
         ctx.lineWidth = 1; ctx.stroke();
       }
       ctx.restore();
     }
 
-    // ── solid extruded body: many thin discs far → near ───────────────
-    // Filling the whole gap between the two faces makes the thickness read as
-    // ONE coin with a beveled edge — not two offset discs ("double coin").
-    // True cosθ (no floor) keeps the motion continuous; the body ellipse above
-    // is the safety net so nothing vanishes when these go edge-on.
-    const LAYERS = 20;
-    const layers = [];
-    for (let i = 0; i <= LAYERS; i++) {
-      const zoff = i / LAYERS - 0.5;             // −0.5 .. +0.5 along normal
-      layers.push({ zoff, depth: zoff * cosT });
-    }
-    layers.sort((a, b) => b.depth - a.depth);    // farthest first, nearest last
-    layers.forEach((ly, idx) => {
-      const ex = cx + nX * ly.zoff * T, ey = cy + nY * ly.zoff * T;
-      const m = [cosT, sinT * sinP, 0, cosP, ex, ey];
-      const isNear = idx === layers.length - 1;  // camera-facing face
-      const t = ly.zoff + 0.5;                   // 0..1 across the body
-      const shade = isNear ? 1 : (0.60 + 0.26 * t);
-      drawDisc(R, m, shade, isNear, isNear);     // ₿ + rim only on the near face
-    });
+    // 2) far face hint (dim, for depth) then the bright near face with the ₿
+    drawFace(xFar,  cy, aX, aY, R, cosT, 0.62, false);
+    drawFace(xNear, cy, aX, aY, R, cosT, 1.0,  true);
 
     // ── floor reflection ──
     ctx.save();
@@ -5323,7 +5303,7 @@ function initCoin3D() {
     const refl = ctx.createLinearGradient(cx, cy - R, cx, cy + R);
     refl.addColorStop(0, 'rgba(247,147,26,0.5)');
     refl.addColorStop(1, 'rgba(247,147,26,0)');
-    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(Math.abs(cosT)*R, R*0.12), R*cosP, 0, 0, Math.PI*2);
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(Math.abs(cosT)*R, R*0.12), aY, 0, 0, Math.PI*2);
     ctx.fillStyle = refl; ctx.fill();
     ctx.restore();
 
