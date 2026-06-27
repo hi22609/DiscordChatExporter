@@ -587,12 +587,42 @@
   .brief-bullet:last-child { border-bottom: none; }
   .brief-bullet strong { color: var(--text); }
   .brief-mindset { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 12px; line-height: 1.6; }
-  /* HERO ANIMATION */
-  .hero-anim-wrap { position:relative; width:100%; height:180px; overflow:hidden; border-radius:0 0 24px 24px; margin-bottom:0; background:linear-gradient(180deg,rgba(0,10,5,0.6) 0%,rgba(0,0,0,0) 100%); }
-  .hero-anim-canvas { width:100%; height:100%; display:block; }
-  .hero-anim-labels { position:absolute; top:12px; left:0; right:0; display:flex; justify-content:space-between; padding:0 16px; pointer-events:none; }
-  .hero-anim-btc { font-size:11px; font-weight:800; color:#00d084; letter-spacing:1px; }
-  .hero-anim-usd { font-size:11px; font-weight:800; color:#ff4560; letter-spacing:1px; }
+  /* ── 3D COIN HERO ─────────────────────────────────────────────── */
+  .coin-hero {
+    position: relative; width: 100vw; left: 50%; transform: translateX(-50%);
+    height: 430px; overflow: hidden;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(247,147,26,0.16) 0%, transparent 62%),
+      radial-gradient(ellipse 120% 80% at 50% 120%, rgba(124,58,237,0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #05050a 0%, #0a0a0f 100%);
+    border-bottom: 1px solid rgba(247,147,26,0.14);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  }
+  #coin3d { position: absolute; top: 0; left: 0; width: 100%; height: 290px; display: block; z-index: 1; }
+  .coin-hero-text { position: relative; z-index: 2; margin-top: 268px; text-align: center; width: 100%; padding: 0 20px; }
+  .coin-hero-label {
+    font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--orange); opacity: 0.85; margin-bottom: 2px;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .coin-hero-price {
+    font-size: 52px; font-weight: 900; letter-spacing: -2px; line-height: 1;
+    background: linear-gradient(180deg, #fff 0%, #ffd87a 55%, var(--orange) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(247,147,26,0.25);
+    font-variant-numeric: tabular-nums;
+  }
+  .coin-hero-change { font-size: 15px; font-weight: 800; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .coin-hero-verdict {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px; padding: 9px 20px; border-radius: 99px;
+    font-size: 15px; font-weight: 900; letter-spacing: 0.5px;
+    border: 1.5px solid; cursor: pointer; user-select: none;
+    transition: transform 0.15s;
+  }
+  .coin-hero-verdict:active { transform: scale(0.96); }
+  .coin-hero-verdict .verdict-dot { width: 9px; height: 9px; border-radius: 50%; animation: verdictPulse 2s ease-in-out infinite; }
+  @keyframes verdictPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }
 
   /* STRATEGY ENGINE */
   .strat-verdict { border-radius:16px; padding:18px; margin-bottom:12px; border:1px solid; }
@@ -1749,12 +1779,16 @@
   <!-- PAGE: HOME -->
   <div class="page active" id="page-home">
 
-    <!-- HERO ANIMATION: BTC rising / USD falling -->
-    <div class="hero-anim-wrap">
-      <canvas class="hero-anim-canvas" id="heroAnim"></canvas>
-      <div class="hero-anim-labels">
-        <span class="hero-anim-btc">₿ Bitcoin ↑</span>
-        <span class="hero-anim-usd">$ US Dollar ↓</span>
+    <!-- 3D BITCOIN COIN HERO -->
+    <div class="coin-hero">
+      <canvas id="coin3d"></canvas>
+      <div class="coin-hero-text">
+        <div class="coin-hero-label"><span class="live-dot"></span>Live Bitcoin Price</div>
+        <div class="coin-hero-price" id="heroPrice">$—</div>
+        <div class="coin-hero-change" id="heroChange">&nbsp;</div>
+        <div class="coin-hero-verdict" id="heroVerdict" onclick="document.getElementById('signalHero').scrollIntoView({behavior:'smooth',block:'center'})" style="border-color:rgba(0,208,132,0.4);background:rgba(0,208,132,0.08);color:var(--green)">
+          <span class="verdict-dot" style="background:var(--green)"></span><span id="heroVerdictText">ANALYZING…</span>
+        </div>
       </div>
     </div>
 
@@ -4264,6 +4298,30 @@ const PHASES = [
   { name: 'Stealth Bottom',    start: 1351, end: 1434, desc: 'Bottom forming. Whales absorbing supply.',                dca: 'BUY AGGRESSIVELY',              risk: 'LOW',  riskColor: '#00d084', up: false },
 ];
 
+// Plain-English phase detail (indexed to PHASES) — defined early so updateCycleUI can use it
+const PHASE_SMART_MONEY = [
+  'Whales quietly accumulating', 'Institutions adding to positions', 'Smart money buying dips',
+  'Pros reducing new buys, holding', 'Pros holding, watching for exit signals',
+  'Exit ladders activating', 'Final profit-taking by big players',
+  'Patient money waiting on sidelines', 'First movers quietly re-entering'
+];
+const PHASE_TYPICAL_MOVE = [
+  '+50% to +150% from bottom', '+80% to +250% from bottom', '+150% to +400% from bottom',
+  '+300% to +800% from bottom', 'Near or at cycle peak',
+  '-20% to -40% from ATH', '-40% to -65% from ATH', '-60% to -80% from ATH', 'Bottoming range'
+];
+const PHASE_CONTEXT = [
+  'The market looks dead. The news is quiet. This is historically when the best entries are made — before anyone knows what is coming.',
+  'Crypto is slowly making headlines again. Early adopters are excited. Retail is just starting to pay attention.',
+  'The old all-time high has been broken. Price discovery is happening. This feels scary but is historically the middle of the run.',
+  'Price is going exponential. Your neighbor is asking you about Bitcoin. This is the most exciting — and most dangerous — phase.',
+  'Euphoria is everywhere. Everyone "knows" Bitcoin is going to a million dollars. This is historically the best time to sell.',
+  'The ATH is in but nobody believes it. People say "just a correction." Patience is required — the worst is not over yet.',
+  'Panic selling. Bad news everywhere. Long-time holders are questioning everything. The bottom is getting closer but not yet here.',
+  'Complete silence. Nobody talks about crypto. This is historically when the best buys of the cycle become available.',
+  'The very bottom is forming. Quiet accumulation is happening again. A new cycle is about to begin.'
+];
+
 // Price scenario anchors along the calendar (base = mid case)
 const PRICE_ANCHORS = [
   { date: new Date('2022-11-01T00:00:00Z'), bear: 15500,  base: 15500,  bull: 15500  }, // last bottom
@@ -4562,10 +4620,20 @@ async function fetchPrice() {
     livePrice = d.bitcoin.usd;
     const change = d.bitcoin.usd_24h_change;
 
-    document.getElementById('btcPrice').textContent = '$' + livePrice.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    const priceStr = '$' + livePrice.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    document.getElementById('btcPrice').textContent = priceStr;
     const changeEl = document.getElementById('btcChange');
     changeEl.textContent = (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change).toFixed(2) + '% 24h';
     changeEl.className = 'btc-change ' + (change >= 0 ? 'positive' : 'negative');
+
+    // 3D coin hero
+    const heroP = document.getElementById('heroPrice');
+    if (heroP) heroP.textContent = priceStr;
+    const heroC = document.getElementById('heroChange');
+    if (heroC) {
+      heroC.textContent = (change >= 0 ? '▲ ' : '▼ ') + Math.abs(change).toFixed(2) + '% today';
+      heroC.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+    }
 
     // Live price changes the valuation → refresh everything that depends on it.
     refreshProjection();
@@ -5031,109 +5099,179 @@ function calcVsUSD() {
     </div>`;
 }
 
-// ── HERO ANIMATION ───────────────────────────────────────────
-function initHeroAnim() {
-  const c = document.getElementById('heroAnim');
+// ── 3D BITCOIN COIN HERO ──────────────────────────────────────
+// A real spinning, lit, metallic coin rendered on canvas. No libraries.
+function initCoin3D() {
+  const c = document.getElementById('coin3d');
   if (!c) return;
   const ctx = c.getContext('2d');
-  let frame = 0, drawProg = 0;
+  let angle = 0, frame = 0, intro = 0;
+  const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function resize() {
-    const r = window.devicePixelRatio || 1;
+    const r = Math.min(window.devicePixelRatio || 1, 2);
     c.width  = c.offsetWidth  * r;
     c.height = c.offsetHeight * r;
-    ctx.scale(r, r);
+    ctx.setTransform(r, 0, 0, r, 0, 0);
   }
   resize();
-  window.addEventListener('resize', () => { resize(); });
+  window.addEventListener('resize', resize);
+
+  // metallic gold ramp: s in [0,1], 0 = deep bronze shadow, 1 = bright highlight
+  function gold(s) {
+    s = Math.max(0, Math.min(1, s));
+    // dark (74,42,6) -> core (247,147,26) -> bright (255,228,150)
+    let rr, gg, bb;
+    if (s < 0.5) { const t = s / 0.5; rr = 74 + t*(247-74); gg = 42 + t*(147-42); bb = 6 + t*(26-6); }
+    else { const t = (s-0.5)/0.5; rr = 247 + t*(255-247); gg = 147 + t*(228-147); bb = 26 + t*(150-26); }
+    return `rgb(${rr|0},${gg|0},${bb|0})`;
+  }
+
+  function drawCoinFace(cx, cy, rx, ry, facing) {
+    // facing: +1 we see the front (₿), -1 we see the back
+    // base metallic radial gradient — light from upper-left
+    const g = ctx.createRadialGradient(cx - rx*0.35, cy - ry*0.4, ry*0.1, cx, cy, ry*1.15);
+    g.addColorStop(0, gold(0.98));
+    g.addColorStop(0.35, gold(0.78));
+    g.addColorStop(0.72, gold(0.5));
+    g.addColorStop(1, gold(0.28));
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(rx,0.5), ry, 0, 0, Math.PI*2);
+    ctx.fillStyle = g; ctx.fill();
+
+    // inner raised ring
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(rx*0.82,0.5), ry*0.82, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,235,170,0.55)'; ctx.lineWidth = Math.max(rx*0.02,0.6); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(rx*0.78,0.5), ry*0.78, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(90,50,8,0.45)'; ctx.lineWidth = Math.max(rx*0.015,0.5); ctx.stroke();
+
+    // the ₿ symbol — squished horizontally with the coin, embossed
+    if (rx > 2) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(facing * (rx / ry), 1); // horizontal compression = 3D foreshortening
+      ctx.font = `900 ${ry*1.15}px -apple-system,'SF Pro Display',Georgia,serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      // shadow emboss
+      ctx.fillStyle = 'rgba(70,38,4,0.55)';
+      ctx.fillText('₿', ry*0.03, ry*0.04);
+      // highlight emboss
+      ctx.fillStyle = 'rgba(255,240,190,0.95)';
+      ctx.fillText('₿', -ry*0.012, -ry*0.015);
+      // core
+      ctx.fillStyle = gold(0.62);
+      ctx.fillText('₿', 0, 0);
+      ctx.restore();
+    }
+
+    // moving specular highlight sweep
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(rx,0.5), ry, 0, 0, Math.PI*2);
+    ctx.clip();
+    const sweep = ((frame * 0.9) % (ry*5)) - ry*1.5;
+    const sg = ctx.createLinearGradient(cx - ry + sweep, cy - ry, cx - ry + sweep + ry*0.8, cy + ry);
+    sg.addColorStop(0, 'rgba(255,255,255,0)');
+    sg.addColorStop(0.5, 'rgba(255,255,255,0.22)');
+    sg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sg; ctx.fillRect(cx - rx, cy - ry, rx*2, ry*2);
+    ctx.restore();
+  }
 
   function draw() {
     const W = c.offsetWidth, H = c.offsetHeight;
     ctx.clearRect(0, 0, W, H);
     frame++;
-    if (drawProg < 1) drawProg = Math.min(1, drawProg + 0.008);
+    if (intro < 1) intro = Math.min(1, intro + 0.02);
+    if (!prefersReduce) angle += 0.012;
 
-    // subtle grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let i = 1; i < 5; i++) {
-      ctx.beginPath(); ctx.moveTo(0, (i/5)*H); ctx.lineTo(W, (i/5)*H); ctx.stroke();
-    }
-    for (let i = 1; i < 8; i++) {
-      ctx.beginPath(); ctx.moveTo((i/8)*W, 0); ctx.lineTo((i/8)*W, H); ctx.stroke();
-    }
+    const cx = W / 2;
+    const cy = H * 0.46;
+    const R  = Math.min(W * 0.30, 118) * (0.6 + 0.4*intro); // radius, eases in
+    const thickness = R * 0.16;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const faceRx = Math.abs(cos) * R;
+    const facing = cos >= 0 ? 1 : -1;
 
-    const pts = Math.floor(120 * drawProg);
+    // ── ambient halo behind the coin ──
+    const halo = ctx.createRadialGradient(cx, cy, R*0.3, cx, cy, R*2.4);
+    halo.addColorStop(0, 'rgba(247,147,26,0.30)');
+    halo.addColorStop(0.4, 'rgba(247,147,26,0.10)');
+    halo.addColorStop(1, 'rgba(247,147,26,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, W, H);
 
-    // BTC path: smoothstep curve rising
-    const btcY = t => H * 0.88 - (t*t*(3-2*t)) * H * 0.78;
-    const btcX = t => t * W;
-
-    // USD path: slow linear decline
-    const usdY = t => H * 0.18 + t * H * 0.62;
-    const usdX = t => t * W;
-
-    // BTC area fill
-    if (pts > 1) {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, 'rgba(0,208,132,0.18)');
-      grad.addColorStop(1, 'rgba(0,208,132,0)');
+    // ── orbiting sparks (data points circling the coin) ──
+    const SPARKS = prefersReduce ? 0 : 22;
+    for (let i = 0; i < SPARKS; i++) {
+      const a = (i / SPARKS) * Math.PI * 2 + frame * 0.006;
+      const orbitR = R * (1.5 + 0.25 * Math.sin(i * 2.1 + frame * 0.02));
+      const ox = cx + Math.cos(a) * orbitR;
+      const oy = cy + Math.sin(a) * orbitR * 0.42; // flattened orbit = perspective
+      const depth = (Math.sin(a) + 1) / 2; // 0 behind, 1 front
       ctx.beginPath();
-      ctx.moveTo(btcX(0), btcY(0));
-      for (let i = 1; i <= pts; i++) { const t = i/120; ctx.lineTo(btcX(t), btcY(t)); }
-      const lastT = pts/120;
-      ctx.lineTo(btcX(lastT), H); ctx.lineTo(0, H); ctx.closePath();
-      ctx.fillStyle = grad; ctx.fill();
+      ctx.arc(ox, oy, 0.8 + depth * 1.8, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${depth>0.5?255:124},${depth>0.5?183:120},${depth>0.5?70:200},${0.12 + depth*0.5})`;
+      ctx.fill();
     }
 
-    // BTC line with glow
-    if (pts > 0) {
-      ctx.save();
-      ctx.shadowBlur = 18; ctx.shadowColor = '#00d084';
-      ctx.strokeStyle = '#00d084'; ctx.lineWidth = 2.5;
+    // ── 3D coin: stack of disks from back face to front face ──
+    const LAYERS = 16;
+    const edgeDir = sin >= 0 ? 1 : -1; // which side the cylinder edge shows
+    const dx = sin * thickness;        // horizontal offset of the back face
+    for (let i = LAYERS; i >= 1; i--) {
+      const f = i / LAYERS;            // 1 = far back, ~0 = front
+      const ox = cx - dx * f;
+      // edge shading: reeded rim, brighter where light hits
+      const rimLight = 0.30 + 0.30 * Math.max(0, Math.cos(angle + edgeDir * 0.6));
+      const shade = rimLight * (1 - f*0.25);
       ctx.beginPath();
-      for (let i = 0; i <= pts; i++) { const t = i/120; i===0 ? ctx.moveTo(btcX(t),btcY(t)) : ctx.lineTo(btcX(t),btcY(t)); }
-      ctx.stroke(); ctx.restore();
+      ctx.ellipse(ox, cy, Math.max(faceRx, 0.5), R, 0, 0, Math.PI*2);
+      ctx.fillStyle = gold(shade);
+      ctx.fill();
     }
-
-    // USD dashed line with glow
-    if (pts > 0) {
+    // reeded edge ticks (coin grooves) on the exposed rim
+    if (faceRx < R * 0.96) {
       ctx.save();
-      ctx.shadowBlur = 10; ctx.shadowColor = '#ff4560';
-      ctx.strokeStyle = '#ff4560'; ctx.lineWidth = 1.8; ctx.setLineDash([6,5]);
-      ctx.beginPath();
-      for (let i = 0; i <= pts; i++) { const t = i/120; i===0 ? ctx.moveTo(usdX(t),usdY(t)) : ctx.lineTo(usdX(t),usdY(t)); }
-      ctx.stroke(); ctx.restore();
-    }
-
-    // Current price dot on BTC
-    if (drawProg > 0.3) {
-      const tNow = 0.5 + 0.1*Math.sin(frame*0.04);
-      const dotX = btcX(drawProg > 0.5 ? drawProg : 0.5);
-      const dotY = btcY(drawProg > 0.5 ? drawProg : 0.5);
-      ctx.save();
-      ctx.shadowBlur = 20; ctx.shadowColor = '#00d084';
-      ctx.beginPath(); ctx.arc(dotX, dotY, 4, 0, Math.PI*2);
-      ctx.fillStyle = '#00d084'; ctx.fill(); ctx.restore();
-    }
-
-    // Floating ₿ particles
-    for (let i = 0; i < 6; i++) {
-      const seed = i * 173;
-      const px = ((frame * 0.25 + seed * 3.7) % (W + 40)) - 20;
-      const py = H * 0.12 + Math.sin(frame * 0.018 + seed) * H * 0.12;
-      ctx.save();
-      ctx.globalAlpha = 0.08 + 0.07 * Math.sin(frame * 0.04 + i);
-      ctx.fillStyle = '#f7931a';
-      ctx.font = `${12 + i*2}px serif`;
-      ctx.fillText('₿', px, py);
+      ctx.globalAlpha = 0.5;
+      for (let k = -10; k <= 10; k++) {
+        const ty = cy + (k / 10) * R * 0.94;
+        const half = Math.sqrt(Math.max(0, 1 - Math.pow((ty-cy)/R, 2))) * faceRx;
+        const ex = cx + edgeDir * half;
+        ctx.beginPath();
+        ctx.moveTo(ex, ty);
+        ctx.lineTo(ex - dx, ty);
+        ctx.strokeStyle = (k % 2 === 0) ? 'rgba(120,68,10,0.6)' : 'rgba(255,220,140,0.35)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
       ctx.restore();
     }
+
+    // ── the lit front face with the ₿ ──
+    drawCoinFace(cx, cy, faceRx, R, facing);
+
+    // crisp outer rim highlight
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(faceRx,0.5), R, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,240,190,0.7)'; ctx.lineWidth = 1.4; ctx.stroke();
+
+    // ── floor reflection ──
+    ctx.save();
+    ctx.globalAlpha = 0.16;
+    ctx.scale(1, -1);
+    ctx.translate(0, -(cy*2 + R*2.15));
+    const refl = ctx.createLinearGradient(cx, cy - R, cx, cy + R);
+    refl.addColorStop(0, 'rgba(247,147,26,0.5)');
+    refl.addColorStop(1, 'rgba(247,147,26,0)');
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(faceRx,0.5), R, 0, 0, Math.PI*2);
+    ctx.fillStyle = refl; ctx.fill();
+    ctx.restore();
 
     requestAnimationFrame(draw);
   }
   draw();
 }
+// keep old name alive for any stray callers
+function initHeroAnim() { initCoin3D(); }
 
 // ── BLOCKCHAIN EXPLAINER (Learn page) ─────────────────────────
 function toggleConcept(el) {
@@ -5521,9 +5659,22 @@ function updateSignal() {
   const hero = document.getElementById('signalHero');
   if (hero) { hero.style.background = cfg.bg; hero.style.border = '1px solid ' + cfg.border; }
   const vEl = document.getElementById('signalVerdict');
-  if (vEl) { vEl.textContent = cfg.verdict; vEl.style.color = cfg.color; }
+  if (vEl) { vEl.textContent = cfg.verdict.replace(/[^\x20-\x7E]/g, '').trim(); vEl.style.color = cfg.color; }
   const rEl = document.getElementById('signalReason');
   if (rEl) rEl.textContent = cfg.reason;
+
+  // 3D coin hero verdict pill — short, glanceable
+  const hv = document.getElementById('heroVerdict');
+  const hvt = document.getElementById('heroVerdictText');
+  if (hv && hvt) {
+    const word = cfg.verdict.replace(/[^\x20-\x7E]/g, '').trim(); // strip emoji
+    hvt.textContent = word.toUpperCase();
+    hv.style.color = cfg.color;
+    hv.style.borderColor = cfg.border;
+    hv.style.background = cfg.bg;
+    const dot = hv.querySelector('.verdict-dot');
+    if (dot) dot.style.background = cfg.color;
+  }
   const sEl = document.getElementById('signalScore');
   if (sEl) { sEl.textContent = score; sEl.style.color = cfg.color; }
   const dEl = document.getElementById('signalDays');
@@ -7070,6 +7221,7 @@ function initIntelPage() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────
+initCoin3D();            // centerpiece first — never gated by anything that can fail
 updateCycleUI();
 buildSmallChart();
 buildBigChart();
@@ -7093,7 +7245,6 @@ buildStrategy();
 updatePortfolioMilestones();
 loadSaved();
 restoreEmailUI();
-initHeroAnim();
 initChainAnim();
 initCycleRing();
 calcTimeMachine();
@@ -7209,29 +7360,6 @@ function openGlossary() {
 }
 
 // ── PHASE BANNER EXPAND ───────────────────────────────────────────
-const PHASE_SMART_MONEY = [
-  'Whales quietly accumulating', 'Institutions adding to positions', 'Smart money buying dips',
-  'Pros reducing new buys, holding', 'Pros holding, watching for exit signals',
-  'Exit ladders activating', 'Final profit-taking by big players',
-  'Patient money waiting on sidelines', 'First movers quietly re-entering'
-];
-const PHASE_TYPICAL_MOVE = [
-  '+50% to +150% from bottom', '+80% to +250% from bottom', '+150% to +400% from bottom',
-  '+300% to +800% from bottom', 'Near or at cycle peak',
-  '-20% to -40% from ATH', '-40% to -65% from ATH', '-60% to -80% from ATH', 'Bottoming range'
-];
-const PHASE_CONTEXT = [
-  'The market looks dead. The news is quiet. This is historically when the best entries are made — before anyone knows what is coming.',
-  'Crypto is slowly making headlines again. Early adopters are excited. Retail is just starting to pay attention.',
-  'The old all-time high has been broken. Price discovery is happening. This feels scary but is historically the middle of the run.',
-  'Price is going exponential. Your neighbor is asking you about Bitcoin. This is the most exciting — and most dangerous — phase.',
-  'Euphoria is everywhere. Everyone "knows" Bitcoin is going to a million dollars. This is historically the best time to sell.',
-  'The ATH is in but nobody believes it. People say "just a correction." Patience is required — the worst is not over yet.',
-  'Panic selling. Bad news everywhere. Long-time holders are questioning everything. The bottom is getting closer but not yet here.',
-  'Complete silence. Nobody talks about crypto. This is historically when the best buys of the cycle become available.',
-  'The very bottom is forming. Quiet accumulation is happening again. A new cycle is about to begin.'
-];
-
 function togglePhaseExpand() {
   const ex = document.getElementById('phaseExpand');
   const hint = document.getElementById('phaseExpandHint');
