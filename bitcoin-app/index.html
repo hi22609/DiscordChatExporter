@@ -1735,6 +1735,97 @@
   .phase-expand-val { font-weight: 700; }
   .phase-tap-hint { font-size: 11px; color: var(--orange); font-weight: 700; letter-spacing: 0.5px; margin-top: 10px; cursor: pointer; text-align: right; }
 
+  /* ── FUTURE / LAUNCH PAGE ──────────────────────────────────────── */
+  .future-hero {
+    position: relative; width: 100vw; left: 50%; transform: translateX(-50%);
+    height: 360px; overflow: hidden; margin-bottom: 6px;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 42%, rgba(124,58,237,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 90% 60% at 50% 100%, rgba(247,147,26,0.10) 0%, transparent 55%),
+      #05050a;
+    border-bottom: 1px solid rgba(124,58,237,0.18);
+  }
+  #futureBrain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+  .future-hero-cap {
+    position: absolute; bottom: 16px; left: 0; right: 0; z-index: 2; text-align: center; padding: 0 24px;
+    pointer-events: none;
+  }
+  .future-hero-kicker { font-size: 11px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #a78bfa; }
+  .future-hero-title { font-size: 27px; font-weight: 900; letter-spacing: -0.8px; margin-top: 4px;
+    background: linear-gradient(180deg,#fff,#cbb6ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .future-hero-sub { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  .future-intro {
+    background: linear-gradient(135deg, rgba(124,58,237,0.10), rgba(247,147,26,0.05));
+    border: 1px solid rgba(124,58,237,0.25); border-radius: 18px; padding: 20px; margin: 14px 0;
+  }
+  .future-intro-q { font-size: 19px; font-weight: 900; letter-spacing: -0.4px; margin-bottom: 8px; }
+  .future-intro-a { font-size: 14.5px; color: #c8c8d8; line-height: 1.7; }
+  .future-intro-a b { color: var(--orange); }
+
+  .future-section-head {
+    font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin: 24px 0 4px; display: flex; align-items: center; gap: 8px;
+  }
+  .future-section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .future-section-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+
+  /* Trajectory eras (vertical timeline) */
+  .era-track { position: relative; padding-left: 26px; }
+  .era-track::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px;
+    background: linear-gradient(180deg, var(--orange), #a78bfa, #4ea3ff); border-radius: 2px; }
+  .era {
+    position: relative; margin-bottom: 14px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px;
+    transition: transform 0.15s, border-color 0.15s; cursor: pointer;
+  }
+  .era:active { transform: scale(0.99); }
+  .era::before {
+    content: ''; position: absolute; left: -23px; top: 20px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--eraColor, var(--orange)); box-shadow: 0 0 0 4px rgba(0,0,0,0.6), 0 0 14px var(--eraColor, var(--orange));
+  }
+  .era-years { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--eraColor, var(--orange)); text-transform: uppercase; }
+  .era-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; margin: 2px 0 6px; }
+  .era-tag { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 99px;
+    background: rgba(255,255,255,0.06); color: var(--muted); margin-bottom: 8px; }
+  .era-desc { font-size: 13.5px; color: #c2c2d2; line-height: 1.6; }
+  .era-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .era.open .era-detail { display: block; }
+  .era-detail-row { display: flex; gap: 10px; padding: 6px 0; font-size: 13px; line-height: 1.5; }
+  .era-detail-row .dot { color: var(--eraColor, var(--orange)); font-weight: 900; flex-shrink: 0; }
+  .era-price { margin-top: 10px; font-size: 12px; color: var(--muted); font-family: 'SF Mono', monospace; }
+  .era-price b { color: var(--eraColor, var(--orange)); }
+  .era-more { font-size: 11px; font-weight: 700; color: var(--eraColor, var(--orange)); margin-top: 10px; letter-spacing: 0.5px; }
+
+  /* Launch / domain cards — what Bitcoin powers */
+  .launch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .launch-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px;
+    position: relative; overflow: hidden; transition: transform 0.15s, border-color 0.15s;
+  }
+  .launch-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 70px; height: 70px;
+    background: radial-gradient(circle, var(--lc, rgba(247,147,26,0.18)) 0%, transparent 70%); border-radius: 50%; }
+  .launch-card:active { transform: scale(0.98); }
+  .launch-icon { font-size: 26px; margin-bottom: 8px; display: block; }
+  .launch-domain { font-size: 15px; font-weight: 900; letter-spacing: -0.3px; }
+  .launch-now { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.45; }
+  .launch-then { font-size: 12px; color: var(--text); margin-top: 8px; line-height: 1.5; font-weight: 600; }
+  .launch-then span { color: var(--lc-text, var(--orange)); }
+
+  /* T-minus mission countdown strip */
+  .tminus-card {
+    background: #05050a; border: 1px solid rgba(124,58,237,0.3); border-radius: 18px;
+    padding: 20px; margin: 14px 0; text-align: center; position: relative; overflow: hidden;
+  }
+  .tminus-label { font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #a78bfa; }
+  .tminus-value { font-size: 40px; font-weight: 900; letter-spacing: -1px; margin: 6px 0 2px;
+    background: linear-gradient(180deg,#fff,#a78bfa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums; }
+  .tminus-sub { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  .future-disclaimer { font-size: 11.5px; color: var(--muted); line-height: 1.6; text-align: center;
+    margin: 18px 4px 6px; padding: 14px; border: 1px dashed var(--border); border-radius: 14px; }
+
 </style>
 </head>
 <body>
@@ -4214,6 +4305,51 @@
 
 </div><!-- end page-intel -->
 
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PAGE: FUTURE / LAUNCH SYSTEM — the next 50 years              -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-future">
+
+  <!-- OBSIDIAN BRAIN HERO -->
+  <div class="future-hero">
+    <canvas id="futureBrain"></canvas>
+    <div class="future-hero-cap">
+      <div class="future-hero-kicker">The Launch System</div>
+      <div class="future-hero-title">Bitcoin Powers Everything</div>
+      <div class="future-hero-sub">One network at the center of money, energy, machines &amp; nations</div>
+    </div>
+  </div>
+
+  <div class="future-intro">
+    <div class="future-intro-q">What is Bitcoin actually becoming?</div>
+    <div class="future-intro-a">Right now most people see a <b>price chart</b>. But Bitcoin isn't a stock — it's the first money that no king, bank, or country can print, freeze, or fake. Over the next 50 years that single property quietly turns it into the <b>base layer of value</b> for the entire planet: the thing prices, energy, machines and even other planets settle against. This page maps that trajectory — the launches ahead.</div>
+  </div>
+
+  <!-- T-MINUS COUNTDOWN -->
+  <div class="tminus-card">
+    <div class="tminus-label">⏱ Projected Time to "The Standard"</div>
+    <div class="tminus-value" id="tminusValue">—</div>
+    <div class="tminus-sub" id="tminusSub">When Bitcoin is the world's default unit of value (model estimate, not a promise)</div>
+  </div>
+
+  <!-- 50-YEAR TRAJECTORY -->
+  <div class="future-section-head">The 50-Year Trajectory</div>
+  <div class="future-section-sub">Four eras, each a phase change in what Bitcoin <em>is</em>. Tap any era to expand.</div>
+  <div class="era-track" id="eraTrack"></div>
+
+  <!-- WHAT BITCOIN POWERS -->
+  <div class="future-section-head">What Bitcoin Powers</div>
+  <div class="future-section-sub">The same network, plugged into every domain of life. Left: today. Right: where it heads.</div>
+  <div class="launch-grid" id="launchGrid"></div>
+
+  <div class="future-disclaimer">
+    🧭 This is a <b>vision built from first principles</b>, not financial advice or a prediction with a date guarantee.
+    Bitcoin could fail, stall, or be outpaced. But <em>if</em> hard, un-printable money keeps winning, this is the shape of it.
+    Think in decades, hold what you can afford to lose, and verify everything yourself.
+  </div>
+
+</div><!-- end page-future -->
+
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="nav-item active" onclick="showPage('home',this)">
@@ -4243,6 +4379,10 @@
   <div class="nav-item" onclick="showPage('intel',this)">
     <span class="nav-icon">🐋</span>
     <span class="nav-label">Intel</span>
+  </div>
+  <div class="nav-item" onclick="showPage('future',this)">
+    <span class="nav-icon">🚀</span>
+    <span class="nav-label">Future</span>
   </div>
 </div>
 
@@ -6047,6 +6187,7 @@ function showPage(name, el) {
     if (active && active.id === 'learn-how' && chainAnim) { chainAnim.resize(); animateScarcity(); }
   }
   if (name === 'intel') { buildHoldersTable(); buildNewsFeed(); initWhaleAlert(); initMempoolSim(); buildObituaryList(); buildFiguresSection(); fetchMempoolData(); updateOraclePhaseSignal(); }
+  if (name === 'future') { buildFuturePage(); initFutureBrain(); updateTminus(); }
 }
 
 // ── EMAIL CAPTURE ─────────────────────────────────────────────
@@ -7147,6 +7288,218 @@ function initIntelPage() {
   buildFiguresSection();
   fetchMempoolData();
   updateOraclePhaseSignal();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FUTURE / LAUNCH SYSTEM — the next 50 years
+// ═══════════════════════════════════════════════════════════════
+const FUTURE_ERAS = [
+  {
+    years: '2025 – 2030', name: 'Ignition', color: '#f7931a',
+    tag: 'Digital Gold, mainstream',
+    desc: 'Bitcoin is accepted as a serious reserve asset. ETFs, corporations and the first nation-states quietly absorb supply faster than miners create it.',
+    points: [
+      'Spot ETFs swallow more BTC per year than is mined',
+      'First wave of countries hold Bitcoin in their treasury',
+      'Companies replace idle cash with BTC on the balance sheet',
+      'Self-custody becomes as normal as having an email address',
+    ],
+    price: 'Model range: <b>$100K → $500K</b>',
+  },
+  {
+    years: '2030 – 2040', name: 'Monetization', color: '#ffd700',
+    tag: 'The measuring stick flips',
+    desc: 'People stop asking "what\'s Bitcoin worth in dollars?" and start pricing things in Bitcoin. Lightning makes spending instant and nearly free worldwide.',
+    points: [
+      'Salaries, savings and loans denominated in sats',
+      'Bitcoin-backed bonds and global settlement rails go live',
+      'Remittances collapse from days + 8% fees to seconds + cents',
+      'A generation grows up never trusting a printed currency',
+    ],
+    price: 'Model range: <b>$500K → $2M</b>',
+  },
+  {
+    years: '2040 – 2055', name: 'Integration', color: '#7c3aed',
+    tag: 'Bitcoin becomes infrastructure',
+    desc: 'Bitcoin stops being something you "buy" and becomes plumbing — wired into energy grids, AI compute markets and the machine economy that runs underneath everything.',
+    points: [
+      'Miners become the buyer-of-last-resort for the planet\'s wasted energy',
+      'AI agents hold wallets and pay each other in sats, machine-to-machine',
+      'Proof-of-work secures not just money but global compute and data',
+      'Grids use mining to balance load — green energy gets a paycheck',
+    ],
+    price: 'Model range: <b>$2M → $5M+</b>',
+  },
+  {
+    years: '2055 – 2075', name: 'The Standard', color: '#4ea3ff',
+    tag: 'Hyperbitcoinization',
+    desc: 'Bitcoin is simply the base layer of value for Earth — and the only money that works off it. Property, identity and contracts settle on the chain. The dollar is a history lesson.',
+    points: [
+      'Default unit of account for humans and machines alike',
+      'Property titles and self-sovereign identity anchored to Bitcoin',
+      'Interplanetary settlement — no central bank works on Mars, Bitcoin does',
+      'Money finally stops being a tool governments can quietly steal with',
+    ],
+    price: 'Model range: <b>$5M → $13M+ per coin</b>',
+  },
+];
+
+const FUTURE_DOMAINS = [
+  { icon:'💰', domain:'Money', lc:'rgba(247,147,26,0.20)', tcol:'var(--orange)',
+    now:'A volatile asset most people trade.',
+    then:'The <span>savings account of the world</span> — value that holds for decades without a bank.' },
+  { icon:'🏛', domain:'Nations', lc:'rgba(78,163,255,0.18)', tcol:'#4ea3ff',
+    now:'A few small countries experiment with it.',
+    then:'<span>Strategic reserves</span> — superpowers race to stack BTC like they once stacked gold.' },
+  { icon:'⚡', domain:'Energy', lc:'rgba(0,208,132,0.18)', tcol:'var(--green)',
+    now:'Mining is criticized for using power.',
+    then:'Mining <span>monetizes wasted &amp; stranded energy</span> and stabilizes green grids worldwide.' },
+  { icon:'🤖', domain:'AI &amp; Machines', lc:'rgba(124,58,237,0.20)', tcol:'#a78bfa',
+    now:'AI has no native way to hold or spend money.',
+    then:'AI agents <span>earn and pay in sats</span> — a machine economy that never sleeps.' },
+  { icon:'🏠', domain:'Property &amp; ID', lc:'rgba(255,215,0,0.16)', tcol:'var(--yellow)',
+    now:'Deeds and identity live in fragile government databases.',
+    then:'Title, identity &amp; contracts <span>anchored to the chain</span> — yours, provable, un-seizable.' },
+  { icon:'🚀', domain:'Space', lc:'rgba(255,69,96,0.16)', tcol:'var(--red)',
+    now:'Off-world commerce has no money that works.',
+    then:'Bitcoin is <span>the money of space</span> — no Earth bank required to settle on Mars.' },
+];
+
+let _futureBuilt = false;
+function buildFuturePage() {
+  if (_futureBuilt) return;
+  // Eras
+  const track = document.getElementById('eraTrack');
+  if (track) {
+    track.innerHTML = FUTURE_ERAS.map((e, i) => `
+      <div class="era" style="--eraColor:${e.color}" onclick="toggleEra(this)">
+        <div class="era-years">Era ${i+1} · ${e.years}</div>
+        <div class="era-name">${e.name}</div>
+        <div class="era-tag">${e.tag}</div>
+        <div class="era-desc">${e.desc}</div>
+        <div class="era-detail">
+          ${e.points.map(p => `<div class="era-detail-row"><span class="dot">▸</span><span>${p}</span></div>`).join('')}
+          <div class="era-price">${e.price}</div>
+        </div>
+        <div class="era-more">Tap to expand ↓</div>
+      </div>`).join('');
+  }
+  // Domain cards
+  const grid = document.getElementById('launchGrid');
+  if (grid) {
+    grid.innerHTML = FUTURE_DOMAINS.map(d => `
+      <div class="launch-card" style="--lc:${d.lc};--lc-text:${d.tcol}">
+        <span class="launch-icon">${d.icon}</span>
+        <div class="launch-domain">${d.domain}</div>
+        <div class="launch-now">Today: ${d.now}</div>
+        <div class="launch-then">${d.then}</div>
+      </div>`).join('');
+  }
+  updateTminus();
+  _futureBuilt = true;
+}
+
+function toggleEra(el) {
+  const wasOpen = el.classList.contains('open');
+  el.classList.toggle('open', !wasOpen);
+  const more = el.querySelector('.era-more');
+  if (more) more.textContent = wasOpen ? 'Tap to expand ↓' : 'Tap to collapse ↑';
+}
+
+function updateTminus() {
+  // "The Standard" era opens in 2055 — show a live countdown in years.
+  const target = new Date('2055-01-01').getTime();
+  const yrs = Math.max(0, (target - Date.now()) / (365.25 * DAY_MS));
+  const vEl = document.getElementById('tminusValue');
+  if (vEl) vEl.textContent = 'T‑' + yrs.toFixed(1) + ' yrs';
+}
+
+// ── OBSIDIAN BRAIN: Bitcoin at the center of everything ──────────
+let _brainStarted = false;
+function initFutureBrain() {
+  if (_brainStarted) return;
+  const c = document.getElementById('futureBrain');
+  if (!c) return;
+  _brainStarted = true;
+  const ctx = c.getContext('2d');
+  const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let frame = 0;
+  const NODES = [
+    { label:'💰', name:'Money',   col:'#f7931a' },
+    { label:'🏛', name:'Nations', col:'#4ea3ff' },
+    { label:'⚡', name:'Energy',  col:'#00d084' },
+    { label:'🤖', name:'AI',      col:'#a78bfa' },
+    { label:'🏠', name:'Property',col:'#ffd700' },
+    { label:'🚀', name:'Space',   col:'#ff4560' },
+    { label:'🌐', name:'Internet',col:'#4ea3ff' },
+    { label:'🪪', name:'Identity', col:'#00d084' },
+  ];
+  function resize() {
+    const r = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = c.offsetWidth * r; c.height = c.offsetHeight * r;
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    const W = c.offsetWidth, H = c.offsetHeight;
+    if (W < 4 || H < 4) { requestAnimationFrame(draw); return; } // hidden page guard
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    const cx = W / 2, cy = H * 0.42;
+    const ringR = Math.min(W * 0.36, 150);
+    const spin = prefersReduce ? 0 : frame * 0.0035;
+
+    // node positions on an orbit ring (flattened for perspective)
+    const pts = NODES.map((n, i) => {
+      const a = (i / NODES.length) * Math.PI * 2 + spin;
+      return { ...n, x: cx + Math.cos(a) * ringR, y: cy + Math.sin(a) * ringR * 0.62, a };
+    });
+
+    // connection lines — core to each node, with a travelling pulse
+    pts.forEach((p, i) => {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(p.x, p.y);
+      ctx.strokeStyle = 'rgba(124,58,237,0.16)'; ctx.lineWidth = 1; ctx.stroke();
+      // pulse dot travelling outward
+      const t = ((frame * 0.012) + i / NODES.length) % 1;
+      const px = cx + (p.x - cx) * t, py = cy + (p.y - cy) * t;
+      ctx.beginPath(); ctx.arc(px, py, 2.2, 0, Math.PI*2);
+      ctx.fillStyle = p.col; ctx.globalAlpha = 0.8 * (1 - t) + 0.2; ctx.fill(); ctx.globalAlpha = 1;
+    });
+    // faint ring connecting neighbours
+    ctx.beginPath();
+    pts.forEach((p, i) => { i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); });
+    ctx.closePath(); ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1; ctx.stroke();
+
+    // domain nodes
+    pts.forEach(p => {
+      const pulse = 0.5 + 0.5 * Math.sin(frame * 0.05 + p.a);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(10,10,18,0.92)'; ctx.fill();
+      ctx.strokeStyle = p.col; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.55 + 0.45 * pulse; ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.font = '14px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(p.label, p.x, p.y + 0.5);
+    });
+
+    // central Bitcoin core
+    const coreR = 30 + 2 * Math.sin(frame * 0.04);
+    const coreHalo = ctx.createRadialGradient(cx, cy, 4, cx, cy, coreR * 2.4);
+    coreHalo.addColorStop(0, 'rgba(247,147,26,0.5)');
+    coreHalo.addColorStop(0.5, 'rgba(247,147,26,0.12)');
+    coreHalo.addColorStop(1, 'rgba(247,147,26,0)');
+    ctx.fillStyle = coreHalo; ctx.beginPath(); ctx.arc(cx, cy, coreR * 2.4, 0, Math.PI*2); ctx.fill();
+    const coreGrad = ctx.createRadialGradient(cx - 8, cy - 8, 2, cx, cy, coreR);
+    coreGrad.addColorStop(0, '#ffd87a'); coreGrad.addColorStop(0.6, '#f7931a'); coreGrad.addColorStop(1, '#a35c0a');
+    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI*2); ctx.fillStyle = coreGrad; ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '900 30px -apple-system, Georgia, serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('₿', cx, cy + 1);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 // ── INIT ─────────────────────────────────────────────────────
