@@ -5255,23 +5255,34 @@ function initCoin3D() {
     // Screen-space normal (image of local +z) → used to offset the thickness.
     const nX = sinT, nY = -cosT * sinP;
     const T  = R * 0.34;                        // edge thickness in px
-    // Nearer face = the one offset toward the camera. cosT>0 → front toward us.
-    const nearSign = cosT >= 0 ? 1 : -1;
+    // Floor the horizontal foreshortening so the disc NEVER collapses to a
+    // zero-area sliver at edge-on (that was the "blink"). It still reads as a
+    // thin coin on its side, just never vanishes.
+    const cosEff = (cosT >= 0 ? 1 : -1) * Math.max(Math.abs(cosT), 0.12);
 
-    // ── stack discs from far face → edge → near face for a solid 3D body ──
-    const LAYERS = 20;
+    // ── build the disc stack and paint strictly far → near by true depth ──
+    // Using a continuous depth sort (instead of a hard near/far sign flip)
+    // means the layer order reverses smoothly through edge-on with no 1-frame
+    // pop — the other half of the blink.
+    const LAYERS = 22;
+    const discs = [];
     for (let i = 0; i <= LAYERS; i++) {
-      const f = i / LAYERS;                     // 0 = far, 1 = near
-      const off = (f - 0.5) * T * nearSign;
-      const ex = cx + nX * off, ey = cy + nY * off;
-      // unit-scale orientation matrix; the R scale comes from the arc/font radii
-      const m = [cosT, sinT * sinP, 0, cosP, ex, ey];
-      const isNear = i === LAYERS;
-      const isFar  = i === 0;
-      // edge layers are milled/bronze; the near face is the bright lit one
-      const shade = isNear ? 1 : (0.42 + 0.34 * f);
-      drawDisc(R, m, shade, isNear || isFar, isNear);
+      const zoff = i / LAYERS - 0.5;            // −0.5 .. +0.5 along the normal
+      discs.push({ zoff, depth: zoff * cosT }); // depth along view axis
     }
+    discs.sort((a, b) => b.depth - a.depth);    // farthest first, nearest last
+    discs.forEach((dsc, idx) => {
+      const off = dsc.zoff * T;
+      const ex = cx + nX * off, ey = cy + nY * off;
+      const m = [cosEff, sinT * sinP, 0, cosP, ex, ey];
+      const isNear = idx === discs.length - 1;  // the single camera-facing face
+      const t = dsc.zoff + 0.5;                 // 0..1 across the body
+      // brighter when the coin is edge-on so the milled rim gleams instead of
+      // dimming away (edgeOn → 1 at edge, 0 at face)
+      const edgeOn = 1 - Math.abs(cosT);
+      const shade = isNear ? 1 : (0.56 + 0.30 * t + 0.18 * edgeOn);
+      drawDisc(R, m, shade, isNear, isNear);    // ₿ + rim only on the near face
+    });
 
     // ── floor reflection ──
     ctx.save();
