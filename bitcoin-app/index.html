@@ -3451,17 +3451,17 @@
     <div class="mempool-card">
       <div class="intel-card-title">⛓ Mempool Status <span style="font-size:11px;color:var(--green);font-weight:600">● Simulated Live</span></div>
       <div class="mempool-grid">
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolTxs">82,441</div><div class="mempool-cell-label">Txs in Mempool</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolFee">22 sat/vB</div><div class="mempool-cell-label">Avg Fee</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolNext">4:12</div><div class="mempool-cell-label">Next Block</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolHash">743 EH/s</div><div class="mempool-cell-label">Hash Rate</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolTxs">82,441</div><div class="mempool-cell-label">Txs in Mempool</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolFee">22 sat/vB</div><div class="mempool-cell-label">Avg Fee</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolNext">4:12</div><div class="mempool-cell-label">Next Block</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolHash">743 EH/s</div><div class="mempool-cell-label">Hash Rate</div></div>
       </div>
     </div>
 
     <!-- RECENT BLOCKS -->
     <div class="mempool-card">
       <div class="intel-card-title">📦 Recently Confirmed Blocks</div>
-      <div class="block-list" id="blockList"></div>
+      <div class="block-list" data-live="blockList"></div>
     </div>
 
     <!-- EXPLAINER ACCORDION -->
@@ -4049,10 +4049,10 @@
         <span class="chain-live-badge"><span class="live-dot"></span>mempool.space</span>
       </div>
       <div class="mempool-grid">
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolTxs">…</div><div class="mempool-cell-label">Unconfirmed TXs</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolFee">…</div><div class="mempool-cell-label">Fastest Fee</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolNext">…</div><div class="mempool-cell-label">Next Block</div></div>
-        <div class="mempool-cell"><div class="mempool-cell-val" id="mempoolHash">741 EH/s</div><div class="mempool-cell-label">Network Hash Rate</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolTxs">…</div><div class="mempool-cell-label">Unconfirmed TXs</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolFee">…</div><div class="mempool-cell-label">Fastest Fee</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolNext">…</div><div class="mempool-cell-label">Next Block</div></div>
+        <div class="mempool-cell"><div class="mempool-cell-val" data-live="mempoolHash">741 EH/s</div><div class="mempool-cell-label">Network Hash Rate</div></div>
       </div>
       <!-- Fee tiers -->
       <div style="margin-top:14px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Current Fee Tiers</div>
@@ -4069,7 +4069,7 @@
         <div style="font-size:14px;font-weight:800">Recent Blocks</div>
         <span class="chain-live-badge"><span class="live-dot"></span>LIVE</span>
       </div>
-      <div class="block-list" id="blockList"></div>
+      <div class="block-list" data-live="blockList"></div>
     </div>
 
     <!-- LARGE ON-CHAIN MOVEMENTS -->
@@ -4917,87 +4917,6 @@ function calcSell() {
   document.getElementById('sellROI').style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
 }
 
-// ── CALCULATOR: LONG / SHORT (shared logic) ────────────────
-const MMR = 0.005; // maintenance margin rate
-
-function useLivePriceFor(type) {
-  if (!livePrice) return;
-  document.getElementById(type + 'Entry').value = Math.round(livePrice);
-  if (type === 'long') calcLong(); else calcShort();
-}
-
-function buildPnlTable(containerId, entry, size, lev, isLong) {
-  const pcts = [-0.30, -0.20, -0.10, -0.05, 0.05, 0.10, 0.20, 0.30, 0.50];
-  const container = document.getElementById(containerId);
-  container.innerHTML = pcts.map(pct => {
-    const targetPrice = entry * (1 + pct);
-    const priceDelta = isLong ? pct : -pct;
-    const pnl = size * priceDelta;
-    const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
-    return `<div class="pnl-row">
-      <span class="pnl-price">${fmtUSD(targetPrice)} (${pct >= 0 ? '+' : ''}${(pct*100).toFixed(0)}%)</span>
-      <span class="pnl-val" style="color:${pnlColor}">${pnl >= 0 ? '+' : ''}${fmtUSD(pnl, 0)}</span>
-    </div>`;
-  }).join('');
-}
-
-function calcLong() {
-  const entry = parseFloat(document.getElementById('longEntry').value) || 0;
-  const size = parseFloat(document.getElementById('longSize').value) || 0;
-  const lev = parseInt(document.getElementById('longLev').value) || 1;
-  document.getElementById('longLevValue').textContent = lev + '×';
-
-  const margin = size / lev;
-  const liqPrice = entry * (1 - 1/lev + MMR);
-  const liqDist = ((entry - liqPrice) / entry) * 100;
-
-  document.getElementById('longLiqPrice').textContent = fmtUSD(liqPrice, 0);
-  document.getElementById('longMargin').textContent = fmtUSD(margin, 2);
-  document.getElementById('longLiqDist').textContent = '-' + liqDist.toFixed(2) + '%';
-
-  const warnEl = document.getElementById('longLiqWarning');
-  if (liqDist < 5) {
-    warnEl.textContent = '🔴 EXTREME RISK — a ' + liqDist.toFixed(1) + '% drop liquidates this position';
-    warnEl.style.background = 'rgba(255,69,96,0.15)'; warnEl.style.color = 'var(--red)';
-  } else if (liqDist < 15) {
-    warnEl.textContent = '⚠ HIGH RISK — liquidation ' + liqDist.toFixed(1) + '% below entry';
-    warnEl.style.background = 'rgba(255,215,0,0.12)'; warnEl.style.color = 'var(--yellow)';
-  } else {
-    warnEl.textContent = '🟢 Liquidation buffer: ' + liqDist.toFixed(1) + '% — reasonably safe';
-    warnEl.style.background = 'rgba(0,208,132,0.12)'; warnEl.style.color = 'var(--green)';
-  }
-
-  buildPnlTable('longPnlTable', entry, size, lev, true);
-}
-
-function calcShort() {
-  const entry = parseFloat(document.getElementById('shortEntry').value) || 0;
-  const size = parseFloat(document.getElementById('shortSize').value) || 0;
-  const lev = parseInt(document.getElementById('shortLev').value) || 1;
-  document.getElementById('shortLevValue').textContent = lev + '×';
-
-  const margin = size / lev;
-  const liqPrice = entry * (1 + 1/lev - MMR);
-  const liqDist = ((liqPrice - entry) / entry) * 100;
-
-  document.getElementById('shortLiqPrice').textContent = fmtUSD(liqPrice, 0);
-  document.getElementById('shortMargin').textContent = fmtUSD(margin, 2);
-  document.getElementById('shortLiqDist').textContent = '+' + liqDist.toFixed(2) + '%';
-
-  const warnEl = document.getElementById('shortLiqWarning');
-  if (liqDist < 5) {
-    warnEl.textContent = '🔴 EXTREME RISK — a ' + liqDist.toFixed(1) + '% rise liquidates this position';
-    warnEl.style.background = 'rgba(255,69,96,0.15)'; warnEl.style.color = 'var(--red)';
-  } else if (liqDist < 15) {
-    warnEl.textContent = '⚠ HIGH RISK — liquidation ' + liqDist.toFixed(1) + '% above entry';
-    warnEl.style.background = 'rgba(255,215,0,0.12)'; warnEl.style.color = 'var(--yellow)';
-  } else {
-    warnEl.textContent = '🟢 Liquidation buffer: ' + liqDist.toFixed(1) + '% — reasonably safe';
-    warnEl.style.background = 'rgba(0,208,132,0.12)'; warnEl.style.color = 'var(--green)';
-  }
-
-  buildPnlTable('shortPnlTable', entry, size, lev, false);
-}
 
 // ── CALC TAB SWITCHING ──────────────────────────────────────
 // ── CALCULATOR: BTC vs USD ──────────────────────────────────
@@ -5178,6 +5097,9 @@ function initCoin3D() {
 
   function draw() {
     const W = c.offsetWidth, H = c.offsetHeight;
+    // When the home page is hidden the canvas collapses to 0×0; drawing then
+    // produces non-finite gradient coords (e.g. frame % 0 = NaN). Skip the frame.
+    if (W < 4 || H < 4) { requestAnimationFrame(draw); return; }
     ctx.clearRect(0, 0, W, H);
     frame++;
     if (intro < 1) intro = Math.min(1, intro + 0.02);
@@ -5352,6 +5274,7 @@ function initChainAnim() {
 
   function draw() {
     const W = c.offsetWidth, H = c.offsetHeight;
+    if (W < 4 || H < 4) { requestAnimationFrame(draw); return; } // skip while page hidden
     ctx.clearRect(0,0,W,H);
     frame++;
 
@@ -6623,18 +6546,26 @@ function buildBlockList() {
       <div class="block-reward">+3.125 ₿</div>
     </div>`;
   }).join('');
-  ['blockList'].forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = content; });
+  setLiveHTML('blockList', content);
+}
+
+// Update every element tagged with data-live="KEY" (same metric can appear on
+// multiple pages — e.g. the Learn explainer card and the Intel live card).
+function setLive(key, val) {
+  document.querySelectorAll('[data-live="' + key + '"]').forEach(e => { e.textContent = val; });
+}
+function setLiveHTML(key, html) {
+  document.querySelectorAll('[data-live="' + key + '"]').forEach(e => { e.innerHTML = html; });
 }
 
 function initMempoolSim() {
   if (_mempoolRunning) return; // guard: run once only
   _mempoolRunning = true;
   const tick = () => {
-    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-    set('mempoolTxs',  randBetween(48000, 145000).toLocaleString());
-    set('mempoolFee',  randBetween(8, 45) + ' sat/vB');
-    set('mempoolNext', randBetween(0,9) + ':' + String(randBetween(0,59)).padStart(2,'0'));
-    set('mempoolHash', randBetween(700, 800) + ' EH/s');
+    setLive('mempoolTxs',  randBetween(48000, 145000).toLocaleString());
+    setLive('mempoolFee',  randBetween(8, 45) + ' sat/vB');
+    setLive('mempoolNext', randBetween(0,9) + ':' + String(randBetween(0,59)).padStart(2,'0'));
+    setLive('mempoolHash', randBetween(700, 800) + ' EH/s');
   };
   buildBlockList();
   tick();
@@ -7169,12 +7100,12 @@ async function fetchMempoolData() {
     if (mempoolRes.status === 'fulfilled' && mempoolRes.value.ok) {
       const m = await mempoolRes.value.json();
       const txCount = (m.count || 0).toLocaleString();
-      set('mempoolTxs', txCount);
+      setLive('mempoolTxs', txCount);
       set('liveMempoolTxs', txCount);
     }
     if (feesRes.status === 'fulfilled' && feesRes.value.ok) {
       const f = await feesRes.value.json();
-      set('mempoolFee', f.fastestFee + ' sat/vB');
+      setLive('mempoolFee', f.fastestFee + ' sat/vB');
       set('liveFeeFast', f.fastestFee);
       set('feeFast', f.fastestFee);
       set('feeHour', f.hourFee);
@@ -7187,21 +7118,19 @@ async function fetchMempoolData() {
         const height = blocks[0].height;
         set('liveBlockHeight', height.toLocaleString());
         updateTicker(livePrice, height);
-        set('mempoolNext', '#' + (height + 1).toLocaleString());
+        setLive('mempoolNext', '#' + (height + 1).toLocaleString());
         _blockHeight = height;
-        const blockEl = document.getElementById('blockList');
-        if (blockEl) {
-          blockEl.innerHTML = blocks.slice(0, 6).map((b, i) => {
-            const pool = (b.extras && b.extras.pool && b.extras.pool.name) || 'Unknown';
-            const txs = b.tx_count || 0;
-            const minsAgo = Math.round((Date.now()/1000 - b.timestamp) / 60);
-            return `<div class="block-row">
-              <div class="block-num">#${b.height.toLocaleString()}</div>
-              <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
-              <div class="block-reward">+3.125 ₿</div>
-            </div>`;
-          }).join('');
-        }
+        const blockHTML = blocks.slice(0, 6).map((b, i) => {
+          const pool = (b.extras && b.extras.pool && b.extras.pool.name) || 'Unknown';
+          const txs = b.tx_count || 0;
+          const minsAgo = Math.round((Date.now()/1000 - b.timestamp) / 60);
+          return `<div class="block-row">
+            <div class="block-num">#${b.height.toLocaleString()}</div>
+            <div class="block-info">${txs.toLocaleString()} txs · ${pool} · ${minsAgo}m ago</div>
+            <div class="block-reward">+3.125 ₿</div>
+          </div>`;
+        }).join('');
+        setLiveHTML('blockList', blockHTML);
       }
     }
   } catch(e) { /* silently fall back to simulation */ }
