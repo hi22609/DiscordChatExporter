@@ -1826,6 +1826,19 @@
   .future-disclaimer { font-size: 11.5px; color: var(--muted); line-height: 1.6; text-align: center;
     margin: 18px 4px 6px; padding: 14px; border: 1px dashed var(--border); border-radius: 14px; }
 
+  /* Calmer vertical rhythm on the home page — more air between sections so it
+     reads as deliberate chapters, not a wall of stacked cards. */
+  #page-home > .signal-hero,
+  #page-home > .phase-banner,
+  #page-home > .cycle-ring-section,
+  #page-home > .countdown-card,
+  #page-home > .stats-grid,
+  #page-home > .confidence-banner,
+  #page-home > .proj-card,
+  #page-home > .chart-card,
+  #page-home > .signals-card,
+  #page-home > .supply-shock-wrap { margin-top: 26px; margin-bottom: 0; }
+
 </style>
 </head>
 <body>
@@ -1994,7 +2007,8 @@
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats — only facts NOT already shown above (day-in-cycle is in the
+         phase banner, next-bottom is the projections card below) -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Cycle Progress</div>
@@ -2002,38 +2016,9 @@
         <div class="stat-sub" id="arcDaysLeft">— days to event</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Day in Cycle</div>
-        <div class="stat-value" id="halvingDays" style="color:var(--text)">—</div>
-        <div class="stat-sub">of 1434 total</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Next Bottom</div>
-        <div class="stat-value" style="color:var(--red)">Oct 5, 2026</div>
-        <div class="stat-sub">~$40K–$75K</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Next Cycle ATH</div>
+        <div class="stat-label">Next Cycle Peak</div>
         <div class="stat-value" style="color:var(--accent)">Sep 2029</div>
         <div class="stat-sub">~$250K–$700K</div>
-      </div>
-    </div>
-
-    <!-- Cycle Score -->
-    <div class="score-card">
-      <div class="score-header">
-        <div class="score-title">Cycle Score <button class="help-btn" onclick="showTip('cycle-score')">?</button></div>
-        <div class="score-num" id="scoreNum" style="color:var(--yellow)">72</div>
-      </div>
-      <div class="score-bar-track">
-        <div class="score-bar-fill" id="scoreBar" style="width:72%; background: linear-gradient(90deg,#00d084,#ffd700,#ff4560);"></div>
-      </div>
-      <div class="score-labels">
-        <span style="color:var(--green)">🟢 Buy (0–40)</span>
-        <span style="color:var(--yellow)">🟡 Hold (41–65)</span>
-        <span style="color:var(--red)">🔴 Sell (66–100)</span>
-      </div>
-      <div class="score-action" id="scoreAction" style="background:rgba(255,215,0,0.1); color:var(--yellow);">
-        ⚠ Overvalued — Consider taking partial profits
       </div>
     </div>
 
@@ -4724,15 +4709,17 @@ function updateCycleUI() {
   if (typeof populatePhaseExpand === 'function') populatePhaseExpand(phaseIdx, phase);
 
   // Score — driven by the SAME brain as the Signal (one source of truth).
-  document.getElementById('scoreNum').textContent = score;
-  document.getElementById('scoreNum').style.color = getSignalConfig(score).color;
-  document.getElementById('scoreBar').style.width = score + '%';
-
   const cfg = getSignalConfig(score);
+  const scoreNumEl = document.getElementById('scoreNum');
+  if (scoreNumEl) { scoreNumEl.textContent = score; scoreNumEl.style.color = cfg.color; }
+  const scoreBarEl = document.getElementById('scoreBar');
+  if (scoreBarEl) scoreBarEl.style.width = score + '%';
   const scoreEl = document.getElementById('scoreAction');
-  scoreEl.textContent = cfg.verdict + ' — ' + cfg.reason.split('.')[0] + '.';
-  scoreEl.style.background = cfg.bg;
-  scoreEl.style.color = cfg.color;
+  if (scoreEl) {
+    scoreEl.textContent = cfg.verdict + ' — ' + cfg.reason.split('.')[0] + '.';
+    scoreEl.style.background = cfg.bg;
+    scoreEl.style.color = cfg.color;
+  }
 
   // Live signal rows (home)
   const setSig = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
