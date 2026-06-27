@@ -5268,7 +5268,10 @@ function initCoin3D() {
     // shrinks smoothly to a thin bar at edge-on and NEVER hits a constant
     // floor. No clamp ⇒ no frozen "stop", and it never vanishes because the
     // edge bar is always at least T wide. The faces are painted on top.
-    const bodyHW = Math.abs(cosT) * R + T * 0.5;
+    // match the real silhouette of the offset disc stack (face width + the
+    // horizontal spread of the thickness) so the body never pokes past the
+    // discs as a dark rim — it only shows through at edge-on.
+    const bodyHW = Math.abs(cosT) * R + 0.5 * T * Math.abs(sinT);
     const bodyVH = R * cosP;
     const bg = ctx.createLinearGradient(cx - bodyHW, 0, cx + bodyHW, 0);
     bg.addColorStop(0,    gold(0.30));
@@ -5291,17 +5294,25 @@ function initCoin3D() {
       ctx.restore();
     }
 
-    // ── the two faces, far → near, ₿ on the camera-facing one ──────────
-    // True cosθ (no floor) → face width passes smoothly through 0 at edge-on,
-    // so the motion is perfectly continuous. The body above keeps it visible.
-    const faces = [{ zoff: 0.5 }, { zoff: -0.5 }]
-      .map(o => ({ zoff: o.zoff, depth: o.zoff * cosT }))
-      .sort((a, b) => b.depth - a.depth);       // far first, near last
-    faces.forEach((fc, idx) => {
-      const ex = cx + nX * fc.zoff * T, ey = cy + nY * fc.zoff * T;
+    // ── solid extruded body: many thin discs far → near ───────────────
+    // Filling the whole gap between the two faces makes the thickness read as
+    // ONE coin with a beveled edge — not two offset discs ("double coin").
+    // True cosθ (no floor) keeps the motion continuous; the body ellipse above
+    // is the safety net so nothing vanishes when these go edge-on.
+    const LAYERS = 20;
+    const layers = [];
+    for (let i = 0; i <= LAYERS; i++) {
+      const zoff = i / LAYERS - 0.5;             // −0.5 .. +0.5 along normal
+      layers.push({ zoff, depth: zoff * cosT });
+    }
+    layers.sort((a, b) => b.depth - a.depth);    // farthest first, nearest last
+    layers.forEach((ly, idx) => {
+      const ex = cx + nX * ly.zoff * T, ey = cy + nY * ly.zoff * T;
       const m = [cosT, sinT * sinP, 0, cosP, ex, ey];
-      const isNear = idx === faces.length - 1;
-      drawDisc(R, m, isNear ? 1 : 0.5, isNear, isNear);
+      const isNear = idx === layers.length - 1;  // camera-facing face
+      const t = ly.zoff + 0.5;                   // 0..1 across the body
+      const shade = isNear ? 1 : (0.60 + 0.26 * t);
+      drawDisc(R, m, shade, isNear, isNear);     // ₿ + rim only on the near face
     });
 
     // ── floor reflection ──
