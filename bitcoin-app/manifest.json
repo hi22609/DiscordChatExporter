@@ -1,7 +1,8 @@
 {
   "name": "Bitcoin Cycle Tracker",
   "short_name": "BTC Cycle",
-  "description": "1070/364 Bitcoin halving cycle projection calculator",
+  "description": "See exactly where Bitcoin is in its 4-year cycle and what to do about it. Live signal, stack calculator, on-chain intel — 100% in your browser, no tracking.",
+  "categories": ["finance", "education", "utilities"],
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0f",
@@ -10,5 +11,8 @@
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "icons/og-image.png", "sizes": "1200x630", "type": "image/png", "form_factor": "wide" }
   ]
 }

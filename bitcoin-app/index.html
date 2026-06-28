@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>BTC Cycle Tracker</title>
+<title>Bitcoin Cycle Tracker — See where we are in the 4-year cycle</title>
+<meta name="description" content="See exactly where Bitcoin is in its 4-year cycle and what to do about it. Live signal, stack calculator, on-chain intel, and a 50-year vision. 100% in your browser — no bank, no account, no tracking.">
+
+<!-- ── Social share / link unfurl (Open Graph + Twitter) ── -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bitcoin Cycle Tracker">
+<meta property="og:title" content="Bitcoin Cycle Tracker — the 4-year cycle, decoded">
+<meta property="og:description" content="See exactly where we are in the cycle and what to do about it. Free, open, 100% in your browser. No bank, no permission, no fiat leash.">
+<meta property="og:url" content="https://hi22609.github.io/DiscordChatExporter/bitcoin-app/">
+<meta property="og:image" content="https://hi22609.github.io/DiscordChatExporter/bitcoin-app/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bitcoin Cycle Tracker — the 4-year cycle, decoded">
+<meta name="twitter:description" content="Where are we in the cycle, and what do you do about it? Free, open, runs in your browser. No bank, no permission.">
+<meta name="twitter:image" content="https://hi22609.github.io/DiscordChatExporter/bitcoin-app/icons/og-image.png">
 
 <!-- PWA / Add to Home Screen support -->
 <link rel="manifest" href="manifest.json">
@@ -1946,6 +1961,9 @@
         </div>
         <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5">These are projections, not guarantees. Bitcoin is volatile. <button class="help-btn" onclick="showTip('ath')">?</button></div>
       </div>
+      <button onclick="shareSignal()" style="width:100%;margin-top:14px;padding:14px;border-radius:12px;border:1.5px solid rgba(247,147,26,0.4);background:rgba(247,147,26,0.1);color:var(--orange);font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        📤 Share this signal — orange-pill a friend
+      </button>
     </div>
 
     <!-- Phase Banner -->
@@ -7479,6 +7497,95 @@ function initFutureBrain() {
     requestAnimationFrame(draw);
   }
   draw();
+}
+
+// ── SHARE: render the live signal as an image and share it ──────────
+const APP_URL = 'https://hi22609.github.io/DiscordChatExporter/bitcoin-app/';
+function _colHex(c) {
+  return ({ 'var(--green)':'#00d084','var(--yellow)':'#ffd700','var(--red)':'#ff4560','var(--orange)':'#f7931a','#ff6b35':'#ff6b35' })[c] || (c && c[0] === '#' ? c : '#f7931a');
+}
+function _wrap(x, text, cx, y, maxW, lh) {
+  const words = text.split(' '); let line = '', yy = y;
+  for (const w of words) {
+    if (x.measureText(line + w + ' ').width > maxW && line) { x.fillText(line.trim(), cx, yy); line = ''; yy += lh; }
+    line += w + ' ';
+  }
+  x.fillText(line.trim(), cx, yy); return yy;
+}
+async function shareSignal() {
+  const day = getCycleDay(), score = getCycleScore(day), phase = getPhase(day);
+  const cfg = getSignalConfig(score);
+  const verdict = cfg.verdict.replace(/[^\x20-\x7E]/g, '').trim();
+  const col = _colHex(cfg.color);
+  const price = livePrice ? '$' + livePrice.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '—';
+  const W = 1080, H = 1350, cv = document.createElement('canvas');
+  cv.width = W; cv.height = H; const x = cv.getContext('2d');
+  // background + glows
+  x.fillStyle = '#06060b'; x.fillRect(0, 0, W, H);
+  let g = x.createRadialGradient(W*0.25, H*0.28, 0, W*0.25, H*0.28, W*0.85);
+  g.addColorStop(0, 'rgba(247,147,26,0.20)'); g.addColorStop(1, 'rgba(247,147,26,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  g = x.createRadialGradient(W*0.85, H*0.9, 0, W*0.85, H*0.9, W*0.8);
+  g.addColorStop(0, 'rgba(124,58,237,0.18)'); g.addColorStop(1, 'rgba(124,58,237,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.textAlign = 'center';
+  // kicker
+  x.fillStyle = '#a78bfa'; x.font = '800 30px -apple-system,Segoe UI,sans-serif';
+  x.fillText('● BITCOIN CYCLE TRACKER · LIVE', W/2, 96);
+  // coin
+  const ccx = W/2, ccy = 320, R = 132;
+  const cg = x.createRadialGradient(ccx-46, ccy-46, 8, ccx, ccy, R);
+  cg.addColorStop(0, '#ffe49a'); cg.addColorStop(0.55, '#f7931a'); cg.addColorStop(1, '#a35c0a');
+  x.beginPath(); x.arc(ccx, ccy, R, 0, Math.PI*2); x.fillStyle = cg; x.fill();
+  x.lineWidth = 9; x.strokeStyle = 'rgba(255,235,170,0.4)'; x.beginPath(); x.arc(ccx, ccy, R-9, 0, Math.PI*2); x.stroke();
+  x.fillStyle = '#fff'; x.font = '900 180px Georgia,serif'; x.textBaseline = 'middle';
+  x.fillText('₿', ccx, ccy + 6); x.textBaseline = 'alphabetic';
+  // verdict
+  x.fillStyle = col; x.font = '900 124px -apple-system,Segoe UI,sans-serif';
+  x.fillText(verdict, W/2, 600);
+  // reason
+  x.fillStyle = '#c8c8d8'; x.font = '500 36px -apple-system,Segoe UI,sans-serif';
+  _wrap(x, cfg.reason.split('.')[0] + '.', W/2, 668, W-150, 48);
+  // stat band
+  const bandY = 800;
+  x.fillStyle = 'rgba(255,255,255,0.04)';
+  x.fillRect(80, bandY, W-160, 260);
+  x.strokeStyle = 'rgba(255,255,255,0.08)'; x.lineWidth = 1.5; x.strokeRect(80, bandY, W-160, 260);
+  const cells = [
+    ['CYCLE SCORE', score + '/100', col],
+    ['CYCLE DAY', day + ' / ' + CYCLE_LEN, '#e8e8f0'],
+    ['PHASE', phase.name, '#f7931a'],
+    ['BTC PRICE', price, '#ffd87a'],
+  ];
+  cells.forEach((c, i) => {
+    const colx = (i % 2 === 0) ? W*0.32 : W*0.68;
+    const rowy = bandY + (i < 2 ? 86 : 196);
+    x.fillStyle = '#8f8fa8'; x.font = '700 24px -apple-system,sans-serif';
+    x.fillText(c[0], colx, rowy - 34);
+    x.fillStyle = c[2]; x.font = '900 50px -apple-system,sans-serif';
+    x.fillText(c[1], colx, rowy + 18);
+  });
+  // footer
+  x.fillStyle = '#f7931a'; x.font = '800 34px -apple-system,sans-serif';
+  x.fillText('Escape the fiat plantation.', W/2, 1175);
+  x.fillStyle = '#8f8fa8'; x.font = '600 28px -apple-system,sans-serif';
+  x.fillText('Free · open · 100% in your browser · no tracking', W/2, 1220);
+  x.fillStyle = '#e8e8f0'; x.font = '800 30px -apple-system,sans-serif';
+  x.fillText('hi22609.github.io/DiscordChatExporter', W/2, 1275);
+
+  const caption = `Bitcoin cycle signal: ${verdict} — Day ${day}/${CYCLE_LEN}, score ${score}/100.\nSee exactly where we are in the 4-year cycle 👇\n${APP_URL}\n#Bitcoin #BTC`;
+  cv.toBlob(async (blob) => {
+    if (!blob) { showToast('Could not build image'); return; }
+    const file = new File([blob], 'btc-cycle-signal.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: caption }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'btc-cycle-signal.png'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    try { await navigator.clipboard.writeText(caption); showToast('Image saved + caption copied — paste it anywhere 🚀'); }
+    catch (e) { showToast('Image saved — share it anywhere 🚀'); }
+  }, 'image/png');
 }
 
 // ── INIT ─────────────────────────────────────────────────────
