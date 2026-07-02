@@ -94,6 +94,7 @@ wtm/
 ## Key Features (MVP)
 
 - **Map-first** — the home screen is a live dark map of moves happening around you; pins are placed by real coordinates returned from the geo query
+- **Fire Spots layer** — toggle the map from Moves (time-bound events, circular pins) to Spots (permanent gems, diamond pins): urbex, skate spots, sunsets, fire views, swim holes. Long-press anywhere on the map to drop one. Members 🔥 spots and save them; hot spots (10+ fires) glow on the map
 - **Know-someone entry** — invite-only, but frictionless: every member gets 5 personal invites to hand out. Using someone's code links you to them (referral graph)
 - **Create a Move** — title, category, location (name + coordinates), time, max capacity, cover photo
 - **List view** — secondary tab: infinite scroll, filter by category and distance radius
@@ -107,18 +108,24 @@ wtm/
 ## Database Schema
 
 ```
-profiles          ← extends auth.users
-invite_codes      ← beta access control
+profiles          ← extends auth.users (+ referral_code, invited_by)
+invite_codes      ← beta access control + member referral codes
 moves             ← PostGIS geography(Point,4326) for geo queries
 rsvps             ← capacity enforced via DB trigger
 moves_with_counts ← view with attendee_count, spots_left, is_full
+spots             ← permanent map gems (urbex, skate, sunset, view...)
+spot_fires        ← 🔥 votes (one per member; counts synced by trigger)
+spot_saves        ← bookmarks
 ```
 
 Key SQL functions:
 - `nearby_moves(lat, lng, radius_m, filter_cat)` — PostGIS ST_DWithin query
+- `nearby_spots(lat, lng, radius_m, filter_cat)` — spots layer, hottest-first, includes the caller's 🔥/save state
+- `get_spot(spot_id)` — spot detail with creator info
 - `get_move_attendees(move_id, limit)` — attendee list with profiles
 - `my_rsvp_status(move_id)` — current user's RSVP status
 - `get_my_upcoming_moves()` — activity feed
+- `get_my_invite()` / `get_my_referrals()` — referral graph
 
 ---
 

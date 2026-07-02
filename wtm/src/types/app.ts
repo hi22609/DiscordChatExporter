@@ -136,6 +136,65 @@ export const CATEGORY_META: Record<MoveCategory, CategoryMeta> = {
   other: { label: 'Other', emoji: '✨', gradient: ['#6B7280', '#374151'] },
 };
 
+// ---------- Fire Spots (permanent map gems) ----------
+
+export type SpotCategory =
+  | 'urbex'
+  | 'skate'
+  | 'sunset'
+  | 'view'
+  | 'swim'
+  | 'chill'
+  | 'photo'
+  | 'other';
+
+export interface NearbySpot {
+  id: string;
+  created_by: string;
+  name: string;
+  description: string | null;
+  category: SpotCategory;
+  address: string | null;
+  city: string;
+  cover_image_url: string | null;
+  best_time: string | null;
+  fire_count: number;
+  save_count: number;
+  created_at: string;
+  latitude: number;
+  longitude: number;
+  distance_m: number;
+  i_fired: boolean;
+  i_saved: boolean;
+}
+
+export interface SpotDetail extends Omit<NearbySpot, 'distance_m'> {
+  creator_username: string;
+  creator_avatar: string | null;
+}
+
+export interface CreateSpotInput {
+  name: string;
+  description?: string;
+  category: SpotCategory;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  best_time?: string;
+  cover_image_url?: string;
+}
+
+export const SPOT_CATEGORY_META: Record<SpotCategory, CategoryMeta> = {
+  urbex: { label: 'Urbex', emoji: '🏚️', gradient: ['#78716C', '#292524'] },
+  skate: { label: 'Skate', emoji: '🛹', gradient: ['#F59E0B', '#78350F'] },
+  sunset: { label: 'Sunset', emoji: '🌅', gradient: ['#F97316', '#7C2D12'] },
+  view: { label: 'Fire View', emoji: '🌆', gradient: ['#8B5CF6', '#4C1D95'] },
+  swim: { label: 'Swim', emoji: '💧', gradient: ['#0EA5E9', '#0C4A6E'] },
+  chill: { label: 'Chill', emoji: '🌳', gradient: ['#22C55E', '#14532D'] },
+  photo: { label: 'Photo Op', emoji: '📸', gradient: ['#EC4899', '#831843'] },
+  other: { label: 'Other', emoji: '📍', gradient: ['#6B7280', '#374151'] },
+};
+
 export const RADIUS_OPTIONS = [
   { label: '1 mi', meters: 1609 },
   { label: '3 mi', meters: 4828 },

@@ -61,6 +61,20 @@ function AuthGate() {
         }}
       />
       <Stack.Screen name="i/[code]" options={{ animation: 'fade' }} />
+      <Stack.Screen
+        name="spot/[id]"
+        options={{
+          presentation: 'card',
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="add-spot"
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
     </Stack>
   );
 }
