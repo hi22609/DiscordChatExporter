@@ -50,6 +50,13 @@ function AuthGate() {
           animation: 'slide_from_right',
         }}
       />
+      <Stack.Screen
+        name="invite-friends"
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
     </Stack>
   );
 }

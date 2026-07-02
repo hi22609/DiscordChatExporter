@@ -7,13 +7,16 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/queryClient';
 import { useAuthStore } from '@/store/authStore';
+import { useMyInvite } from '@/hooks/useInvites';
 import { Avatar } from '@/components/ui/Avatar';
 import { MoveCard } from '@/components/moves/MoveCard';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { MoveWithCounts } from '@/types/app';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, user } = useAuthStore();
+  const { data: invite } = useMyInvite();
 
   const { data: myMoves } = useQuery({
     queryKey: queryKeys.moves.byUser(user?.id ?? ''),
@@ -105,6 +108,30 @@ export default function ProfileScreen() {
             <View style={{ width: 1, backgroundColor: '#2E2E2E', marginHorizontal: 16 }} />
             <Stat label="City" value={profile.city} isText />
           </View>
+
+          {/* Invite friends — the club-growth card */}
+          <TouchableOpacity onPress={() => router.push('/invite-friends')} activeOpacity={0.9}>
+            <LinearGradient
+              colors={['#FF6B35', '#E84E14']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ borderRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }}
+            >
+              <View style={{
+                width: 46, height: 46, borderRadius: 14,
+                backgroundColor: '#ffffff25', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Text style={{ fontSize: 24 }}>🎟️</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>Invite friends</Text>
+                <Text style={{ color: '#ffffffcc', fontSize: 13 }}>
+                  {invite ? `${invite.invites_left} of ${invite.max_uses} invites left` : 'Bring your people in'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#ffffffcc" />
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
         {/* My moves */}

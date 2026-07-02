@@ -93,14 +93,14 @@ wtm/
 
 ## Key Features (MVP)
 
-- **Invite-only beta** — validate codes via Edge Function before sign-up
+- **Map-first** — the home screen is a live dark map of moves happening around you; pins are placed by real coordinates returned from the geo query
+- **Know-someone entry** — invite-only, but frictionless: every member gets 5 personal invites to hand out. Using someone's code links you to them (referral graph)
 - **Create a Move** — title, category, location (name + coordinates), time, max capacity, cover photo
-- **Browse Feed** — infinite scroll, filter by category and distance radius
-- **Map View** — custom dark map, tap pins to preview moves
+- **List view** — secondary tab: infinite scroll, filter by category and distance radius
 - **RSVP System** — optimistic updates, max capacity enforcement at DB level
 - **Realtime** — live attendee count via Supabase Realtime subscriptions
 - **Push Notifications** — notify move creator when someone joins (Expo push)
-- **Profiles** — avatar, bio, stats, move history
+- **Profiles** — avatar, bio, stats, move history, and your invite code
 
 ---
 
@@ -157,21 +157,31 @@ eas submit --profile production
 
 ---
 
-## Invite Code Beta Flow
+## Know-Someone Entry (Referral Graph)
+
+The "you gotta know someone" mechanic — exclusive in feel, easy if you actually
+know a member:
 
 1. User opens app → `/welcome`
 2. Taps "I have an invite code" → `/invite`
 3. Code validated via `validate-invite` Edge Function
 4. `codeId` stored in Zustand (in-memory) → proceed to `/sign-up`
-5. On account creation → Supabase trigger auto-creates profile
-6. Edge Function atomically marks code as used
+5. On account creation, the `handle_new_user` trigger (migration `007_referrals.sql`):
+   - burns one use of the invite code and records `invited_by` (the referral link)
+   - mints the new member their **own** personal code (`MOVExxxx`) with 5 invites
+6. New member sees their code + invites-left on Profile → `/invite-friends`, and can
+   see everyone they've brought in
 
-Generate codes for launch:
+Because each personal code lives in the same `invite_codes` table, the existing
+`validate-invite` function works for member codes with no changes.
+
+**Bootstrapping:** the very first members need founder codes (nobody invited them).
+`seed.sql` ships a handful (`PITTSB01`, `STEEL412`, …). Generate more:
 ```bash
 curl -X POST https://your-project.supabase.co/functions/v1/generate-invite-codes \
   -H "Authorization: Bearer YOUR_ADMIN_SECRET" \
   -H "Content-Type: application/json" \
-  -d '{"count": 500, "maxUses": 1}'
+  -d '{"count": 100, "maxUses": 1}'
 ```
 
 ---

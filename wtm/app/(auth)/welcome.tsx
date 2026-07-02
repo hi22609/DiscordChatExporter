@@ -46,7 +46,7 @@ export default function WelcomeScreen() {
               textAlign: 'center',
               lineHeight: 26,
             }}>
-              Find what's happening today.{'\n'}Set the move for tonight.
+              The map of what's happening tonight.{'\n'}Invite-only — you gotta know someone.
             </Text>
           </Animated.View>
 

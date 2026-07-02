@@ -138,6 +138,8 @@ returns table (
   attendee_count  int,
   spots_left      int,
   is_full         boolean,
+  latitude        float8,
+  longitude       float8,
   distance_m      float8
 )
 language sql stable security definer
@@ -148,6 +150,8 @@ as $$
     m.max_attendees, m.cover_image_url, m.is_public, m.is_cancelled,
     m.vibes, m.created_at, m.updated_at,
     m.attendee_count, m.spots_left, m.is_full,
+    ST_Y(m.location_point::geometry) as latitude,
+    ST_X(m.location_point::geometry) as longitude,
     ST_Distance(m.location_point, ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography) as distance_m
   from public.moves_with_counts m
   where

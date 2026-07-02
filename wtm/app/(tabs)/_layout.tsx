@@ -57,15 +57,15 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Feed',
-          tabBarIcon: ({ focused }) => <TabIcon name="flame" focused={focused} />,
+          title: 'Map',
+          tabBarIcon: ({ focused }) => <TabIcon name="map" focused={focused} />,
         }}
       />
       <Tabs.Screen
-        name="map"
+        name="list"
         options={{
-          title: 'Map',
-          tabBarIcon: ({ focused }) => <TabIcon name="map" focused={focused} />,
+          title: 'List',
+          tabBarIcon: ({ focused }) => <TabIcon name="flame" focused={focused} />,
         }}
       />
       <Tabs.Screen

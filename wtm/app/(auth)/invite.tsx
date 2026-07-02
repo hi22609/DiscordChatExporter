@@ -71,7 +71,7 @@ export default function InviteScreen() {
               Enter your{'\n'}invite code
             </Text>
             <Text style={{ color: '#A0A0A0', fontSize: 16, lineHeight: 24 }}>
-              WTM is currently invite-only. Got a code from a friend? Drop it below.
+              WTM is invite-only — someone already in has to let you in. Drop their code below.
             </Text>
           </View>
 
@@ -132,8 +132,8 @@ export default function InviteScreen() {
           </View>
 
           <Text style={{ color: '#424242', fontSize: 13, textAlign: 'center', lineHeight: 20 }}>
-            Don't have a code? Join the waitlist at{'\n'}
-            <Text style={{ color: '#FF6B35' }}>whatsthemove.app</Text>
+            No code? Ask a friend who's already in —{'\n'}
+            everyone gets a few to hand out.
           </Text>
         </Animated.View>
       </SafeAreaView>

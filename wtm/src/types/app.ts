@@ -19,11 +19,28 @@ export interface Profile {
   bio: string | null;
   city: string;
   push_token: string | null;
+  referral_code: string | null;
+  invited_by: string | null;
   follower_count: number;
   following_count: number;
   moves_created: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface MyInvite {
+  code: string;
+  max_uses: number;
+  use_count: number;
+  invites_left: number;
+}
+
+export interface Referral {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  joined_at: string;
 }
 
 export interface Move {
@@ -55,6 +72,8 @@ export interface MoveWithCounts extends Move {
 }
 
 export interface NearbyMove extends MoveWithCounts {
+  latitude: number;
+  longitude: number;
   distance_m: number;
 }
 
