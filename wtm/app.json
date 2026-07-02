@@ -19,6 +19,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.wtm.app",
       "buildNumber": "1",
+      "associatedDomains": ["applinks:whatsthemove.app"],
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "WTM uses your location to show moves happening near you.",
         "NSPhotoLibraryUsageDescription": "WTM needs access to your photos to set a cover image for your move.",
@@ -41,6 +42,20 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "whatsthemove.app",
+              "pathPrefix": "/i"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ],
       "config": {
         "googleMaps": {

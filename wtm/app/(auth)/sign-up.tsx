@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, ActivityIndicator,
   KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -35,6 +35,7 @@ function validate(form: FormState): FieldErrors {
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { code: invitedCode } = useLocalSearchParams<{ code?: string }>();
   const pendingInviteCodeId = useAuthStore((s) => s.pendingInviteCodeId);
   const [form, setForm] = useState<FormState>({
     email: '', password: '', username: '', displayName: '',
@@ -110,6 +111,20 @@ export default function SignUpScreen() {
                 You're in. Let's set up your profile.
               </Text>
             </View>
+
+            {invitedCode && (
+              <View style={{
+                flexDirection: 'row', alignItems: 'center', gap: 8,
+                backgroundColor: '#22C55E15', borderRadius: 12,
+                paddingHorizontal: 14, paddingVertical: 10,
+                borderWidth: 1, borderColor: '#22C55E30',
+              }}>
+                <Ionicons name="checkmark-circle" size={18} color="#22C55E" />
+                <Text style={{ color: '#22C55E', fontSize: 14, fontWeight: '600' }}>
+                  Invited with code {invitedCode}
+                </Text>
+              </View>
+            )}
 
             <View style={{ gap: 14 }}>
               <Field

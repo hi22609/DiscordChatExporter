@@ -24,8 +24,11 @@ function AuthGate() {
     SplashScreen.hideAsync();
 
     const inAuthGroup = segments[0] === '(auth)';
+    // The invite deep-link route is public — a signed-out friend must be able
+    // to open it so it can validate their code and route them into sign-up.
+    const inPublicRoute = segments[0] === 'i';
 
-    if (!isAuthenticated && !inAuthGroup) {
+    if (!isAuthenticated && !inAuthGroup && !inPublicRoute) {
       router.replace('/(auth)/welcome');
     } else if (isAuthenticated && inAuthGroup) {
       router.replace('/(tabs)');
@@ -57,6 +60,7 @@ function AuthGate() {
           animation: 'slide_from_bottom',
         }}
       />
+      <Stack.Screen name="i/[code]" options={{ animation: 'fade' }} />
     </Stack>
   );
 }

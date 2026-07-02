@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -18,10 +18,13 @@ const REASON_MESSAGES: Record<string, string> = {
 
 export default function InviteScreen() {
   const router = useRouter();
+  const { code: codeParam, error: errorParam } = useLocalSearchParams<{ code?: string; error?: string }>();
   const setPendingInviteCodeId = useAuthStore((s) => s.setPendingInviteCodeId);
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState((codeParam ?? '').toUpperCase());
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    errorParam ? "That invite link didn't work. Double-check the code." : null
+  );
   const inputRef = useRef<TextInput>(null);
 
   async function handleValidate() {

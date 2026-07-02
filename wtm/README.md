@@ -186,6 +186,51 @@ curl -X POST https://your-project.supabase.co/functions/v1/generate-invite-codes
 
 ---
 
+## Deep-Link Invites
+
+Sharing an invite from `/invite-friends` produces a link like
+`https://whatsthemove.app/i/MOVE7K2Q`. Tapping it:
+
+1. Opens the app to `app/i/[code].tsx` (custom scheme `wtm://i/CODE` works too)
+2. Validates the code via the `validate-invite` Edge Function
+3. On success → routes straight to `/sign-up` with the code applied and an
+   "Invited with code" banner (skips manual entry entirely)
+4. On failure → routes to `/invite` with the code prefilled and an error
+5. If the tapper is already a member → sends them into the app
+
+The `i` route is whitelisted in the root auth gate so a signed-out friend can
+reach it without being bounced to the welcome screen.
+
+**Required server-side files** (host on `whatsthemove.app`) for the links to open
+the app directly instead of the browser:
+
+`/.well-known/apple-app-site-association` (no extension, `Content-Type: application/json`):
+```json
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      { "appID": "YOUR_TEAM_ID.com.wtm.app", "paths": ["/i/*"] }
+    ]
+  }
+}
+```
+
+`/.well-known/assetlinks.json`:
+```json
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.wtm.app",
+    "sha256_cert_fingerprints": ["YOUR_APP_SIGNING_SHA256"]
+  }
+}]
+```
+
+The matching client config already lives in `app.json`
+(`ios.associatedDomains` + `android.intentFilters`).
+
 ## Scaling Beyond Pittsburgh
 
 The architecture is already global-ready:
