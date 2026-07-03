@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
   Switch, ActivityIndicator, Image, Alert, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
-import { useCreateMove, uploadMoveImage } from '@/hooks/useCreateMove';
+import { useCreateMove, attachMoveCoverImage } from '@/hooks/useCreateMove';
 import { CategoryPicker } from '@/components/moves/CategoryPicker';
 import { format } from 'date-fns';
 import type { MoveCategory, CreateMoveInput } from '@/types/app';
@@ -40,6 +40,10 @@ function getDefaultStartTime(): Date {
 export default function CreateScreen() {
   const router = useRouter();
   const createMove = useCreateMove();
+  // Prefill from "Set a move here" on a spot detail screen.
+  const prefill = useLocalSearchParams<{
+    locationName?: string; lat?: string; lng?: string; address?: string;
+  }>();
 
   const [form, setForm] = useState<FormState>({
     title: '',
@@ -58,8 +62,20 @@ export default function CreateScreen() {
   });
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [step, setStep] = useState<'basics' | 'details' | 'preview'>('basics');
   const [isUploading, setIsUploading] = useState(false);
+
+  // Tabs stay mounted, so apply prefill whenever the params change —
+  // not just on first render.
+  useEffect(() => {
+    if (!prefill.locationName) return;
+    setForm((f) => ({
+      ...f,
+      locationName: prefill.locationName ?? f.locationName,
+      locationLat: prefill.lat ? parseFloat(prefill.lat) : f.locationLat,
+      locationLng: prefill.lng ? parseFloat(prefill.lng) : f.locationLng,
+      address: prefill.address ?? f.address,
+    }));
+  }, [prefill.locationName, prefill.lat, prefill.lng, prefill.address]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -99,17 +115,17 @@ export default function CreateScreen() {
     try {
       const moveId = await createMove.mutateAsync(input);
 
-      // Upload cover image if selected
+      // Upload the cover and persist its URL on the move row.
       if (form.coverImageUri) {
         setIsUploading(true);
-        const url = await uploadMoveImage(form.coverImageUri, moveId);
-        // Update cover_image_url (fire and forget is ok here)
+        await attachMoveCoverImage(form.coverImageUri, moveId);
         setIsUploading(false);
       }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace(`/move/${moveId}`);
     } catch (err: any) {
+      setIsUploading(false);
       Alert.alert('Error', err.message || 'Failed to create move. Try again.');
     }
   }

@@ -52,6 +52,16 @@
               "scheme": "https",
               "host": "whatsthemove.app",
               "pathPrefix": "/i"
+            },
+            {
+              "scheme": "https",
+              "host": "whatsthemove.app",
+              "pathPrefix": "/move"
+            },
+            {
+              "scheme": "https",
+              "host": "whatsthemove.app",
+              "pathPrefix": "/spot"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

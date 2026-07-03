@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import * as Location from 'expo-location';
+import { useShallow } from 'zustand/react/shallow';
 import { useLocationStore } from '@/store/locationStore';
 
 export function useLocationInit() {
@@ -26,11 +27,13 @@ export function useLocationInit() {
 }
 
 export function useLocation() {
-  return useLocationStore((s) => ({
-    coords: s.coords,
-    city: s.city,
-    permissionGranted: s.permissionGranted,
-    isFetching: s.isFetching,
-    getCoords: s.getCoords,
-  }));
+  return useLocationStore(
+    useShallow((s) => ({
+      coords: s.coords,
+      city: s.city,
+      permissionGranted: s.permissionGranted,
+      isFetching: s.isFetching,
+      getCoords: s.getCoords,
+    }))
+  );
 }

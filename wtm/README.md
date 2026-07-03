@@ -159,7 +159,7 @@ eas submit --profile production
 2. Run migrations: `supabase db push`
 3. Deploy Edge Functions: `supabase functions deploy`
 4. Enable PostGIS extension in dashboard
-5. Create storage buckets: `avatars` and `move-images` (set public)
+5. Create storage buckets: `avatars`, `move-images`, and `spot-images` (set public)
 6. Set Edge Function secrets: `ADMIN_SECRET`
 
 ---
@@ -217,7 +217,7 @@ the app directly instead of the browser:
   "applinks": {
     "apps": [],
     "details": [
-      { "appID": "YOUR_TEAM_ID.com.wtm.app", "paths": ["/i/*"] }
+      { "appID": "YOUR_TEAM_ID.com.wtm.app", "paths": ["/i/*", "/move/*", "/spot/*"] }
     ]
   }
 }

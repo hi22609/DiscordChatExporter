@@ -18,10 +18,13 @@ export function useRSVP(moveId: string) {
         if (error.message.includes('move_full')) throw new Error('move_full');
         throw error;
       }
-      // Trigger push notification to move creator
-      await supabase.functions.invoke('send-push-notification', {
-        body: { type: 'new_rsvp', moveId, actorId: userId },
-      });
+      // Notify the move creator — fire-and-forget. The RSVP row is already
+      // committed; a notification hiccup must not fail (and roll back) the join.
+      supabase.functions
+        .invoke('send-push-notification', {
+          body: { type: 'new_rsvp', moveId, actorId: userId },
+        })
+        .catch((err) => console.warn('rsvp push notify failed', err));
     },
     onMutate: async () => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

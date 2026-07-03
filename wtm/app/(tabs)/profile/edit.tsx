@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
+import { uploadImage } from '@/lib/storage';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar } from '@/components/ui/Avatar';
 
@@ -34,17 +35,10 @@ export default function EditProfileScreen() {
     let avatarUrl = profile.avatar_url;
 
     if (avatarUri) {
-      const ext = avatarUri.split('.').pop() ?? 'jpg';
-      const path = `avatars/${profile.id}.${ext}`;
-      const response = await fetch(avatarUri);
-      const blob = await response.blob();
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, blob, { contentType: `image/${ext}`, upsert: true });
-
-      if (!uploadError) {
-        const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-        avatarUrl = data.publicUrl;
+      try {
+        avatarUrl = await uploadImage('avatars', `avatars/${profile.id}`, avatarUri);
+      } catch (err) {
+        console.warn('avatar upload failed', err);
       }
     }
 

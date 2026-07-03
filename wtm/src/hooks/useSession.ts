@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 
@@ -40,11 +41,15 @@ export function useSessionInit() {
 }
 
 export function useAuth() {
-  return useAuthStore((s) => ({
-    session: s.session,
-    user: s.user,
-    profile: s.profile,
-    isLoading: s.isLoading,
-    isAuthenticated: !!s.session,
-  }));
+  // useShallow: the selector builds a new object each call — without shallow
+  // comparison every store change re-renders every consumer.
+  return useAuthStore(
+    useShallow((s) => ({
+      session: s.session,
+      user: s.user,
+      profile: s.profile,
+      isLoading: s.isLoading,
+      isAuthenticated: !!s.session,
+    }))
+  );
 }

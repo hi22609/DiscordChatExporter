@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
+import { uploadImage } from '@/lib/storage';
 import { queryKeys } from '@/lib/queryClient';
 import { useAuthStore } from '@/store/authStore';
 import type { CreateMoveInput } from '@/types/app';
@@ -32,12 +33,14 @@ export function useCreateMove() {
 
       if (error) throw error;
 
-      // Auto-RSVP creator
-      await supabase.from('rsvps').insert({
+      // Auto-RSVP creator — non-fatal: the move exists either way, and the
+      // creator can always tap Join on the detail screen.
+      const { error: rsvpError } = await supabase.from('rsvps').insert({
         move_id: data.id,
         user_id: userId!,
         status: 'going',
       });
+      if (rsvpError) console.warn('creator auto-RSVP failed', rsvpError.message);
 
       return data.id;
     },
@@ -49,19 +52,22 @@ export function useCreateMove() {
   });
 }
 
-export async function uploadMoveImage(uri: string, moveId: string): Promise<string> {
-  const ext = uri.split('.').pop() ?? 'jpg';
-  const path = `moves/${moveId}/cover.${ext}`;
-
-  const response = await fetch(uri);
-  const blob = await response.blob();
-
-  const { error } = await supabase.storage
-    .from('move-images')
-    .upload(path, blob, { contentType: `image/${ext}`, upsert: true });
-
-  if (error) throw error;
-
-  const { data } = supabase.storage.from('move-images').getPublicUrl(path);
-  return data.publicUrl;
+/**
+ * Upload a cover image for a move and persist its URL on the row.
+ * Returns the public URL, or null if the upload failed (non-fatal —
+ * the move stands on its own with a category gradient).
+ */
+export async function attachMoveCoverImage(uri: string, moveId: string): Promise<string | null> {
+  try {
+    const url = await uploadImage('move-images', `moves/${moveId}/cover`, uri);
+    const { error } = await supabase
+      .from('moves')
+      .update({ cover_image_url: url })
+      .eq('id', moveId);
+    if (error) throw error;
+    return url;
+  } catch (err) {
+    console.warn('move cover upload failed', err);
+    return null;
+  }
 }

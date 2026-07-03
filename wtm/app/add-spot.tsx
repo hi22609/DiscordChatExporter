@@ -10,6 +10,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as ImagePicker from 'expo-image-picker';
 import { useCreateSpot } from '@/hooks/useSpots';
+import { uploadImage } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
 import { SPOT_CATEGORY_META, type SpotCategory } from '@/types/app';
 
 const SPOT_CATEGORIES = Object.entries(SPOT_CATEGORY_META) as Array<
@@ -54,6 +56,17 @@ export default function AddSpotScreen() {
         longitude,
         best_time: bestTime.trim() || undefined,
       });
+
+      // Upload the photo and persist it — non-fatal if it fails.
+      if (coverImageUri) {
+        try {
+          const url = await uploadImage('spot-images', `spots/${spotId}/cover`, coverImageUri);
+          await supabase.from('spots').update({ cover_image_url: url }).eq('id', spotId);
+        } catch (err) {
+          console.warn('spot cover upload failed', err);
+        }
+      }
+
       router.replace(`/spot/${spotId}`);
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Failed to drop the spot. Try again.');

@@ -205,22 +205,44 @@ export default function SpotDetailScreen() {
         </Animated.View>
       </ScrollView>
 
-      {/* Bottom bar: directions */}
+      {/* Bottom bar: rally a move here + directions */}
       <View style={{
         position: 'absolute', bottom: 0, left: 0, right: 0,
         paddingBottom: 32, paddingTop: 16, paddingHorizontal: 20,
         backgroundColor: '#0A0A0Aee',
         borderTopWidth: 0.5, borderTopColor: '#1E1E1E',
+        flexDirection: 'row', gap: 10,
       }}>
         <TouchableOpacity
-          onPress={handleDirections}
+          onPress={() =>
+            router.push({
+              pathname: '/(tabs)/create',
+              params: {
+                locationName: spot.name,
+                lat: String(spot.latitude),
+                lng: String(spot.longitude),
+                address: spot.address ?? '',
+              },
+            })
+          }
           style={{
-            height: 52, borderRadius: 26, backgroundColor: '#FF6B35',
+            flex: 1, height: 52, borderRadius: 26, backgroundColor: '#FF6B35',
             flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}
         >
-          <Ionicons name="navigate" size={18} color="#fff" />
-          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>Take me there</Text>
+          <Text style={{ fontSize: 16 }}>🕺</Text>
+          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>Set a move here</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleDirections}
+          style={{
+            width: 52, height: 52, borderRadius: 26,
+            backgroundColor: '#1E1E1E', borderWidth: 1.5, borderColor: '#2E2E2E',
+            alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <Ionicons name="navigate" size={20} color="#FF6B35" />
         </TouchableOpacity>
       </View>
 

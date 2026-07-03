@@ -55,6 +55,9 @@ export default function MapHomeScreen() {
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout>>();
   const lastRegion = useRef<Region | null>(null);
+  // Only a real gesture counts as "user panned" — onRegionChangeComplete also
+  // fires when the map first settles, which must not block the GPS fly-to.
+  const userPanned = useRef(false);
   const mapRef = useRef<MapView>(null);
 
   const coords = getCoords();
@@ -83,6 +86,15 @@ export default function MapHomeScreen() {
     setIsLoading(true);
     fetchLayer(region);
   }, [layer, category, spotCategory]);
+
+  // When GPS first resolves, fly to the user and refetch — but never yank the
+  // map away from someone who has already panned somewhere on purpose.
+  useEffect(() => {
+    if (userPanned.current) return;
+    const region = { latitude: coords.lat, longitude: coords.lng, ...DEFAULT_DELTA };
+    mapRef.current?.animateToRegion(region, 500);
+    fetchLayer(region);
+  }, [coords.lat, coords.lng]);
 
   function onRegionChangeComplete(region: Region) {
     lastRegion.current = region;
@@ -132,6 +144,7 @@ export default function MapHomeScreen() {
         customMapStyle={darkMapStyle}
         initialRegion={{ latitude: coords.lat, longitude: coords.lng, ...DEFAULT_DELTA }}
         onRegionChangeComplete={onRegionChangeComplete}
+        onPanDrag={() => { userPanned.current = true; }}
         onPress={clearSelection}
         onLongPress={onLongPress}
         showsUserLocation

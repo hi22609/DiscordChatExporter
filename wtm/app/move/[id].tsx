@@ -53,7 +53,7 @@ export default function MoveDetailScreen() {
     if (!move) return;
     await Share.share({
       title: move.title,
-      message: `Check out this move: ${move.title} — ${formatMoveTime(move.starts_at)} at ${move.location_name}`,
+      message: `What's the move? This: ${move.title} — ${formatMoveTime(move.starts_at)} at ${move.location_name}. Pull up: https://whatsthemove.app/move/${move.id}`,
     });
   }
 

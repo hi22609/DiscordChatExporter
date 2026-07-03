@@ -27,11 +27,14 @@ async function fetchNearbyMoves(
   return (data ?? []) as NearbyMove[];
 }
 
+const PITTSBURGH = { lat: 40.4406, lng: -79.9959 };
+
 export function useNearbyMoves() {
-  const getCoords = useLocationStore((s) => s.getCoords);
+  // Subscribe to coords (not getCoords()) so the feed refetches when GPS resolves.
+  const coords = useLocationStore((s) => s.coords);
   const { category, radiusMeters } = useFilterStore();
 
-  const { lat, lng } = getCoords();
+  const { lat, lng } = coords ?? PITTSBURGH;
 
   return useInfiniteQuery({
     queryKey: queryKeys.moves.nearby(lat, lng, radiusMeters, category),
