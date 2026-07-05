@@ -19,6 +19,7 @@ import { formatFullDate, formatMoveTime, formatMoveDuration, getMoveUrgency, isM
 import { CATEGORY_META } from '@/types/app';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
+import { submitReport } from '@/hooks/useSafety';
 import { queryClient } from '@/lib/queryClient';
 import { queryKeys } from '@/lib/queryClient';
 
@@ -241,6 +242,32 @@ export default function MoveDetailScreen() {
               </View>
             )}
           </View>
+
+          {/* Report — non-creators only */}
+          {!isCreator && (
+            <TouchableOpacity
+              onPress={() => {
+                const reasons = ['Spam or fake event', 'Unsafe or illegal activity', 'Inappropriate content'];
+                Alert.alert('Report this move', 'Reports are reviewed within 24 hours.', [
+                  ...reasons.map((reason) => ({
+                    text: reason,
+                    onPress: async () => {
+                      const ok = await submitReport(userId!, 'move', move.id, reason);
+                      Alert.alert(ok ? 'Report received' : 'Something went wrong', ok
+                        ? 'Thanks for keeping WTM safe.'
+                        : 'Try again in a minute.');
+                    },
+                  })),
+                  { text: 'Cancel', style: 'cancel' as const },
+                ]);
+              }}
+              style={{ alignSelf: 'center', paddingVertical: 6 }}
+            >
+              <Text style={{ color: '#606060', fontSize: 13 }}>
+                <Ionicons name="flag-outline" size={12} color="#606060" />  Report this move
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {/* Creator options */}
           {isCreator && !move.is_cancelled && (

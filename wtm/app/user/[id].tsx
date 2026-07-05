@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/queryClient';
+import { useAuthStore } from '@/store/authStore';
+import { useIsBlocked, useBlockUser, submitReport } from '@/hooks/useSafety';
 import { Avatar } from '@/components/ui/Avatar';
 import { MoveCard } from '@/components/moves/MoveCard';
 import type { Profile, MoveWithCounts } from '@/types/app';
@@ -13,6 +15,61 @@ import type { Profile, MoveWithCounts } from '@/types/app';
 export default function UserProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const myId = useAuthStore((s) => s.user?.id);
+  const { data: isBlocked = false } = useIsBlocked(id);
+  const blockMutation = useBlockUser(id);
+
+  function openSafetyMenu(username: string) {
+    Alert.alert(`@${username}`, undefined, [
+      {
+        text: isBlocked ? 'Unblock' : 'Block user',
+        style: 'destructive',
+        onPress: () => {
+          if (isBlocked) {
+            blockMutation.mutate(false);
+            return;
+          }
+          Alert.alert(
+            'Block user?',
+            "You won't see each other's moves, spots, or profiles.",
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Block',
+                style: 'destructive',
+                onPress: () => {
+                  blockMutation.mutate(true);
+                  router.back();
+                },
+              },
+            ]
+          );
+        },
+      },
+      { text: 'Report user', onPress: () => openReportMenu(username) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  }
+
+  function openReportMenu(username: string) {
+    const reasons = ['Spam or fake account', 'Harassment or hate', 'Inappropriate content'];
+    Alert.alert(
+      `Report @${username}`,
+      'Reports are reviewed within 24 hours.',
+      [
+        ...reasons.map((reason) => ({
+          text: reason,
+          onPress: async () => {
+            const ok = await submitReport(myId!, 'profile', id, reason);
+            Alert.alert(ok ? 'Report received' : 'Something went wrong', ok
+              ? 'Thanks for keeping WTM safe. We review every report.'
+              : 'Try again in a minute.');
+          },
+        })),
+        { text: 'Cancel', style: 'cancel' as const },
+      ]
+    );
+  }
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: queryKeys.profiles.detail(id),
@@ -56,15 +113,51 @@ export default function UserProfileScreen() {
     );
   }
 
+  if (isBlocked) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#0A0A0A' }} edges={['top']}>
+        <View style={{ paddingHorizontal: 20, paddingVertical: 14 }}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FAFAFA" />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 32 }}>
+          <Ionicons name="hand-left-outline" size={40} color="#606060" />
+          <Text style={{ color: '#FAFAFA', fontSize: 18, fontWeight: '800' }}>
+            You've blocked @{profile.username}
+          </Text>
+          <TouchableOpacity
+            onPress={() => blockMutation.mutate(false)}
+            style={{
+              marginTop: 8, paddingHorizontal: 20, height: 44, borderRadius: 22,
+              backgroundColor: '#1E1E1E', borderWidth: 1, borderColor: '#2E2E2E',
+              alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <Text style={{ color: '#A0A0A0', fontWeight: '600' }}>Unblock</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0A0A0A' }} edges={['top']}>
       <View style={{
-        flexDirection: 'row', alignItems: 'center', gap: 12,
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
         paddingHorizontal: 20, paddingVertical: 14,
       }}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#FAFAFA" />
         </TouchableOpacity>
+        {myId !== id && profile && (
+          <TouchableOpacity
+            onPress={() => openSafetyMenu(profile.username)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="ellipsis-horizontal" size={22} color="#A0A0A0" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView

@@ -213,6 +213,12 @@ export interface Database {
         Update: Partial<ReportRow>;
         Relationships: [];
       };
+      blocks: {
+        Row: { blocker_id: string; blocked_id: string; created_at: string };
+        Insert: { blocker_id: string; blocked_id: string; created_at?: string };
+        Update: Partial<{ blocker_id: string; blocked_id: string }>;
+        Relationships: [];
+      };
     };
     Views: {
       moves_with_counts: {
