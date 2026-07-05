@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  Image, Share, Alert, ActivityIndicator, Dimensions,
+  Share, Alert,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useMove, useMoveAttendees } from '@/hooks/useMove';
 import { RSVPButton } from '@/components/moves/RSVPButton';
@@ -22,7 +22,6 @@ import { useAuthStore } from '@/store/authStore';
 import { queryClient } from '@/lib/queryClient';
 import { queryKeys } from '@/lib/queryClient';
 
-const { width, height } = Dimensions.get('window');
 
 export default function MoveDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -102,7 +101,9 @@ export default function MoveDetailScreen() {
             <Image
               source={{ uri: move.cover_image_url }}
               style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={200}
+              cachePolicy="memory-disk"
             />
           ) : (
             <LinearGradient

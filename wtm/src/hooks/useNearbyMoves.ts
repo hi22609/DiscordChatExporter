@@ -1,8 +1,9 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/queryClient';
 import { useLocationStore } from '@/store/locationStore';
 import { useFilterStore } from '@/store/filterStore';
+import { PITTSBURGH } from '@/constants/geo';
 import type { NearbyMove } from '@/types/app';
 
 const PAGE_SIZE = 20;
@@ -27,8 +28,6 @@ async function fetchNearbyMoves(
   return (data ?? []) as NearbyMove[];
 }
 
-const PITTSBURGH = { lat: 40.4406, lng: -79.9959 };
-
 export function useNearbyMoves() {
   // Subscribe to coords (not getCoords()) so the feed refetches when GPS resolves.
   const coords = useLocationStore((s) => s.coords);
@@ -44,5 +43,8 @@ export function useNearbyMoves() {
       lastPage.length === PAGE_SIZE ? allPages.length : undefined,
     initialPageParam: 0,
     staleTime: 1000 * 60,
+    // Keep showing the previous results while a filter/radius change refetches —
+    // the list crossfades instead of collapsing to skeletons.
+    placeholderData: keepPreviousData,
   });
 }

@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { queryClient } from '@/lib/queryClient';
 import { useSessionInit, useAuth } from '@/hooks/useSession';
 import { useLocationInit } from '@/hooks/useLocation';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
@@ -82,10 +83,12 @@ function AuthGate() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <StatusBar style="light" />
-        <AuthGate />
-      </QueryClientProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <StatusBar style="light" />
+          <AuthGate />
+        </QueryClientProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

@@ -238,6 +238,34 @@ the app directly instead of the browser:
 The matching client config already lives in `app.json`
 (`ios.associatedDomains` + `android.intentFilters`).
 
+## Performance & Security Notes
+
+**Feed latency:** `nearby_moves` returns the caller's own RSVP status inline
+(migration 009), so the feed renders join-state with **one** round-trip
+instead of one-per-card. Detail + attendee queries are prefetched on card
+press-in, and the RSVP mutation optimistically patches both the detail and
+every cached feed page.
+
+**Rendering:** `MoveCard` is memoized with an explicit comparator; the feed
+FlatList uses `removeClippedSubviews`, tuned batch/window sizes, and
+`keepPreviousData` so filter changes crossfade instead of collapsing to
+skeletons. All remote images go through `expo-image` (memory+disk cache,
+fade-in transitions, recycling keys).
+
+**Security:**
+- `invite_codes` SELECT is restricted to rows you created — the previous
+  policy allowed authenticated enumeration of valid codes. Validation goes
+  exclusively through the `validate-invite` Edge Function (service role).
+- DB-level rate limits: 10 moves and 20 spots per user per 24h (migration 009).
+- Capacity, username format, title lengths, and RSVP uniqueness are all
+  enforced by constraints/triggers, not just client code.
+- `reports` table (insert-only for members) for community moderation.
+
+**Crash safety:** a root `ErrorBoundary` renders a branded recovery screen and
+routes render crashes through `src/lib/log.ts` (the hook point for Sentry).
+
+**Tests:** `npm test` runs Jest (jest-expo) unit tests for the pure utils.
+
 ## Scaling Beyond Pittsburgh
 
 The architecture is already global-ready:

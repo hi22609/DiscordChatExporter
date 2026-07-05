@@ -11,10 +11,18 @@ interface RSVPButtonProps {
   moveId: string;
   isFull: boolean;
   compact?: boolean;
+  /**
+   * RSVP status already known by the parent (e.g. from nearby_moves).
+   * When provided, the per-button status query is skipped entirely —
+   * feed lists render with zero extra round-trips.
+   */
+  knownStatus?: string | null;
 }
 
-export function RSVPButton({ moveId, isFull, compact = false }: RSVPButtonProps) {
-  const { data: rsvpStatus } = useMyRsvpStatus(moveId);
+export function RSVPButton({ moveId, isFull, compact = false, knownStatus }: RSVPButtonProps) {
+  const hasKnown = knownStatus !== undefined;
+  const { data: fetchedStatus } = useMyRsvpStatus(hasKnown ? '' : moveId);
+  const rsvpStatus = hasKnown ? knownStatus : fetchedStatus;
   const { joinMutation, leaveMutation } = useRSVP(moveId);
   const scale = useSharedValue(1);
 

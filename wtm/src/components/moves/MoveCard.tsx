@@ -1,13 +1,15 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { AttendeePile } from './AttendeePile';
 import { RSVPButton } from './RSVPButton';
+import { prefetchMove } from '@/hooks/useMove';
 import { formatMoveTime, getMoveUrgency } from '@/utils/time';
 import { formatDistance } from '@/utils/distance';
 import { CATEGORY_META } from '@/types/app';
@@ -21,14 +23,14 @@ interface MoveCardProps {
   showRSVP?: boolean;
 }
 
-const { width } = Dimensions.get('window');
-
-export function MoveCard({ move, index = 0, showRSVP = true }: MoveCardProps) {
+function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
   const router = useRouter();
+  const qc = useQueryClient();
   const scale = useSharedValue(1);
   const meta = CATEGORY_META[move.category];
   const urgency = getMoveUrgency(move.starts_at);
   const distanceM = 'distance_m' in move ? move.distance_m : null;
+  const knownStatus = 'my_status' in move ? move.my_status : undefined;
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -36,13 +38,16 @@ export function MoveCard({ move, index = 0, showRSVP = true }: MoveCardProps) {
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(index * 60).springify().damping(18)}
+      entering={FadeInDown.delay(Math.min(index, 6) * 60).springify().damping(18)}
       style={[animStyle]}
     >
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => router.push(`/move/${move.id}`)}
-        onPressIn={() => { scale.value = withSpring(0.97, { damping: 15 }); }}
+        onPressIn={() => {
+          scale.value = withSpring(0.97, { damping: 15 });
+          prefetchMove(qc, move.id);
+        }}
         onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
         className="mb-4 rounded-3xl overflow-hidden"
         style={{ backgroundColor: '#1E1E1E' }}
@@ -53,7 +58,10 @@ export function MoveCard({ move, index = 0, showRSVP = true }: MoveCardProps) {
             <Image
               source={{ uri: move.cover_image_url }}
               style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={180}
+              cachePolicy="memory-disk"
+              recyclingKey={move.id}
             />
           ) : (
             <LinearGradient
@@ -121,6 +129,7 @@ export function MoveCard({ move, index = 0, showRSVP = true }: MoveCardProps) {
                 moveId={move.id}
                 isFull={move.is_full}
                 compact
+                knownStatus={knownStatus}
               />
             )}
           </View>
@@ -129,3 +138,21 @@ export function MoveCard({ move, index = 0, showRSVP = true }: MoveCardProps) {
     </Animated.View>
   );
 }
+
+/**
+ * Memoized: list scrolling re-renders only cards whose data actually changed.
+ * The comparator covers every field the card renders.
+ */
+export const MoveCard = memo(MoveCardInner, (prev, next) => {
+  const a = prev.move, b = next.move;
+  return (
+    a.id === b.id &&
+    a.title === b.title &&
+    a.starts_at === b.starts_at &&
+    a.attendee_count === b.attendee_count &&
+    a.is_full === b.is_full &&
+    a.cover_image_url === b.cover_image_url &&
+    ('my_status' in a ? a.my_status : null) === ('my_status' in b ? b.my_status : null) &&
+    prev.showRSVP === next.showRSVP
+  );
+});

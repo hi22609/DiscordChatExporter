@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-
-const PITTSBURGH = { lat: 40.4406, lng: -79.9959 };
+import { PITTSBURGH } from '@/constants/geo';
 
 interface LocationState {
   coords: { lat: number; lng: number } | null;

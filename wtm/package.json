@@ -15,7 +15,12 @@
     "supabase:start": "supabase start",
     "supabase:reset": "supabase db reset",
     "lint": "eslint . --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": ["**/__tests__/**/*.test.ts"]
   },
   "dependencies": {
     "expo": "~51.0.0",
@@ -40,22 +45,17 @@
     "react-native-gesture-handler": "~2.16.1",
     "react-native-reanimated": "~3.10.1",
     "react-native-maps": "1.14.0",
-    "react-native-svg": "15.2.0",
-    "@gorhom/bottom-sheet": "^4.6.3",
+    "expo-image": "~1.12.9",
     "@supabase/supabase-js": "^2.43.5",
     "@tanstack/react-query": "^5.45.1",
     "zustand": "^4.5.4",
     "react-hook-form": "^7.52.1",
     "zod": "^3.23.8",
     "@hookform/resolvers": "^3.6.0",
-    "react-native-google-places-autocomplete": "^2.5.6",
     "date-fns": "^3.6.0",
     "nativewind": "^4.0.1",
-    "react-native-mmkv": "^2.12.2",
-    "@react-native-async-storage/async-storage": "1.23.1",
     "react-native-modal-datetime-picker": "^17.1.0",
-    "@react-native-datetimepicker/datetimepicker": "8.0.1",
-    "react-native-image-crop-picker": "^0.40.3"
+    "@react-native-community/datetimepicker": "8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
@@ -65,7 +65,9 @@
     "tailwindcss": "^3.4.3",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.0.0",
-    "@types/react-native-maps": "^1.14.0"
+    "jest": "^29.7.0",
+    "jest-expo": "~51.0.0",
+    "@types/jest": "^29.5.12"
   },
   "private": true
 }

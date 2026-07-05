@@ -1,9 +1,29 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import { queryKeys } from '@/lib/queryClient';
 import { useAuthStore } from '@/store/authStore';
-import type { MoveWithCounts } from '@/types/app';
+import type { MoveWithCounts, NearbyMove } from '@/types/app';
+
+/** Optimistically patch a move inside every cached nearby-feed page. */
+function patchFeedCaches(
+  qc: ReturnType<typeof useQueryClient>,
+  moveId: string,
+  patch: (m: NearbyMove) => NearbyMove
+) {
+  qc.setQueriesData<InfiniteData<NearbyMove[]>>(
+    { queryKey: ['moves', 'nearby'] },
+    (data) =>
+      data
+        ? {
+            ...data,
+            pages: data.pages.map((page) =>
+              page.map((m) => (m.id === moveId ? patch(m) : m))
+            ),
+          }
+        : data
+  );
+}
 
 export function useRSVP(moveId: string) {
   const qc = useQueryClient();
@@ -47,6 +67,13 @@ export function useRSVP(moveId: string) {
       );
 
       qc.setQueryData(queryKeys.rsvps.myStatus(moveId), 'going');
+      patchFeedCaches(qc, moveId, (m) => ({
+        ...m,
+        my_status: 'going',
+        attendee_count: m.attendee_count + 1,
+        spots_left: m.spots_left != null ? m.spots_left - 1 : null,
+        is_full: m.max_attendees != null ? m.attendee_count + 1 >= m.max_attendees : false,
+      }));
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
@@ -54,6 +81,13 @@ export function useRSVP(moveId: string) {
         qc.setQueryData(queryKeys.moves.detail(moveId), ctx.prev);
       }
       qc.setQueryData(queryKeys.rsvps.myStatus(moveId), null);
+      patchFeedCaches(qc, moveId, (m) => ({
+        ...m,
+        my_status: null,
+        attendee_count: Math.max(0, m.attendee_count - 1),
+        spots_left: m.spots_left != null ? m.spots_left + 1 : null,
+        is_full: false,
+      }));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     },
     onSettled: () => {
@@ -87,6 +121,13 @@ export function useRSVP(moveId: string) {
           : old
       );
       qc.setQueryData(queryKeys.rsvps.myStatus(moveId), null);
+      patchFeedCaches(qc, moveId, (m) => ({
+        ...m,
+        my_status: null,
+        attendee_count: Math.max(0, m.attendee_count - 1),
+        spots_left: m.spots_left != null ? m.spots_left + 1 : null,
+        is_full: false,
+      }));
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
@@ -94,6 +135,12 @@ export function useRSVP(moveId: string) {
         qc.setQueryData(queryKeys.moves.detail(moveId), ctx.prev);
       }
       qc.setQueryData(queryKeys.rsvps.myStatus(moveId), 'going');
+      patchFeedCaches(qc, moveId, (m) => ({
+        ...m,
+        my_status: 'going',
+        attendee_count: m.attendee_count + 1,
+        spots_left: m.spots_left != null ? m.spots_left - 1 : null,
+      }));
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: queryKeys.moves.detail(moveId) });

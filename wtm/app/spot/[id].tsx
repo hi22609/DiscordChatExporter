@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, Image,
+  View, Text, ScrollView, TouchableOpacity,
   Share, Linking, Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -78,7 +79,7 @@ export default function SpotDetailScreen() {
         {/* Hero */}
         <View style={{ height: 260 }}>
           {spot.cover_image_url ? (
-            <Image source={{ uri: spot.cover_image_url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <Image source={{ uri: spot.cover_image_url }} style={{ width: '100%', height: '100%' }} contentFit="cover" transition={200} cachePolicy="memory-disk" />
           ) : (
             <LinearGradient
               colors={meta.gradient}

@@ -75,6 +75,8 @@ export interface NearbyMove extends MoveWithCounts {
   latitude: number;
   longitude: number;
   distance_m: number;
+  /** Caller's own RSVP status, resolved server-side in nearby_moves — avoids an RPC per card. */
+  my_status: string | null;
 }
 
 export interface Rsvp {

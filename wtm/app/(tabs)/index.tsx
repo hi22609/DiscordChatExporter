@@ -16,6 +16,7 @@ import {
 } from '@/types/app';
 import { formatMoveTime } from '@/utils/time';
 import { formatDistance } from '@/utils/distance';
+import { darkMapStyle } from '@/constants/mapStyle';
 import { RSVPButton } from '@/components/moves/RSVPButton';
 
 const DEFAULT_DELTA = { latitudeDelta: 0.06, longitudeDelta: 0.06 };
@@ -466,14 +467,3 @@ function regionToMeters(region: Region): number {
   return Math.max(region.latitudeDelta, region.longitudeDelta) * 111320;
 }
 
-const darkMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#0a0a0a' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0a0a0a' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#555' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
-  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#222' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#2a2a2a' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#060d18' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-];

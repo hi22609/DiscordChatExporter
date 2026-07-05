@@ -12,6 +12,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useCreateSpot } from '@/hooks/useSpots';
 import { uploadImage } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
+import { miniMapStyle } from '@/constants/mapStyle';
 import { SPOT_CATEGORY_META, type SpotCategory } from '@/types/app';
 
 const SPOT_CATEGORIES = Object.entries(SPOT_CATEGORY_META) as Array<
@@ -275,11 +276,3 @@ function Section({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-const miniMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#0a0a0a' }] },
-  { elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#060d18' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-];

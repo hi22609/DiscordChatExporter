@@ -53,6 +53,11 @@ export function FeedList() {
       showsVerticalScrollIndicator={false}
       onEndReached={onEndReached}
       onEndReachedThreshold={0.4}
+      removeClippedSubviews
+      maxToRenderPerBatch={6}
+      windowSize={7}
+      initialNumToRender={5}
+      updateCellsBatchingPeriod={40}
       ListEmptyComponent={EmptyState}
       ListFooterComponent={
         isFetchingNextPage
