@@ -30,10 +30,10 @@ export function useRSVP(moveId: string) {
   const userId = useAuthStore((s) => s.user?.id);
 
   const joinMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (squadWith: string[] = []) => {
       const { error } = await supabase
         .from('rsvps')
-        .insert({ move_id: moveId, user_id: userId!, status: 'going' });
+        .insert({ move_id: moveId, user_id: userId!, status: 'going', squad_with: squadWith });
       if (error) {
         if (error.message.includes('move_full')) throw new Error('move_full');
         throw error;
@@ -46,7 +46,7 @@ export function useRSVP(moveId: string) {
         })
         .catch((err) => console.warn('rsvp push notify failed', err));
     },
-    onMutate: async () => {
+    onMutate: async (_squadWith: string[]) => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await qc.cancelQueries({ queryKey: queryKeys.moves.detail(moveId) });
 

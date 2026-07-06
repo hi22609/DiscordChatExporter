@@ -15,12 +15,33 @@ interface FormState {
   password: string;
   username: string;
   displayName: string;
+  birthMonth: string;
+  birthDay: string;
+  birthYear: string;
+  socialHandle: string;
 }
 
 interface FieldErrors {
   email?: string;
   password?: string;
   username?: string;
+  birthdate?: string;
+  socialHandle?: string;
+}
+
+function parseAge(month: string, day: string, year: string): number | null {
+  const m = parseInt(month, 10);
+  const d = parseInt(day, 10);
+  const y = parseInt(year, 10);
+  if (isNaN(m) || isNaN(d) || isNaN(y)) return null;
+  if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900) return null;
+  const dob = new Date(y, m - 1, d);
+  if (dob.getMonth() !== m - 1) return null; // invalid day for month
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  const monthDiff = now.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) age--;
+  return age;
 }
 
 function validate(form: FormState): FieldErrors {
@@ -29,6 +50,17 @@ function validate(form: FormState): FieldErrors {
   if (form.password.length < 8) errors.password = 'Password must be at least 8 characters';
   if (!/^[a-z0-9_]{3,20}$/.test(form.username)) {
     errors.username = '3-20 chars, lowercase letters, numbers, underscore only';
+  }
+  if (!form.socialHandle.trim()) {
+    errors.socialHandle = 'Required — keeps everyone accountable';
+  }
+  const age = parseAge(form.birthMonth, form.birthDay, form.birthYear);
+  if (age === null) {
+    errors.birthdate = 'Enter a valid date of birth';
+  } else if (age < 17) {
+    errors.birthdate = 'WTM is for ages 17–25. You\'re not old enough yet.';
+  } else if (age > 25) {
+    errors.birthdate = 'WTM is built for the 17–25 era. Go touch grass 😭';
   }
   return errors;
 }
@@ -39,6 +71,7 @@ export default function SignUpScreen() {
   const pendingInviteCodeId = useAuthStore((s) => s.pendingInviteCodeId);
   const [form, setForm] = useState<FormState>({
     email: '', password: '', username: '', displayName: '',
+    birthMonth: '', birthDay: '', birthYear: '', socialHandle: '',
   });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -48,7 +81,7 @@ export default function SignUpScreen() {
   function update(key: keyof FormState) {
     return (value: string) => {
       setForm((f) => ({ ...f, [key]: key === 'username' ? value.toLowerCase() : value }));
-      setErrors((e) => ({ ...e, [key]: undefined }));
+      setErrors((e) => ({ ...e, [key]: undefined, birthdate: undefined }));
       setServerError(null);
     };
   }
@@ -59,6 +92,8 @@ export default function SignUpScreen() {
       setErrors(validationErrors);
       return;
     }
+
+    const birthdate = `${form.birthYear}-${form.birthMonth.padStart(2, '0')}-${form.birthDay.padStart(2, '0')}`;
 
     setIsLoading(true);
     setServerError(null);
@@ -71,6 +106,8 @@ export default function SignUpScreen() {
           username: form.username.trim(),
           display_name: form.displayName.trim() || form.username.trim(),
           invite_code_id: pendingInviteCodeId,
+          birthdate,
+          social_handle: form.socialHandle.trim().replace(/^@/, ''),
         },
       },
     });
@@ -82,13 +119,14 @@ export default function SignUpScreen() {
         setServerError('An account with this email already exists.');
       } else if (error.message.includes('Username')) {
         setErrors({ username: 'That username is already taken.' });
+      } else if (error.message.includes('age_out_of_range')) {
+        setErrors({ birthdate: 'Age verification failed. WTM is 17–25 only.' });
       } else {
         setServerError(error.message);
       }
       return;
     }
-
-    // Auth gate in _layout.tsx will redirect to (tabs)
+    // Auth gate in _layout.tsx redirects to (tabs)
   }
 
   return (
@@ -167,6 +205,83 @@ export default function SignUpScreen() {
                   </TouchableOpacity>
                 }
               />
+
+              {/* Instagram or Snapchat handle — accountability anchor */}
+              <Field
+                label="Instagram or Snapchat @"
+                value={form.socialHandle}
+                onChangeText={update('socialHandle')}
+                placeholder="yourhandle (no @)"
+                error={errors.socialHandle}
+                autoCapitalize="none"
+                autoCorrect={false}
+                prefix="@"
+              />
+              <Text style={{ color: '#424242', fontSize: 12, marginTop: -8 }}>
+                Keeps our community real. Shown on your profile.
+              </Text>
+
+              {/* Birthday — age gate 17–25 */}
+              <View style={{ gap: 6 }}>
+                <Text style={{ color: '#A0A0A0', fontSize: 13, fontWeight: '600', letterSpacing: 0.3 }}>
+                  DATE OF BIRTH
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      value={form.birthMonth}
+                      onChangeText={(v) => {
+                        update('birthMonth')(v.replace(/\D/g, '').slice(0, 2));
+                      }}
+                      placeholder="MM"
+                      placeholderTextColor="#424242"
+                      keyboardType="number-pad"
+                      maxLength={2}
+                      style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 14, borderWidth: 1,
+                        borderColor: errors.birthdate ? '#EF4444' : '#2E2E2E',
+                        height: 52, textAlign: 'center', color: '#FAFAFA', fontSize: 18, fontWeight: '700',
+                      }}
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      value={form.birthDay}
+                      onChangeText={(v) => update('birthDay')(v.replace(/\D/g, '').slice(0, 2))}
+                      placeholder="DD"
+                      placeholderTextColor="#424242"
+                      keyboardType="number-pad"
+                      maxLength={2}
+                      style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 14, borderWidth: 1,
+                        borderColor: errors.birthdate ? '#EF4444' : '#2E2E2E',
+                        height: 52, textAlign: 'center', color: '#FAFAFA', fontSize: 18, fontWeight: '700',
+                      }}
+                    />
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    <TextInput
+                      value={form.birthYear}
+                      onChangeText={(v) => update('birthYear')(v.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="YYYY"
+                      placeholderTextColor="#424242"
+                      keyboardType="number-pad"
+                      maxLength={4}
+                      style={{
+                        backgroundColor: '#1E1E1E', borderRadius: 14, borderWidth: 1,
+                        borderColor: errors.birthdate ? '#EF4444' : '#2E2E2E',
+                        height: 52, textAlign: 'center', color: '#FAFAFA', fontSize: 18, fontWeight: '700',
+                      }}
+                    />
+                  </View>
+                </View>
+                {errors.birthdate && (
+                  <Text style={{ color: '#EF4444', fontSize: 12 }}>{errors.birthdate}</Text>
+                )}
+                <Text style={{ color: '#424242', fontSize: 12 }}>
+                  WTM is 17–25 only. We verify this.
+                </Text>
+              </View>
             </View>
 
             {serverError && (
@@ -179,21 +294,15 @@ export default function SignUpScreen() {
               onPress={handleSignUp}
               disabled={isLoading}
               style={{
-                backgroundColor: '#FF6B35',
-                height: 56,
-                borderRadius: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: isLoading ? 0.7 : 1,
-                marginTop: 8,
+                backgroundColor: '#FF6B35', height: 56, borderRadius: 28,
+                alignItems: 'center', justifyContent: 'center',
+                opacity: isLoading ? 0.7 : 1, marginTop: 8,
               }}
             >
               {isLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 17 }}>
-                  Let's go
-                </Text>
+                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 17 }}>Let's go</Text>
               )}
             </TouchableOpacity>
 
@@ -218,6 +327,7 @@ interface FieldProps {
   secureTextEntry?: boolean;
   keyboardType?: any;
   autoCapitalize?: any;
+  autoCorrect?: boolean;
 }
 
 function Field({ label, value, onChangeText, placeholder, error, prefix, suffix, ...rest }: FieldProps) {
@@ -227,19 +337,12 @@ function Field({ label, value, onChangeText, placeholder, error, prefix, suffix,
         {label.toUpperCase()}
       </Text>
       <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#1E1E1E',
-        borderRadius: 14,
-        borderWidth: 1,
+        flexDirection: 'row', alignItems: 'center',
+        backgroundColor: '#1E1E1E', borderRadius: 14, borderWidth: 1,
         borderColor: error ? '#EF4444' : '#2E2E2E',
-        paddingHorizontal: 16,
-        height: 52,
-        gap: 8,
+        paddingHorizontal: 16, height: 52, gap: 8,
       }}>
-        {prefix && (
-          <Text style={{ color: '#606060', fontSize: 16 }}>{prefix}</Text>
-        )}
+        {prefix && <Text style={{ color: '#606060', fontSize: 16 }}>{prefix}</Text>}
         <TextInput
           value={value}
           onChangeText={onChangeText}
@@ -250,9 +353,7 @@ function Field({ label, value, onChangeText, placeholder, error, prefix, suffix,
         />
         {suffix}
       </View>
-      {error && (
-        <Text style={{ color: '#EF4444', fontSize: 12 }}>{error}</Text>
-      )}
+      {error && <Text style={{ color: '#EF4444', fontSize: 12 }}>{error}</Text>}
     </View>
   );
 }

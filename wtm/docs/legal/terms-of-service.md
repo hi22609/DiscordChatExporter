@@ -6,8 +6,12 @@ By creating an account or using WTM you agree to these terms.
 
 ## 1. Who can use WTM
 
-You must be **17 or older** and join through a valid invite. One account per
-person. You're responsible for what happens on your account.
+You must be **between 17 and 25 years old** and join through a valid invite.
+One account per person. You're responsible for what happens on your account.
+Providing a false date of birth is grounds for immediate permanent termination.
+
+You must supply a valid Instagram or Snapchat handle at signup. It is
+displayed on your profile and serves as your community accountability anchor.
 
 ## 2. Your content
 
