@@ -41,8 +41,11 @@ identity, and a trust-first positioning (open-source, no tracking, no account).
 
 ## Roadmap — ordered by ROI
 
-### P0 — Identity (requires owner, ~30 minutes, highest ROI of anything on this list)
-1. **New dedicated repo** with a real name (candidates: `cyclesat`, `blocksignal`, `orangecycle`, `thebitcoinclock`). Move `bitcoin-app/` contents to its root. History matters less than the URL.
+### P0 — Identity (requires owner, ~15 minutes, highest ROI of anything on this list)
+**STATUS: FULLY PREPARED.** The `standalone` branch of this repo IS the migration:
+app at repo root, `migrate.sh` one-shot URL rewrite (tested), MIT license, and a
+CI-backed verification suite. Follow `MIGRATION.md` on that branch — copy-paste.
+1. **New dedicated repo** with a real name (candidates: `thebitcoinclock`, `cyclesat`, `blocksignal`). History matters less than the URL.
 2. **Custom domain** (~$10/yr) → GitHub Pages custom domain. Unlocks: real robots.txt, clean share links, Search Console, Cloudflare edge (free tier: caching, privacy-respecting analytics, security headers).
 3. Update OG tags, canonical, README, share captions to the new URL (one grep-replace — prepared for).
 
