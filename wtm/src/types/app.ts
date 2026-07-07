@@ -87,6 +87,25 @@ export interface NearbyMove extends MoveWithCounts {
   distance_m: number;
   /** Caller's own RSVP status, resolved server-side in nearby_moves — avoids an RPC per card. */
   my_status: string | null;
+  /** RSVP velocity score — drives the "Trending 🔥" badge. Higher = filling faster. */
+  hot_score: number;
+}
+
+export type ActivityType =
+  | 'rsvp_on_your_move'
+  | 'squad_confirmed'
+  | 'move_trending'
+  | 'move_starting_soon';
+
+export interface ActivityItem {
+  id: string;
+  type: ActivityType;
+  actor_id: string | null;
+  move_id: string | null;
+  read: boolean;
+  created_at: string;
+  actor: { username: string; avatar_url: string | null } | null;
+  move: { title: string; category: string } | null;
 }
 
 export interface Rsvp {

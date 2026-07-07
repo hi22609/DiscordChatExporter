@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { Badge } from '@/components/ui/Badge';
 import { AttendeePile } from './AttendeePile';
 import { RSVPButton } from './RSVPButton';
 import { prefetchMove } from '@/hooks/useMove';
@@ -17,6 +16,9 @@ import type { NearbyMove, MoveWithCounts } from '@/types/app';
 
 type Move = NearbyMove | MoveWithCounts;
 
+// Hot score threshold: moves above this show "Trending 🔥"
+const HOT_THRESHOLD = 1.5;
+
 interface MoveCardProps {
   move: Move;
   index?: number;
@@ -24,13 +26,20 @@ interface MoveCardProps {
 }
 
 function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
-  const router = useRouter();
-  const qc = useQueryClient();
-  const scale = useSharedValue(1);
-  const meta = CATEGORY_META[move.category];
+  const router  = useRouter();
+  const qc      = useQueryClient();
+  const scale   = useSharedValue(1);
+  const meta    = CATEGORY_META[move.category];
   const urgency = getMoveUrgency(move.starts_at);
-  const distanceM = 'distance_m' in move ? move.distance_m : null;
+
+  const distanceM   = 'distance_m' in move ? move.distance_m : null;
   const knownStatus = 'my_status' in move ? move.my_status : undefined;
+  const hotScore    = 'hot_score' in move ? (move as NearbyMove).hot_score : 0;
+  const isTrending  = hotScore >= HOT_THRESHOLD && !move.is_full;
+
+  const fillPct = move.max_attendees && move.max_attendees > 0
+    ? Math.min(100, Math.round((move.attendee_count / move.max_attendees) * 100))
+    : null;
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -39,7 +48,7 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
   return (
     <Animated.View
       entering={FadeInDown.delay(Math.min(index, 6) * 60).springify().damping(18)}
-      style={[animStyle]}
+      style={animStyle}
     >
       <TouchableOpacity
         activeOpacity={1}
@@ -49,11 +58,10 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
           prefetchMove(qc, move.id);
         }}
         onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
-        className="mb-4 rounded-3xl overflow-hidden"
-        style={{ backgroundColor: '#1E1E1E' }}
+        style={{ backgroundColor: '#1A1A1A', borderRadius: 24, overflow: 'hidden', marginBottom: 14 }}
       >
         {/* Cover image or gradient */}
-        <View style={{ height: 160 }}>
+        <View style={{ height: 164 }}>
           {move.cover_image_url ? (
             <Image
               source={{ uri: move.cover_image_url }}
@@ -70,67 +78,104 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
               end={{ x: 1, y: 1 }}
               style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}
             >
-              <Text style={{ fontSize: 56 }}>{meta.emoji}</Text>
+              <Text style={{ fontSize: 58 }}>{meta.emoji}</Text>
             </LinearGradient>
           )}
 
-          {/* Overlay badges */}
-          <View style={{ position: 'absolute', top: 12, left: 12, right: 12, flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Badge
-              label={meta.label}
-              variant="subtle"
-            />
+          {/* Top badge row */}
+          <View style={{
+            position: 'absolute', top: 12, left: 12, right: 12,
+            flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
+          }}>
+            {/* Category pill */}
+            <View style={{
+              backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 20,
+              paddingHorizontal: 10, paddingVertical: 5,
+              flexDirection: 'row', alignItems: 'center', gap: 5,
+              borderWidth: 0.5, borderColor: 'rgba(255,255,255,.12)',
+            }}>
+              <Text style={{ fontSize: 13 }}>{meta.emoji}</Text>
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{meta.label}</Text>
+            </View>
+
+            {/* Status badges */}
             <View style={{ flexDirection: 'row', gap: 6 }}>
-              {urgency === 'now' && <Badge label="Happening now" variant="now" />}
-              {urgency === 'soon' && <Badge label="Starting soon" variant="warning" />}
-              {move.is_full && <Badge label="Full" variant="danger" />}
+              {isTrending && (
+                <View style={{ backgroundColor: '#FF6B35', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>🔥 Trending</Text>
+                </View>
+              )}
+              {urgency === 'now' && !isTrending && (
+                <View style={{ backgroundColor: '#22C55E', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>● Happening now</Text>
+                </View>
+              )}
+              {urgency === 'soon' && !isTrending && (
+                <View style={{ backgroundColor: '#F59E0B', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>Starting soon</Text>
+                </View>
+              )}
+              {move.is_full && (
+                <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: '#EF4444' }}>
+                  <Text style={{ color: '#EF4444', fontSize: 12, fontWeight: '800' }}>Full</Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
 
         {/* Content */}
-        <View className="p-4 gap-3">
-          <View className="gap-1">
-            <Text
-              className="text-ink font-bold text-lg"
-              numberOfLines={2}
-            >
+        <View style={{ padding: 16, gap: 12 }}>
+          {/* Title + time */}
+          <View style={{ gap: 4 }}>
+            <Text style={{ color: '#FAFAFA', fontWeight: '800', fontSize: 17, letterSpacing: -0.3 }} numberOfLines={2}>
               {move.title}
             </Text>
-
-            <View className="flex-row items-center gap-3">
-              <View className="flex-row items-center gap-1">
-                <Ionicons name="time-outline" size={13} color="#A0A0A0" />
-                <Text className="text-ink-muted text-sm">{formatMoveTime(move.starts_at)}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="time-outline" size={13} color="#606060" />
+                <Text style={{ color: '#808080', fontSize: 13 }}>{formatMoveTime(move.starts_at)}</Text>
               </View>
-
-              <View className="flex-row items-center gap-1">
-                <Ionicons name="location-outline" size={13} color="#A0A0A0" />
-                <Text className="text-ink-muted text-sm" numberOfLines={1} style={{ maxWidth: 140 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="location-outline" size={13} color="#606060" />
+                <Text style={{ color: '#808080', fontSize: 13 }} numberOfLines={1} style={{ maxWidth: 140 }}>
                   {move.location_name}
                 </Text>
               </View>
-
               {distanceM != null && (
-                <Text className="text-ink-subtle text-sm">{formatDistance(distanceM)}</Text>
+                <Text style={{ color: '#444', fontSize: 13 }}>{formatDistance(distanceM)}</Text>
               )}
             </View>
           </View>
 
-          {/* Footer */}
-          <View className="flex-row items-center justify-between">
-            <AttendeePile
-              attendees={[]}
-              totalCount={move.attendee_count}
-              size={26}
-            />
+          {/* Capacity bar — only when max_attendees is set */}
+          {fillPct !== null && (
+            <View style={{ gap: 5 }}>
+              <View style={{
+                height: 4, borderRadius: 2,
+                backgroundColor: '#252525', overflow: 'hidden',
+              }}>
+                <View style={{
+                  height: '100%',
+                  width: `${fillPct}%`,
+                  borderRadius: 2,
+                  backgroundColor: fillPct >= 80 ? '#EF4444' : fillPct >= 50 ? '#F59E0B' : '#22C55E',
+                }} />
+              </View>
+              <Text style={{ color: '#505050', fontSize: 11, fontWeight: '500' }}>
+                {move.spots_left != null && move.spots_left > 0
+                  ? `${move.spots_left} spot${move.spots_left !== 1 ? 's' : ''} left`
+                  : move.is_full ? 'Fully packed' : `${fillPct}% full`
+                }
+              </Text>
+            </View>
+          )}
+
+          {/* Footer: attendees + RSVP */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <AttendeePile attendees={[]} totalCount={move.attendee_count} size={26} />
             {showRSVP && (
-              <RSVPButton
-                moveId={move.id}
-                isFull={move.is_full}
-                compact
-                knownStatus={knownStatus}
-              />
+              <RSVPButton moveId={move.id} isFull={move.is_full} compact knownStatus={knownStatus} />
             )}
           </View>
         </View>
@@ -139,20 +184,20 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
   );
 }
 
-/**
- * Memoized: list scrolling re-renders only cards whose data actually changed.
- * The comparator covers every field the card renders.
- */
 export const MoveCard = memo(MoveCardInner, (prev, next) => {
   const a = prev.move, b = next.move;
+  const aHot = 'hot_score' in a ? (a as NearbyMove).hot_score : 0;
+  const bHot = 'hot_score' in b ? (b as NearbyMove).hot_score : 0;
   return (
-    a.id === b.id &&
-    a.title === b.title &&
-    a.starts_at === b.starts_at &&
-    a.attendee_count === b.attendee_count &&
-    a.is_full === b.is_full &&
+    a.id              === b.id              &&
+    a.title           === b.title           &&
+    a.starts_at       === b.starts_at       &&
+    a.attendee_count  === b.attendee_count  &&
+    a.spots_left      === b.spots_left      &&
+    a.is_full         === b.is_full         &&
     a.cover_image_url === b.cover_image_url &&
+    aHot              === bHot              &&
     ('my_status' in a ? a.my_status : null) === ('my_status' in b ? b.my_status : null) &&
-    prev.showRSVP === next.showRSVP
+    prev.showRSVP     === next.showRSVP
   );
 });
