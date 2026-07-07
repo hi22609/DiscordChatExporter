@@ -24,6 +24,16 @@ export interface Profile {
   follower_count: number;
   following_count: number;
   moves_created: number;
+  /** ISO date string (YYYY-MM-DD). Null until age-gate screen completes. */
+  birthdate: string | null;
+  /** Instagram or Snapchat @handle — accountability anchor. */
+  social_handle: string | null;
+  /** Set true by admin when account violates community rules. */
+  is_banned: boolean;
+  /** Set true by admin after manual photo review. Unlocks invite-code issuance. */
+  photo_approved: boolean;
+  /** '17-20' | '21-25' — derived from birthdate by DB trigger. */
+  age_range: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -13,7 +13,7 @@ import '../global.css';
 SplashScreen.preventAutoHideAsync();
 
 function AuthGate() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, profile } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -24,17 +24,30 @@ function AuthGate() {
     if (isLoading) return;
     SplashScreen.hideAsync();
 
-    const inAuthGroup = segments[0] === '(auth)';
-    // The invite deep-link route is public — a signed-out friend must be able
-    // to open it so it can validate their code and route them into sign-up.
+    const inAuthGroup  = segments[0] === '(auth)';
+    const inVerifyAge  = inAuthGroup && segments[1] === 'verify-age';
     const inPublicRoute = segments[0] === 'i';
 
-    if (!isAuthenticated && !inAuthGroup && !inPublicRoute) {
-      router.replace('/(auth)/welcome');
-    } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
+    // ---- Not authenticated ----
+    if (!isAuthenticated) {
+      if (!inAuthGroup && !inPublicRoute) router.replace('/(auth)/welcome');
+      return;
     }
-  }, [isAuthenticated, isLoading, segments]);
+
+    // ---- Authenticated but no profile yet (e.g. DB trigger still running) ----
+    // Stay put — next render cycle will have the profile.
+    if (!profile) return;
+
+    // ---- Age gate: profile exists but no birthdate ----
+    if (!profile.birthdate) {
+      if (!inVerifyAge) router.replace('/(auth)/verify-age');
+      return;
+    }
+
+    // ---- Fully onboarded — leave auth group ----
+    if (inAuthGroup) router.replace('/(tabs)');
+
+  }, [isAuthenticated, isLoading, profile, segments]);
 
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0A0A0A' } }}>
@@ -42,39 +55,24 @@ function AuthGate() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="move/[id]"
-        options={{
-          presentation: 'card',
-          animation: 'slide_from_right',
-        }}
+        options={{ presentation: 'card', animation: 'slide_from_right' }}
       />
       <Stack.Screen
         name="user/[id]"
-        options={{
-          presentation: 'card',
-          animation: 'slide_from_right',
-        }}
+        options={{ presentation: 'card', animation: 'slide_from_right' }}
       />
       <Stack.Screen
         name="invite-friends"
-        options={{
-          presentation: 'modal',
-          animation: 'slide_from_bottom',
-        }}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
       <Stack.Screen name="i/[code]" options={{ animation: 'fade' }} />
       <Stack.Screen
         name="spot/[id]"
-        options={{
-          presentation: 'card',
-          animation: 'slide_from_right',
-        }}
+        options={{ presentation: 'card', animation: 'slide_from_right' }}
       />
       <Stack.Screen
         name="add-spot"
-        options={{
-          presentation: 'modal',
-          animation: 'slide_from_bottom',
-        }}
+        options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
       />
     </Stack>
   );
