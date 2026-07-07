@@ -1,0 +1,13 @@
+{
+  "name": "btc-cycle-content-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Generates daily value-first social posts grounded in the live Bitcoin cycle position.",
+  "scripts": {
+    "generate": "node generate.mjs --count 100"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0"
+  }
+}
