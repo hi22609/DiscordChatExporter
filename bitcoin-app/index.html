@@ -20,6 +20,22 @@
 <meta name="twitter:description" content="Where are we in the cycle, and what do you do about it? Free, open, runs in your browser. No bank, no permission.">
 <meta name="twitter:image" content="https://hi22609.github.io/DiscordChatExporter/bitcoin-app/icons/og-image.png">
 
+<link rel="canonical" href="https://hi22609.github.io/DiscordChatExporter/bitcoin-app/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Bitcoin Cycle Tracker",
+  "url": "https://hi22609.github.io/DiscordChatExporter/bitcoin-app/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "See exactly where Bitcoin is in its 4-year cycle and what to do about it. Live signal, stack calculator, on-chain intel — 100% in your browser, no account, no tracking.",
+  "browserRequirements": "Requires JavaScript",
+  "featureList": "Cycle signal, DCA planner, stack calculator, sell ladder, retirement planner, live mempool data, halving countdown, education"
+}
+</script>
+
 <!-- PWA / Add to Home Screen support -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a0a0f">
@@ -30,7 +46,6 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -2045,8 +2060,8 @@
     <!-- INSTITUTIONAL ACCUMULATION ALERT -->
     <div class="confidence-banner">
       <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px">Market Intelligence</div>
-      <div class="confidence-title">While You're Reading This, BlackRock Is Buying</div>
-      <div class="confidence-body">Institutional giants spent billions acquiring Bitcoin at prices you can match today — from your phone, in minutes, with no board approval. MicroStrategy's average cost basis: $67K. BlackRock's IBIT: 320,000+ BTC under custody. El Salvador declared it legal tender. The accumulation phase of this cycle is narrowing. Every week you wait is a week they don't.</div>
+      <div class="confidence-title">The Biggest Players Already Made Their Move</div>
+      <div class="confidence-body">BlackRock, Fidelity, and a wave of corporations spent the last two years accumulating Bitcoin through ETFs and treasuries — the same asset you can hold directly, with no fund, no fee, no permission. That's the quiet story of this cycle: the institutions arrived. What you do with that information is your call — this page just makes sure you can see it clearly.</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
         <button class="confidence-cta" onclick="showPage('portfolio',document.querySelectorAll('.nav-item')[3])">Calculate My Stack →</button>
         <button class="confidence-cta" style="background:rgba(247,147,26,0.12);color:var(--orange);border:1px solid rgba(247,147,26,0.35)" onclick="showPage('intel',document.querySelectorAll('.nav-item')[6])">See Who's Holding →</button>
@@ -2167,7 +2182,7 @@
           <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚠ Supply Shock <button class="help-btn" onclick="showTip('supply-shock')" style="border-color:rgba(255,69,96,0.4);color:rgba(255,69,96,0.7)">?</button></div>
           <div style="font-size:17px;font-weight:900;margin-top:3px;letter-spacing:-0.4px">Exchanges Are Running Out</div>
         </div>
-        <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE DATA</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.5px">INDUSTRY ESTIMATES</div>
       </div>
       <div class="supply-shock-grid">
         <div class="supply-shock-cell">
@@ -3282,17 +3297,10 @@
       <div class="brief-mindset" id="briefMindset"></div>
     </div>
 
-    <!-- EMAIL SIGNUP -->
+    <!-- INSTALL / ALERTS HONESTY CARD -->
     <div class="email-signup-card">
-      <div class="email-signup-card-title">📬 Get Cycle Alerts in Your Inbox</div>
-      <div class="email-signup-card-sub">Weekly brief + instant alerts when score crosses BUY/SELL thresholds. 100% free.</div>
-      <div class="email-inline-wrap" id="emailInlineWrap">
-        <input type="email" id="emailInlineInput" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitEmailInline()">
-        <button onclick="submitEmailInline()">Notify Me</button>
-      </div>
-      <div class="email-inline-success" id="emailInlineSuccess">
-        ✅ You're in! Weekly brief starts this Sunday.
-      </div>
+      <div class="email-signup-card-title">📲 Alerts live on this device</div>
+      <div class="email-signup-card-sub">Your alerts are checked every time you open the app — nothing leaves your phone, no account, no email. For one-tap access, add this app to your home screen: <b>Share → Add to Home Screen</b>.</div>
     </div>
 
     <div class="section-header">Smart Alerts</div>
@@ -4173,7 +4181,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div>
           <div style="font-size:14px;font-weight:800">Large Transaction Tracker</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">Every transaction on Bitcoin is visible to anyone, forever</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Largest real transactions seen this session · tap any txid to verify it on-chain</div>
         </div>
         <div style="font-size:10px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:4px"><span class="live-dot"></span>LIVE</div>
       </div>
@@ -4300,8 +4308,8 @@
     <!-- INTELLIGENCE FEED -->
     <div class="intel-card" style="margin-top:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:14px;font-weight:800">Intelligence Feed</div>
-        <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Curated</div>
+        <div style="font-size:14px;font-weight:800">The Milestones That Matter</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px">Verifiable · Dated</div>
       </div>
       <div class="news-feed" id="newsFeed"></div>
     </div>
@@ -4357,70 +4365,52 @@
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <div class="nav-item active" onclick="showPage('home',this)">
+  <div class="nav-item active" data-page="home" onclick="showPage('home',this)">
     <span class="nav-icon">₿</span>
     <span class="nav-label">Cycle</span>
   </div>
-  <div class="nav-item" onclick="showPage('chart',this)">
+  <div class="nav-item" data-page="chart" onclick="showPage('chart',this)">
     <span class="nav-icon">📈</span>
     <span class="nav-label">Chart</span>
   </div>
-  <div class="nav-item" onclick="showPage('calc',this)">
+  <div class="nav-item" data-page="calc" onclick="showPage('calc',this)">
     <span class="nav-icon">🧮</span>
     <span class="nav-label">Calc</span>
   </div>
-  <div class="nav-item" onclick="showPage('portfolio',this)">
+  <div class="nav-item" data-page="portfolio" onclick="showPage('portfolio',this)">
     <span class="nav-icon">📊</span>
     <span class="nav-label">Stack</span>
   </div>
-  <div class="nav-item" onclick="showPage('alerts',this)">
+  <div class="nav-item" data-page="alerts" onclick="showPage('alerts',this)">
     <span class="nav-icon">🔔</span>
     <span class="nav-label">Alerts</span>
   </div>
-  <div class="nav-item" onclick="showPage('learn',this)">
+  <div class="nav-item" data-page="learn" onclick="showPage('learn',this)">
     <span class="nav-icon">🎓</span>
     <span class="nav-label">Learn</span>
   </div>
-  <div class="nav-item" onclick="showPage('intel',this)">
+  <div class="nav-item" data-page="intel" onclick="showPage('intel',this)">
     <span class="nav-icon">🐋</span>
     <span class="nav-label">Intel</span>
   </div>
-  <div class="nav-item" onclick="showPage('future',this)">
+  <div class="nav-item" data-page="future" onclick="showPage('future',this)">
     <span class="nav-icon">🚀</span>
     <span class="nav-label">Future</span>
   </div>
 </div>
 
-<!-- EMAIL CAPTURE MODAL -->
-<div class="email-overlay" id="emailOverlay">
-  <div class="email-modal">
-    <div class="email-modal-close" onclick="closeEmailModal()">✕</div>
-    <div class="email-modal-glow">₿</div>
-    <div class="email-modal-badge">Free Early Access</div>
-    <div class="email-modal-title">Never Miss a Cycle Move</div>
-    <div class="email-modal-sub">Get the weekly brief straight to your inbox — when to buy, hold, and take profit based on the 1070/364 cycle.</div>
-    <div class="email-benefits">
-      <div class="email-benefit"><div class="email-benefit-icon">📊</div>Weekly cycle score + what action to take</div>
-      <div class="email-benefit"><div class="email-benefit-icon">🎯</div>Alerts when score crosses BUY &amp; SELL thresholds</div>
-      <div class="email-benefit"><div class="email-benefit-icon">🚀</div>Phase change notice before the big moves</div>
-    </div>
-    <div class="email-form" id="emailModalForm">
-      <div class="email-input-wrap">
-        <input type="email" id="emailModalInput" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitEmailModal()">
-      </div>
-      <button class="email-cta" onclick="submitEmailModal()">Get Free Cycle Alerts →</button>
-      <span class="email-dismiss" onclick="dismissEmailModal()">Maybe later — I'll check manually</span>
-    </div>
-    <div class="email-success" id="emailModalSuccess">
-      <div class="email-success-icon">🎉</div>
-      <div class="email-success-title">You're on the list!</div>
-      <div class="email-success-sub">Your first weekly brief arrives this Sunday. We'll alert you the moment the cycle score crosses a major threshold.</div>
-      <button class="email-success-close" onclick="closeEmailModal()">Got it, let's go →</button>
-    </div>
-  </div>
-</div>
-
+<!-- Chart.js loads at end of body so first paint never waits on the CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// ── RESILIENCE: charts are enhancement, never a point of failure ──
+// If the Chart.js CDN is unreachable (offline, blocked network, CDN outage),
+// every calculator and page must still work. This no-op shim keeps the app
+// alive; chart panels simply render empty until the library is available.
+if (typeof Chart === 'undefined') {
+  window.Chart = class { constructor() { this.data = { datasets: [{}, {}, {}] }; this.options = {}; } destroy() {} update() {} };
+  window.Chart.register = function () {};
+}
+
 // ── CONSTANTS — BOTTOM-ANCHORED 1070/364 CYCLE ───────────────
 // The cycle runs: BOTTOM -> 1070 days up -> TOP -> 364 days down -> BOTTOM.
 // Anchored to the last real cycle bottom so the next bottom lands Oct 5, 2026.
@@ -6175,6 +6165,12 @@ function showPage(name, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   el.classList.add('active');
+  // Deep links: keep the URL in sync (#calc, #future, ...) so every page is
+  // shareable and the browser back button works. replaceState-free guard:
+  if (location.hash !== '#' + name) {
+    _routingInternal = true;
+    location.hash = name === 'home' ? '' : name;
+  }
   if (name === 'portfolio') { updatePortfolio(); updatePortfolioMilestones(); updatePriceSim(); }
   if (name === 'chart') { updatePriceSim(); }
   if (name === 'calc') { closeCalcView(); }
@@ -6187,68 +6183,9 @@ function showPage(name, el) {
   if (name === 'future') { buildFuturePage(); initFutureBrain(); updateTminus(); }
 }
 
-// ── EMAIL CAPTURE ─────────────────────────────────────────────
-function openEmailModal() {
-  document.getElementById('emailOverlay').classList.add('open');
-}
-function closeEmailModal() {
-  document.getElementById('emailOverlay').classList.remove('open');
-}
-function dismissEmailModal() {
-  closeEmailModal();
-  localStorage.setItem('email_dismissed_at', Date.now());
-}
-function maybeShowEmailModal() {
-  if (localStorage.getItem('email_subscribed')) return;
-  const dismissedAt = parseInt(localStorage.getItem('email_dismissed_at') || '0', 10);
-  if (dismissedAt && Date.now() - dismissedAt < 86400000) return; // wait 24h after dismiss
-  openEmailModal();
-}
-function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-function saveEmail(email) {
-  const list = JSON.parse(localStorage.getItem('email_list') || '[]');
-  if (!list.includes(email)) list.push(email);
-  localStorage.setItem('email_list', JSON.stringify(list));
-  localStorage.setItem('email_subscribed', email);
-}
-function submitEmailModal() {
-  const input = document.getElementById('emailModalInput');
-  const email = input.value.trim();
-  if (!validateEmail(email)) {
-    input.style.borderColor = 'var(--red)';
-    input.focus();
-    setTimeout(() => { input.style.borderColor = ''; }, 1500);
-    return;
-  }
-  saveEmail(email);
-  // Mirror to inline form if on Alerts page
-  const inlineInput = document.getElementById('emailInlineInput');
-  if (inlineInput) inlineInput.value = email;
-  document.getElementById('emailModalForm').classList.add('hide');
-  document.getElementById('emailModalSuccess').classList.add('show');
-  restoreEmailUI();
-}
-function submitEmailInline() {
-  const input = document.getElementById('emailInlineInput');
-  const email = input.value.trim();
-  if (!validateEmail(email)) {
-    input.style.borderColor = 'var(--red)';
-    input.focus();
-    setTimeout(() => { input.style.borderColor = ''; }, 1500);
-    return;
-  }
-  saveEmail(email);
-  document.getElementById('emailInlineWrap').style.display = 'none';
-  document.getElementById('emailInlineSuccess').classList.add('show');
-}
-function restoreEmailUI() {
-  const email = localStorage.getItem('email_subscribed');
-  if (!email) return;
-  // Inline form: show success state
-  const wrap = document.getElementById('emailInlineWrap');
-  const success = document.getElementById('emailInlineSuccess');
-  if (wrap && success) { wrap.style.display = 'none'; success.classList.add('show'); }
-}
+// (Email capture removed. It collected addresses into localStorage — a void —
+//  while telling users a weekly brief was coming. We don't fake features.
+//  A real newsletter returns only when there's a real backend sending it.)
 
 // ── PHASE THEME ──────────────────────────────────────────────
 const PHASE_COLORS = ['#7c3aed','#6366f1','#06b6d4','#f59e0b','#f7931a','#ef4444','#ec4899','#8b5cf6','#7c3aed'];
@@ -6592,61 +6529,98 @@ function buildHoldersTable() {
 }
 
 // ── WHALE ALERT FEED ─────────────────────────────────────────
-const WHALE_EXCHANGES = ['Binance','Coinbase','Kraken','OKX','Bybit','Unknown Wallet','Bitfinex','Gemini'];
-let _whaleEntries = [];
+// ── LARGE TRANSACTION TRACKER — REAL on-chain data ────────────────────
+// Polls mempool.space's recent-transactions endpoint (free, CORS-open) and
+// keeps a rolling board of the largest transactions seen this session.
+// Every entry is a real txid, linked to the public explorer. If the API is
+// unreachable we say so — we never fabricate transactions.
+let _whaleTxs = new Map();      // txid -> {btc, usd, feeRate, seenAt}
 let _whaleIntervalId = null;
 
 function randBetween(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
-function genWhaleEntry() {
-  const btc = randBetween(50, 4800);
-  const price = livePrice || 100000;
-  const usd = btc * price;
-  const minsAgo = randBetween(1, 55);
-  const from = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
-  const to   = WHALE_EXCHANGES[randBetween(0, WHALE_EXCHANGES.length - 1)];
-  const usdStr = usd >= 1e9 ? (usd/1e9).toFixed(2) + 'B' : (usd/1e6).toFixed(1) + 'M';
-  const size = btc >= 1000 ? 'LARGE' : btc >= 300 ? 'MED' : 'SMALL';
-  const sizeColor = btc >= 1000 ? 'var(--orange)' : btc >= 300 ? 'var(--yellow)' : 'var(--muted)';
-  return `<div class="whale-entry">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <div>
-        <span class="whale-amount">${btc.toLocaleString()} BTC</span>
-        <span class="whale-usd"> · $${usdStr}</span>
+function renderWhaleFeed() {
+  const feed = document.getElementById('whaleFeed');
+  if (!feed) return;
+  const rows = [..._whaleTxs.values()].sort((a, b) => b.btc - a.btc).slice(0, 10);
+  if (!rows.length) return;
+  feed.innerHTML = rows.map(tx => {
+    const usdStr = tx.usd >= 1e9 ? (tx.usd / 1e9).toFixed(2) + 'B' : tx.usd >= 1e6 ? (tx.usd / 1e6).toFixed(1) + 'M' : Math.round(tx.usd / 1e3) + 'K';
+    const size = tx.btc >= 100 ? 'LARGE' : tx.btc >= 10 ? 'MED' : 'SMALL';
+    const sizeColor = tx.btc >= 100 ? 'var(--orange)' : tx.btc >= 10 ? 'var(--yellow)' : 'var(--muted)';
+    const mins = Math.max(0, Math.round((Date.now() - tx.seenAt) / 60000));
+    const ago = mins < 1 ? 'just now' : mins + 'm ago';
+    return `<div class="whale-entry">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div>
+          <span class="whale-amount">${tx.btc.toLocaleString('en-US', { maximumFractionDigits: 2 })} BTC</span>
+          <span class="whale-usd"> · $${usdStr}</span>
+        </div>
+        <span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.06);color:${sizeColor}">${size}</span>
       </div>
-      <span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.06);color:${sizeColor}">${size}</span>
-    </div>
-    <div style="font-size:10px;color:var(--muted);margin-top:3px">${from} → ${to} · ${minsAgo}m ago</div>
-  </div>`;
+      <div style="font-size:10px;color:var(--muted);margin-top:3px">
+        <a href="https://mempool.space/tx/${tx.txid}" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:underline dotted">${tx.txid.slice(0, 8)}…${tx.txid.slice(-6)}</a>
+        · ${tx.feeRate} sat/vB · ${ago}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchWhaleTxs() {
+  try {
+    const r = await fetch('https://mempool.space/api/mempool/recent');
+    if (!r.ok) throw new Error('http ' + r.status);
+    const txs = await r.json(); // [{txid, fee, vsize, value}] — value in sats
+    const price = livePrice || 100000;
+    for (const t of txs) {
+      if (!t.txid || !t.value) continue;
+      const btc = t.value / 1e8;
+      if (btc < 0.5) continue; // board tracks meaningful size only
+      _whaleTxs.set(t.txid, {
+        txid: t.txid, btc, usd: btc * price,
+        feeRate: t.vsize ? Math.round(t.fee / t.vsize) : 0,
+        seenAt: _whaleTxs.get(t.txid)?.seenAt || Date.now(),
+      });
+    }
+    // keep the 40 largest to bound memory; render shows top 10
+    if (_whaleTxs.size > 40) {
+      const keep = [..._whaleTxs.values()].sort((a, b) => b.btc - a.btc).slice(0, 40);
+      _whaleTxs = new Map(keep.map(t => [t.txid, t]));
+    }
+    renderWhaleFeed();
+  } catch (e) {
+    const feed = document.getElementById('whaleFeed');
+    if (feed && _whaleTxs.size === 0) {
+      feed.innerHTML = `<div class="whale-entry" style="text-align:center;padding:16px 0;color:var(--muted);font-size:12px">
+        Live feed unavailable — mempool.space unreachable.<br>We show real transactions or nothing.
+      </div>`;
+    }
+  }
 }
 
 function initWhaleAlert() {
   const feed = document.getElementById('whaleFeed');
   if (!feed) return;
   if (_whaleIntervalId) return; // guard: already running
-  _whaleEntries = Array.from({length: 8}, genWhaleEntry);
-  feed.innerHTML = _whaleEntries.join('');
-  _whaleIntervalId = setInterval(() => {
-    const feed = document.getElementById('whaleFeed');
-    if (!feed) return;
-    _whaleEntries.unshift(genWhaleEntry());
-    if (_whaleEntries.length > 12) _whaleEntries.pop();
-    feed.innerHTML = _whaleEntries.join('');
-  }, 5000);
+  fetchWhaleTxs();
+  _whaleIntervalId = setInterval(fetchWhaleTxs, 30000);
 }
 
 // ── NEWS FEED ────────────────────────────────────────────────
+// Curated CONTEXT — established, verifiable facts with real dates.
+// This is deliberately NOT a fake "live news feed": every claim below is a
+// documented milestone you can verify. `when` is the actual period it happened.
 const NEWS_ITEMS = [
-  { headline: 'MicroStrategy adds 11,000 BTC — now holds 214,400 BTC in corporate treasury', source: 'CORPORATE', sentiment: 'bullish', h: 2 },
-  { headline: 'BlackRock IBIT records $1.2B single-day inflow — largest since launch', source: 'ETF MARKETS', sentiment: 'bullish', h: 4 },
-  { headline: 'AI inference companies settling compute costs on crypto payment rails', source: 'AI × CRYPTO', sentiment: 'bullish', h: 1 },
-  { headline: 'El Salvador adds 300 BTC — nation-state accumulation continues', source: 'SOVEREIGN', sentiment: 'bullish', h: 7 },
-  { headline: 'Bitcoin mining difficulty hits all-time high — hash rate at 741 EH/s', source: 'MINING', sentiment: 'bullish', h: 3 },
-  { headline: "Fidelity Digital Assets: 'Institutions now treat Bitcoin as primary reserve'", source: 'INSTITUTIONAL', sentiment: 'bullish', h: 5 },
-  { headline: 'Lightning Network capacity passes 5,000 BTC — payment volume accelerating', source: 'LAYER 2', sentiment: 'bullish', h: 6 },
-  { headline: 'Galaxy Digital launches BTC treasury product for Fortune 500 companies', source: 'INSTITUTIONAL', sentiment: 'bullish', h: 8 },
-  { headline: "Warren Buffett: 'I still don't own Bitcoin' — Berkshire maintains cash position", source: 'TRADITIONAL FINANCE', sentiment: 'bearish', h: 11 },
-  { headline: 'SEC approves Bitcoin ETF options expansion — derivatives market deepening', source: 'REGULATION', sentiment: 'bullish', h: 13 },
+  { headline: 'Spot Bitcoin ETFs approved in the US — BlackRock, Fidelity and others launch', source: 'REGULATION', sentiment: 'bullish', when: 'Jan 2024' },
+  { headline: 'Fourth halving: block reward cut to 3.125 BTC — new supply halved overnight', source: 'PROTOCOL', sentiment: 'bullish', when: 'Apr 2024' },
+  { headline: 'MicroStrategy (Strategy) surpasses 200,000 BTC in corporate treasury', source: 'CORPORATE', sentiment: 'bullish', when: '2024' },
+  { headline: 'BlackRock IBIT becomes the fastest ETF in history to reach $50B in assets', source: 'ETF MARKETS', sentiment: 'bullish', when: '2024' },
+  { headline: 'El Salvador holds Bitcoin as legal tender and keeps accumulating', source: 'SOVEREIGN', sentiment: 'bullish', when: '2021 →' },
+  { headline: 'Network hash rate sets repeated all-time highs — security budget keeps climbing', source: 'MINING', sentiment: 'bullish', when: 'ongoing' },
+  { headline: 'Bitcoin breaks $100,000 for the first time in history', source: 'MARKETS', sentiment: 'bullish', when: 'Dec 2024' },
+  { headline: "Warren Buffett has never bought Bitcoin — Berkshire holds record cash instead", source: 'TRADITIONAL FINANCE', sentiment: 'bearish', when: 'ongoing' },
+  { headline: 'US SEC approves options on spot Bitcoin ETFs — derivatives market deepens', source: 'REGULATION', sentiment: 'bullish', when: '2024' },
+  { headline: '~19.8M of 21M BTC already mined — less than 6% of all Bitcoin left to issue', source: 'SUPPLY', sentiment: 'bullish', when: 'now' },
 ];
 let _newsFeedBuilt = false;
 
@@ -6655,12 +6629,11 @@ function buildNewsFeed() {
   const el = document.getElementById('newsFeed');
   if (!el) return;
   el.innerHTML = NEWS_ITEMS.map(item => {
-    const timeStr = item.h < 24 ? `${item.h}h ago` : `${Math.floor(item.h/24)}d ago`;
     return `<div class="news-item ${item.sentiment}">
       <div class="news-headline">${item.headline}</div>
       <div class="news-meta">
         <span class="news-source">${item.source}</span>
-        <span class="news-time">${timeStr}</span>
+        <span class="news-time">${item.when}</span>
         <span class="news-badge ${item.sentiment}">${item.sentiment === 'bullish' ? 'BULLISH' : 'BEARISH'}</span>
       </div>
     </div>`;
@@ -7588,6 +7561,20 @@ async function shareSignal() {
   }, 'image/png');
 }
 
+// ── HASH ROUTER — deep links + back button ─────────────────────
+let _routingInternal = false;
+function routeFromHash() {
+  const name = (location.hash || '#home').slice(1) || 'home';
+  const nav = document.querySelector('.nav-item[data-page="' + name + '"]');
+  if (nav && !document.getElementById('page-' + name)?.classList.contains('active')) {
+    showPage(name, nav);
+  }
+}
+window.addEventListener('hashchange', () => {
+  if (_routingInternal) { _routingInternal = false; return; }
+  routeFromHash();
+});
+
 // ── INIT ─────────────────────────────────────────────────────
 initCoin3D();            // centerpiece first — never gated by anything that can fail
 updateCycleUI();
@@ -7612,7 +7599,6 @@ calcMultiCycle();
 buildStrategy();
 updatePortfolioMilestones();
 loadSaved();
-restoreEmailUI();
 initChainAnim();
 initCycleRing();
 calcTimeMachine();
@@ -7622,13 +7608,13 @@ calcWealthTier();
 initParticleNetwork();
 initOrbitRing();
 updatePriceSim();
+routeFromHash();            // honor deep links like #calc / #future on load
 
 tickDebtCounter();
 setInterval(updateCountdown, 1000);
 setInterval(fetchPrice, 60000);
 setInterval(fetchFearGreed, 600000); // Fear & Greed updates ~hourly; poll every 10 min
 setInterval(tickDebtCounter, 70);     // live money-printer counter on the Red Pill page
-setTimeout(maybeShowEmailModal, 30000); // show email capture after 30s on first visit
 
 // ── TIP / JARGON EXPLAINER SYSTEM ────────────────────────────────
 const TIPS = {
@@ -7789,6 +7775,13 @@ function initCycleRingTap() {
   canvas.title = 'Tap any segment to learn about that phase';
 }
 setTimeout(initCycleRingTap, 600);
+
+// ── SERVICE WORKER — offline + instant repeat loads ─────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {/* non-fatal */});
+  });
+}
 </script>
 </body>
 </html>
