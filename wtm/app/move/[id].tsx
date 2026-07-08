@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useMove, useMoveAttendees } from '@/hooks/useMove';
+import { useMove, useMoveAttendees, useMyRsvpStatus } from '@/hooks/useMove';
 import { RSVPButton } from '@/components/moves/RSVPButton';
 import { AttendeePile } from '@/components/moves/AttendeePile';
 import { Avatar } from '@/components/ui/Avatar';
@@ -31,6 +31,8 @@ export default function MoveDetailScreen() {
 
   const { data: move, isLoading } = useMove(id);
   const { data: attendees = [] } = useMoveAttendees(id, 12);
+  const { data: myStatus } = useMyRsvpStatus(id);
+  const isGoing = myStatus === 'going';
 
   // Realtime subscription — live attendee count updates
   useEffect(() => {
@@ -54,6 +56,14 @@ export default function MoveDetailScreen() {
     await Share.share({
       title: move.title,
       message: `What's the move? This: ${move.title} — ${formatMoveTime(move.starts_at)} at ${move.location_name}. Pull up: https://whatsthemove.app/move/${move.id}`,
+    });
+  }
+
+  async function handleCrewShare() {
+    if (!move) return;
+    await Share.share({
+      title: `Roll with me to ${move.title}`,
+      message: `Pulling up to "${move.title}" ${formatMoveTime(move.starts_at)} 🔥 you should come\nhttps://whatsthemove.app/move/${move.id}`,
     });
   }
 
@@ -301,17 +311,35 @@ export default function MoveDetailScreen() {
             <RSVPButton moveId={move.id} isFull={move.is_full} />
           </View>
         )}
-        <TouchableOpacity
-          onPress={handleShare}
-          style={{
-            width: 48, height: 48, borderRadius: 24,
-            backgroundColor: '#1E1E1E',
-            alignItems: 'center', justifyContent: 'center',
-            borderWidth: 1, borderColor: '#2E2E2E',
-          }}
-        >
-          <Ionicons name="share-outline" size={20} color="#A0A0A0" />
-        </TouchableOpacity>
+        {isGoing ? (
+          <TouchableOpacity
+            onPress={handleCrewShare}
+            style={{
+              height: 48, paddingHorizontal: 16, borderRadius: 24,
+              backgroundColor: '#FF6B3515',
+              alignItems: 'center', justifyContent: 'center',
+              flexDirection: 'row', gap: 7,
+              borderWidth: 1.5, borderColor: '#FF6B3540',
+            }}
+          >
+            <Ionicons name="link-outline" size={18} color="#FF6B35" />
+            <Text style={{ color: '#FF6B35', fontWeight: '700', fontSize: 14 }}>
+              Bring the crew
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={handleShare}
+            style={{
+              width: 48, height: 48, borderRadius: 24,
+              backgroundColor: '#1E1E1E',
+              alignItems: 'center', justifyContent: 'center',
+              borderWidth: 1, borderColor: '#2E2E2E',
+            }}
+          >
+            <Ionicons name="share-outline" size={20} color="#A0A0A0" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Back button */}

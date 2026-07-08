@@ -30,23 +30,21 @@ export function useRSVP(moveId: string) {
   const userId = useAuthStore((s) => s.user?.id);
 
   const joinMutation = useMutation({
-    mutationFn: async (squadWith: string[] = []) => {
+    mutationFn: async () => {
       const { error } = await supabase
         .from('rsvps')
-        .insert({ move_id: moveId, user_id: userId!, status: 'going', squad_with: squadWith });
+        .insert({ move_id: moveId, user_id: userId!, status: 'going' });
       if (error) {
         if (error.message.includes('move_full')) throw new Error('move_full');
         throw error;
       }
-      // Notify the move creator — fire-and-forget. The RSVP row is already
-      // committed; a notification hiccup must not fail (and roll back) the join.
       supabase.functions
         .invoke('send-push-notification', {
           body: { type: 'new_rsvp', moveId, actorId: userId },
         })
         .catch((err) => console.warn('rsvp push notify failed', err));
     },
-    onMutate: async (_squadWith: string[]) => {
+    onMutate: async () => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await qc.cancelQueries({ queryKey: queryKeys.moves.detail(moveId) });
 
