@@ -12,6 +12,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useMove, useMoveAttendees, useMyRsvpStatus } from '@/hooks/useMove';
 import { RSVPButton } from '@/components/moves/RSVPButton';
 import { AttendeePile } from '@/components/moves/AttendeePile';
+import { HypeReactions } from '@/components/moves/HypeReactions';
+import { MoveChat } from '@/components/moves/MoveChat';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -210,6 +212,9 @@ export default function MoveDetailScreen() {
             </View>
           )}
 
+          {/* Hype reactions */}
+          <HypeReactions moveId={id} />
+
           {/* Attendees */}
           <View style={{ gap: 14 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,6 +254,42 @@ export default function MoveDetailScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
+              </View>
+            )}
+          </View>
+
+          {/* Move Chat — gated to people who are going */}
+          <View style={{
+            backgroundColor: '#141414', borderRadius: 20,
+            overflow: 'hidden',
+            borderWidth: 1, borderColor: '#1E1E1E',
+          }}>
+            <View style={{
+              paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12,
+              borderBottomWidth: 0.5, borderBottomColor: '#1E1E1E',
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <Text style={{ color: '#FAFAFA', fontSize: 17, fontWeight: '800' }}>
+                Move chat
+              </Text>
+              {isGoing && (
+                <Text style={{ color: '#606060', fontSize: 12, fontWeight: '500' }}>
+                  {move.attendee_count} members
+                </Text>
+              )}
+            </View>
+
+            {isGoing || isCreator ? (
+              <MoveChat moveId={id} />
+            ) : (
+              <View style={{ padding: 24, alignItems: 'center', gap: 8 }}>
+                <Text style={{ fontSize: 28 }}>🔒</Text>
+                <Text style={{ color: '#FAFAFA', fontWeight: '700', fontSize: 15 }}>
+                  Join to see the chat
+                </Text>
+                <Text style={{ color: '#606060', fontSize: 13, textAlign: 'center', lineHeight: 19 }}>
+                  The crew going to this move are already coordinating in here.
+                </Text>
               </View>
             )}
           </View>

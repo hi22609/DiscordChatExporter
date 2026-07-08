@@ -9,7 +9,7 @@ export type MoveCategory =
   | 'social'
   | 'other';
 
-export type RsvpStatus = 'going' | 'maybe' | 'left';
+export type RsvpStatus = 'going' | 'waitlist' | 'left';
 
 export interface Profile {
   id: string;
@@ -89,13 +89,39 @@ export interface NearbyMove extends MoveWithCounts {
   my_status: string | null;
   /** RSVP velocity score — drives the "Trending 🔥" badge. Higher = filling faster. */
   hot_score: number;
+  /** How many people are currently queued on the waitlist. */
+  waitlist_count: number;
+  /** Up to 3 invite-tree peers (crew) who are going — drives social proof on cards. */
+  crew_going: Array<{ username: string; avatar_url: string | null }>;
 }
 
 export type ActivityType =
   | 'rsvp_on_your_move'
   | 'squad_confirmed'
   | 'move_trending'
-  | 'move_starting_soon';
+  | 'move_starting_soon'
+  | 'waitlist_promoted';
+
+export type ReactionEmoji = '🔥' | '❤️' | '👀' | '💯' | '🙌';
+
+export interface Reaction {
+  emoji: ReactionEmoji;
+  total: number;
+  i_reacted: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  move_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  profile: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
 
 export interface ActivityItem {
   id: string;

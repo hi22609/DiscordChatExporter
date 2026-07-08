@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { AttendeePile } from './AttendeePile';
 import { RSVPButton } from './RSVPButton';
+import { HypeReactions } from './HypeReactions';
 import { prefetchMove } from '@/hooks/useMove';
 import { formatMoveTime, getMoveUrgency } from '@/utils/time';
 import { formatDistance } from '@/utils/distance';
@@ -32,10 +33,12 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
   const meta    = CATEGORY_META[move.category];
   const urgency = getMoveUrgency(move.starts_at);
 
-  const distanceM   = 'distance_m' in move ? move.distance_m : null;
-  const knownStatus = 'my_status' in move ? move.my_status : undefined;
-  const hotScore    = 'hot_score' in move ? (move as NearbyMove).hot_score : 0;
-  const isTrending  = hotScore >= HOT_THRESHOLD && !move.is_full;
+  const distanceM    = 'distance_m' in move ? move.distance_m : null;
+  const knownStatus  = 'my_status' in move ? move.my_status : undefined;
+  const hotScore     = 'hot_score' in move ? (move as NearbyMove).hot_score : 0;
+  const isTrending   = hotScore >= HOT_THRESHOLD && !move.is_full;
+  const crewGoing    = 'crew_going' in move ? (move as NearbyMove).crew_going : [];
+  const waitlistCount = 'waitlist_count' in move ? (move as NearbyMove).waitlist_count : 0;
 
   const fillPct = move.max_attendees && move.max_attendees > 0
     ? Math.min(100, Math.round((move.attendee_count / move.max_attendees) * 100))
@@ -171,13 +174,39 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
             </View>
           )}
 
+          {/* Crew social proof */}
+          {crewGoing.length > 0 && (
+            <View style={{
+              flexDirection: 'row', alignItems: 'center', gap: 7,
+              backgroundColor: '#FF6B3510', borderRadius: 12,
+              paddingHorizontal: 10, paddingVertical: 6,
+              borderWidth: 1, borderColor: '#FF6B3520',
+            }}>
+              <Text style={{ fontSize: 13 }}>👥</Text>
+              <Text style={{ color: '#FF6B35', fontSize: 12, fontWeight: '700' }}>
+                {crewGoing[0].username}
+                {crewGoing.length > 1 ? ` + ${crewGoing.length - 1} from your crew` : ' from your crew'} is going
+              </Text>
+            </View>
+          )}
+
           {/* Footer: attendees + RSVP */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <AttendeePile attendees={[]} totalCount={move.attendee_count} size={26} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AttendeePile attendees={[]} totalCount={move.attendee_count} size={26} />
+              {waitlistCount > 0 && move.is_full && (
+                <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '600' }}>
+                  {waitlistCount} waitlisted
+                </Text>
+              )}
+            </View>
             {showRSVP && (
               <RSVPButton moveId={move.id} isFull={move.is_full} compact knownStatus={knownStatus} />
             )}
           </View>
+
+          {/* Hype reactions */}
+          <HypeReactions moveId={move.id} />
         </View>
       </TouchableOpacity>
     </Animated.View>
