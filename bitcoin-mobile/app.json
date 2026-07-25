@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "BTC Cycle Tracker",
+    "slug": "btc-cycle-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0a0a0f",
+    "splash": {
+      "backgroundColor": "#0a0a0f"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.btccycletracker.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Not used"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a0a0f"
+      },
+      "package": "com.btccycletracker.app"
+    },
+    "plugins": [
+      "expo-notifications"
+    ]
+  }
+}
