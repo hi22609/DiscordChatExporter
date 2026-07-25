@@ -2405,6 +2405,20 @@
         Bitcoin's halving cuts miner rewards every ~1,460 days. After each halving it takes <strong style="color:var(--orange)">~1,070 days</strong> for the demand surge to push to a new ATH, then <strong style="color:var(--red)">~364 days</strong> of bear market (distribution → denial → capitulation → despair → bottom). The cycle score (0–100) measures where we are. <strong style="color:var(--green)">Under 40 is historically the best time to buy.</strong>
       </div>
     </div>
+
+    <!-- MODEL VS HISTORY — THE RECEIPTS -->
+    <div class="chart-card" id="backtestCard">
+      <div class="chart-title">Model vs. History — The Receipts <button class="help-btn" onclick="showTip('backtest')">?</button></div>
+      <div class="chart-caption">The same 1,434-day clock this entire app runs on, laid over 12 years of real Bitcoin prices. <span style="color:var(--green);font-weight:700">Green lines</span> = where the model says bottoms land. <span style="color:var(--red);font-weight:700">Red lines</span> = where it says tops land. Judge it yourself.</div>
+      <div class="chart-wrap" style="height:240px">
+        <canvas id="backtestChart"></canvas>
+      </div>
+      <div id="backtestSummary" style="text-align:center;font-size:13px;font-weight:700;color:var(--orange);margin-top:12px"></div>
+      <div id="backtestTable" style="margin-top:10px"></div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)">
+        <b>Honesty notes:</b> the model's parameters were tuned on these same cycles — this table shows the pattern is <b>consistent</b>, not that the future must obey it. Prices are approximate month-end closes (±a few %), stored openly in this page's source for anyone to audit or correct. A pattern that held four times can still break the fifth. Not financial advice.
+      </div>
+    </div>
   </div>
 
   <!-- PAGE: STACK CALCULATOR -->
@@ -7575,11 +7589,155 @@ window.addEventListener('hashchange', () => {
   routeFromHash();
 });
 
+// ── BACKTEST: MODEL VS HISTORY ─────────────────────────────────
+// Approximate BTC month-end closes (USD), 2013–2025. Rounded to ~3 significant
+// figures — used for the log-scale backtest visual only. Openly stored here so
+// anyone can audit or correct them. Compiled from public historical data.
+const BTC_MONTHLY = [
+  20,33,93,139,128,97,106,141,141,204,1113,732,               // 2013
+  806,550,458,446,627,640,583,478,387,338,376,320,            // 2014
+  217,254,244,236,230,263,284,230,236,314,377,430,            // 2015
+  369,437,416,448,531,673,624,574,610,700,745,963,            // 2016
+  970,1180,1080,1350,2290,2480,2870,4740,4340,6470,9950,13900,// 2017
+  10200,10400,6940,9240,7500,6400,7730,7030,6630,6320,4020,3740, // 2018
+  3440,3820,4100,5320,8560,10820,10090,9590,8290,9150,7560,7190, // 2019
+  9350,8600,6440,8630,9450,9140,11350,11680,10780,13780,19700,28990, // 2020
+  33110,45140,58920,57750,37330,35040,41630,47170,43790,61320,57010,46310, // 2021
+  38480,43190,45540,37710,31790,19940,23340,20050,19430,20490,17170,16550, // 2022
+  23140,23130,28480,29270,27220,30480,29230,25930,26970,34670,37710,42270, // 2023
+  42580,61200,71330,60640,67490,62680,64620,58970,63330,70220,96450,93430, // 2024
+  102400,84350,82550,94200,104600,107100,115800,108200,114000,110100,91500,88000, // 2025
+];
+const BT_START_YEAR = 2013;
+
+// Real historical turning points (date, intraday extreme, note)
+const BT_ACTUALS = [
+  { kind: 'top',    actual: '2013-11-30', price: '$1,163' },
+  { kind: 'bottom', actual: '2015-01-14', price: '$152' },
+  { kind: 'top',    actual: '2017-12-17', price: '$19,783' },
+  { kind: 'bottom', actual: '2018-12-15', price: '$3,122' },
+  { kind: 'top',    actual: '2021-11-10', price: '$69,000' },
+  { kind: 'bottom', actual: '2022-11-21', price: '$15,480', note: 'anchor cycle' },
+  { kind: 'top',    actual: '2025-10-06', price: '~$126,200' },
+];
+
+// Model event dates — computed from the SAME constants the whole app runs on,
+// so this table can never drift from the model it is testing.
+function btModelEvents() {
+  const ev = [];
+  const bottom = k => new Date(ANCHOR_BOTTOM.getTime() + k * CYCLE_LEN * DAY_MS);
+  ev.push({ kind: 'top', model: new Date(bottom(-2).getTime() - DESCENT_DAYS * DAY_MS) });
+  for (let k = -2; k <= 0; k++) {
+    ev.push({ kind: 'bottom', model: bottom(k) });
+    ev.push({ kind: 'top', model: new Date(bottom(k).getTime() + ASCENT_DAYS * DAY_MS) });
+  }
+  return ev; // chronological: T13, B14, T17, B18, T21, B22, T25
+}
+
+function btDateToIndex(d) {
+  return (d.getUTCFullYear() - BT_START_YEAR) * 12 + d.getUTCMonth() + (d.getUTCDate() - 1) / 30.44;
+}
+const btFmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+const backtestMarkerPlugin = {
+  id: 'btMarkers',
+  afterDatasetsDraw(chart) {
+    const x = chart.scales.x, area = chart.chartArea;
+    if (!x || !area) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    for (const ev of btModelEvents()) {
+      const px = x.getPixelForValue(btDateToIndex(ev.model));
+      if (px < area.left || px > area.right) continue;
+      ctx.beginPath();
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = ev.kind === 'bottom' ? 'rgba(0,208,132,0.75)' : 'rgba(255,69,96,0.75)';
+      ctx.moveTo(px, area.top); ctx.lineTo(px, area.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '800 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = ev.kind === 'bottom' ? 'rgba(0,208,132,0.95)' : 'rgba(255,69,96,0.95)';
+      ctx.fillText(ev.kind === 'bottom' ? 'B' : 'T', px, area.top + 9);
+    }
+    ctx.restore();
+  }
+};
+
+let backtestChart = null;
+function buildBacktest() {
+  // The receipts table renders even if Chart.js is unavailable.
+  const events = btModelEvents();
+  let sumAbs = 0;
+  const rows = BT_ACTUALS.map((a, i) => {
+    const m = events[i];
+    const gap = Math.round((new Date(a.actual + 'T00:00:00Z') - m.model) / DAY_MS);
+    sumAbs += Math.abs(gap);
+    return { ...a, modelDate: m.model, gap };
+  });
+  const avg = (sumAbs / rows.length).toFixed(0);
+
+  const sEl = document.getElementById('backtestSummary');
+  if (sEl) sEl.textContent = `${rows.length} major turning points across 12 years — average miss: ${avg} days on a fixed 1,434-day clock`;
+
+  const tEl = document.getElementById('backtestTable');
+  if (tEl) {
+    const row = (r) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px">
+      <div style="min-width:0">
+        <div style="font-weight:800;color:${r.kind === 'bottom' ? 'var(--green)' : 'var(--red)'}">${r.kind === 'bottom' ? '▼ Bottom' : '▲ Top'}${r.note ? ' <span style="color:var(--muted);font-weight:600">(' + r.note + ')</span>' : ''}</div>
+        <div style="color:var(--muted);font-size:11px;margin-top:1px">model: ${btFmt(r.modelDate)} · actual: ${btFmt(new Date(r.actual + 'T00:00:00Z'))} @ ${r.price}</div>
+      </div>
+      <div style="flex-shrink:0;font-weight:900;font-variant-numeric:tabular-nums;color:${Math.abs(r.gap) <= 10 ? 'var(--green)' : Math.abs(r.gap) <= 21 ? 'var(--yellow)' : 'var(--orange)'}">${Math.abs(r.gap)}d ${r.gap === 0 ? '🎯' : r.gap > 0 ? 'late' : 'early'}</div>
+    </div>`;
+    const nextBottom = new Date(ANCHOR_BOTTOM.getTime() + (ASCENT_DAYS + DESCENT_DAYS) * DAY_MS);
+    tEl.innerHTML = rows.map(row).join('') + `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;font-size:12px">
+      <div><div style="font-weight:800;color:var(--green)">▼ Next bottom</div>
+      <div style="color:var(--muted);font-size:11px;margin-top:1px">model: ${btFmt(nextBottom)} · actual: we find out together</div></div>
+      <div style="flex-shrink:0;font-weight:900;color:var(--muted)">pending</div>
+    </div>`;
+  }
+
+  const canvas = document.getElementById('backtestChart');
+  if (!canvas || backtestChart) return;
+  const labels = BTC_MONTHLY.map((_, i) => {
+    const y = BT_START_YEAR + Math.floor(i / 12), mo = i % 12;
+    return mo === 0 ? String(y) : '';
+  });
+  backtestChart = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: BTC_MONTHLY,
+        borderColor: '#f7931a',
+        borderWidth: 1.6,
+        pointRadius: 0,
+        tension: 0.25,
+        fill: false,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        y: { type: 'logarithmic', grid: { color: 'rgba(255,255,255,0.05)' },
+             ticks: { color: '#8f8fa8', font: { size: 9 }, maxTicksLimit: 5,
+                      callback: v => v >= 1000 ? '$' + (v / 1000) + 'K' : '$' + v } },
+        x: { grid: { display: false },
+             ticks: { color: '#8f8fa8', font: { size: 9 }, autoSkip: false,
+                      callback: function (v, i) { return this.getLabelForValue(v) || null; } } },
+      },
+    },
+    plugins: [backtestMarkerPlugin],
+  });
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 initCoin3D();            // centerpiece first — never gated by anything that can fail
 updateCycleUI();
 buildSmallChart();
 buildBigChart();
+buildBacktest();
 fetchPrice();
 fetchFearGreed();
 updateCountdown();
@@ -7662,6 +7820,11 @@ const TIPS = {
     title: '⏳ What is the Mempool?',
     body: 'The mempool is the "waiting room" for Bitcoin transactions. When you send Bitcoin, your transaction sits in the mempool until miners pick it up and add it to the blockchain.\n\nBusy mempool = lots of activity, higher fees to jump the queue.\nEmpty mempool = quiet market, cheap fees.',
     example: 'Like waiting at a restaurant. Small mempool = no wait, seated right away. Large mempool = busy night, takes longer, might tip more to get faster service.'
+  },
+  'backtest': {
+    title: '🧾 What is the backtest?',
+    body: 'A backtest checks a model against history: if this 1,434-day cycle clock had been running for the last 12 years, where would it have called the tops and bottoms — and where did they actually land?\n\nEvery model date in the table is computed live from the same constants this app uses. Every actual date is a documented market event you can verify.\n\nOne honest caveat: the model was tuned on these same cycles. Consistency with the past is evidence the pattern exists — not proof the future will obey it.',
+    example: 'Best call: the Oct 6, 2025 top — the model named the exact day. Worst: the Dec 2013 top, 27 days off. Average miss across 12 years: about two weeks.'
   },
   'supply-shock': {
     title: '⚡ What is a Supply Shock?',
