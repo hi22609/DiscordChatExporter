@@ -15,17 +15,17 @@ const {chromium} = require('playwright-core');
   const ok=[];
   // full nav cycle x2 (loop leak check)
   for(let r=0;r<2;r++){
-    await frame.click('#scr-moves .tab:nth-child(2)'); await page.waitForTimeout(500); // map
-    await frame.click('#scr-map .tab:nth-child(3)'); await page.waitForTimeout(300); // friends
-    await frame.click('#scr-friends .tab:nth-child(4)'); await page.waitForTimeout(300); // profile
-    await frame.click('#scr-profile .tab:first-child'); await page.waitForTimeout(300); // moves
+    await frame.click('#scr-moves .tab[onclick*=\"map\"]'); await page.waitForTimeout(500); // map
+    await frame.click('#scr-map .tab[onclick*=\"friends\"]'); await page.waitForTimeout(300); // friends
+    await frame.click('#scr-friends .tab[onclick*=\"profile\"]'); await page.waitForTimeout(300); // profile
+    await frame.click('#scr-profile .tab[onclick*=\"moves\"]'); await page.waitForTimeout(300); // moves
   }
   // after cycling on/off map twice, is there still just one loop?
-  await frame.click('#scr-moves .tab:nth-child(2)'); await page.waitForTimeout(500);
+  await frame.click('#scr-moves .tab[onclick*=\"map\"]'); await page.waitForTimeout(500);
   const loops = await frame.evaluate(()=>{const o=requestAnimationFrame;let c=0;window.requestAnimationFrame=f=>{c++;return o(f)};return new Promise(r=>setTimeout(()=>{window.requestAnimationFrame=o;r(c)},500))});
   ok.push('loops after 2 on/off map cycles (want ~30): '+loops);
   // story
-  await frame.click('#scr-map .tab:first-child'); await page.waitForTimeout(400);
+  await frame.click('#scr-map .tab[onclick*=\"moves\"]'); await page.waitForTimeout(400);
   await frame.click('.story'); await page.waitForTimeout(700);
   ok.push('story viewer open: '+(await frame.locator('#story-viewer.open').count()));
   await frame.click('.sv-close'); await page.waitForTimeout(300);

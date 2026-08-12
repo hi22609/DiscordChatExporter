@@ -44,9 +44,9 @@ const VIEWS = [
     await page.screenshot({ path: `${OUT}/beta-welcome-mobile-${theme}-after.png` });
     await f.click('button.wlc-btn'); await page.waitForTimeout(800);
     await page.screenshot({ path: `${OUT}/beta-feed-mobile-${theme}-after.png` });
-    await f.click('#scr-moves .tab:nth-child(2)'); await page.waitForTimeout(1100);
+    await f.click('#scr-moves .tab[onclick*=\"map\"]'); await page.waitForTimeout(1100);
     await page.screenshot({ path: `${OUT}/beta-map-mobile-${theme}-after.png` });
-    await f.click('#scr-map .tab:first-child'); await page.waitForTimeout(400);
+    await f.click('#scr-map .tab[onclick*=\"moves\"]'); await page.waitForTimeout(400);
     await f.click('.card'); await page.waitForTimeout(700);
     await page.screenshot({ path: `${OUT}/beta-movesheet-mobile-${theme}-after.png` });
     await page.close();
