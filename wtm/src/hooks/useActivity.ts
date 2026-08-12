@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { log } from '@/lib/log';
 import { useAuthStore } from '@/store/authStore';
 import type { ActivityItem } from '@/types/app';
 
@@ -74,6 +75,9 @@ export function useUnreadCount() {
   });
 }
 
-export async function markAllRead(userId: string) {
-  await supabase.rpc('mark_activity_read', { uid: userId });
+// Takes no argument on purpose: the function derives the user from auth.uid()
+// server-side. Passing a caller-supplied id let anyone clear anyone's feed.
+export async function markAllRead() {
+  const { error } = await supabase.rpc('mark_activity_read');
+  if (error) log.warn('activity', `mark_activity_read failed: ${error.message}`);
 }

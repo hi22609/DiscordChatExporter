@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/authStore';
 import type { ChatMessage } from '@/types/app';
+import { log } from '@/lib/log';
 
 const PAGE = 30;
 
@@ -45,7 +46,13 @@ export function useMoveChat(moveId: string) {
 
   // Mark read when chat is mounted
   useEffect(() => {
-    supabase.rpc('mark_chat_read', { p_move_id: moveId }).catch(() => {});
+    // PostgrestBuilder is a thenable, not a Promise — it has no .catch().
+    // Errors come back on the resolved value instead.
+    void supabase
+      .rpc('mark_chat_read', { p_move_id: moveId })
+      .then(({ error }) => {
+        if (error) log.warn('chat', `mark_chat_read failed: ${error.message}`);
+      });
   }, [moveId]);
 
   const sendMutation = useMutation({

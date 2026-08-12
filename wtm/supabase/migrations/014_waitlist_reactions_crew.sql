@@ -3,11 +3,12 @@
 -- ═══════════════════════════════════════════
 
 -- ── 1. Waitlist status ────────────────────────────────────────────────────
--- Reuses the existing rsvps.status column. Add 'waitlist' as a valid value.
--- Drop old check if it exists, recreate inclusive of new status.
-alter table rsvps drop constraint if exists rsvps_status_check;
-alter table rsvps add constraint rsvps_status_check
-  check (status in ('going', 'waitlist', 'left'));
+-- `rsvps.status` is the rsvp_status ENUM from 005 ('going','maybe','left').
+-- The 'waitlist' value is added to the type in 014a_rsvp_status_waitlist.sql,
+-- which must be a separate migration: Postgres will not let a transaction use
+-- an enum value it added itself. A CHECK constraint cannot substitute for that.
+-- (Previously this file tried `check (status in (...,'waitlist',...))`, which
+-- fails at apply time because the literal is coerced to the enum.)
 
 -- waitlist_position() — returns caller's 1-indexed position on the waitlist
 create or replace function waitlist_position(p_move_id uuid)
@@ -145,12 +146,14 @@ $$;
 -- ── 4. Feed enrichment — expose waitlist_count + crew ────────────────────
 -- Update nearby_moves to surface waitlist depth and crew-going list.
 -- Callers can display "3 on waitlist" and "Alex is going".
-create or replace function nearby_moves(
+-- Parameter names must match the 011 signature exactly: `create or replace`
+-- cannot rename an input parameter (error 42P13).
+create or replace function public.nearby_moves(
   lat            float,
   lng            float,
   radius_meters  int     default 8047,
   filter_category text   default null,
-  caller_id      uuid    default null
+  uid            uuid    default null
 )
 returns table (
   id               uuid,
@@ -213,7 +216,7 @@ language sql stable security definer as $$
     m.hot_score,
 
     -- caller's own status
-    max(case when r.user_id = coalesce(caller_id, auth.uid()) then r.status end) as my_status,
+    max(case when r.user_id = coalesce(uid, auth.uid()) then r.status end) as my_status,
 
     -- up to 3 crew members going (invite-tree peers)
     coalesce((
@@ -223,9 +226,9 @@ language sql stable security definer as $$
       where r2.move_id = m.id
         and r2.status = 'going'
         and r2.user_id in (
-          select used_by from invite_codes where created_by = coalesce(caller_id, auth.uid()) and used_by is not null
+          select used_by from invite_codes where created_by = coalesce(uid, auth.uid()) and used_by is not null
           union
-          select created_by from invite_codes where used_by = coalesce(caller_id, auth.uid()) and created_by is not null
+          select created_by from invite_codes where used_by = coalesce(uid, auth.uid()) and created_by is not null
         )
       limit 3
     ), '[]'::jsonb)                                             as crew_going

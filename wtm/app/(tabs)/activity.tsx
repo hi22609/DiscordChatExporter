@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, RefreshControl,
   ActivityIndicator,
@@ -20,6 +20,7 @@ const ACTIVITY_COPY: Record<ActivityType, (actor: string) => string> = {
   squad_confirmed:    (a) => `${a} tagged you as their crew 👥`,
   move_trending:      (_) => `Your move is blowing up 🔥`,
   move_starting_soon: (_) => `Your move starts in 30 minutes ⏰`,
+  waitlist_promoted:  (_) => `A spot opened up — you're in 🎉`,
 };
 
 function activityCopy(type: ActivityType, actor: string | null): string {
@@ -97,15 +98,19 @@ export default function ActivityScreen() {
   const { data: items = [], isLoading, refetch, isRefetching } = useActivityFeed();
   const { data: unread = 0 } = useUnreadCount();
 
-  // Mark all read when screen opens
+  // Mark all read once the count actually resolves. The previous version
+  // depended only on `userId`, so on a cold start into this tab the effect ran
+  // while `unread` was still its default 0 and never re-ran — leaving the badge
+  // stuck for the whole session.
+  const markedRef = useRef(false);
   useEffect(() => {
-    if (userId && unread > 0) {
-      markAllRead(userId).then(() => {
-        qc.invalidateQueries({ queryKey: ['activity', 'unread'] });
-        qc.invalidateQueries({ queryKey: ['activity'] });
-      });
-    }
-  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!userId || unread === 0 || markedRef.current) return;
+    markedRef.current = true;
+    void markAllRead().then(() => {
+      qc.invalidateQueries({ queryKey: ['activity', 'unread'] });
+      qc.invalidateQueries({ queryKey: ['activity'] });
+    });
+  }, [userId, unread, qc]);
 
   const handlePress = useCallback((item: ActivityItem) => {
     if (item.move_id) router.push(`/move/${item.move_id}`);

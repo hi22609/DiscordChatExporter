@@ -8,12 +8,12 @@
 type MoveCategory =
   | 'bars' | 'sports' | 'food' | 'music' | 'outdoor'
   | 'gaming' | 'art' | 'social' | 'other';
-type RsvpStatus = 'going' | 'maybe' | 'left';
+type RsvpStatus = 'going' | 'maybe' | 'waitlist' | 'left';
 type SpotCategory =
   | 'urbex' | 'skate' | 'sunset' | 'view' | 'swim'
   | 'chill' | 'photo' | 'other';
 
-interface ProfileRow {
+type ProfileRow = {
   id: string;
   username: string;
   display_name: string | null;
@@ -26,11 +26,16 @@ interface ProfileRow {
   follower_count: number;
   following_count: number;
   moves_created: number;
+  birthdate: string | null;
+  age_range: string | null;
+  social_handle: string | null;
+  is_banned: boolean;
+  photo_approved: boolean;
   created_at: string;
   updated_at: string;
-}
+};
 
-interface MoveRow {
+type MoveRow = {
   id: string;
   creator_id: string;
   title: string;
@@ -50,25 +55,25 @@ interface MoveRow {
   vibes: string[];
   created_at: string;
   updated_at: string;
-}
+};
 
-interface MoveWithCountsRow extends MoveRow {
+type MoveWithCountsRow = MoveRow & {
   attendee_count: number;
   spots_left: number | null;
   is_empty: boolean;
   is_full: boolean;
-}
+};
 
-interface RsvpRow {
+type RsvpRow = {
   id: string;
   move_id: string;
   user_id: string;
   status: RsvpStatus;
   created_at: string;
   updated_at: string;
-}
+};
 
-interface InviteCodeRow {
+type InviteCodeRow = {
   id: string;
   code: string;
   created_by: string | null;
@@ -77,9 +82,9 @@ interface InviteCodeRow {
   use_count: number;
   expires_at: string | null;
   created_at: string;
-}
+};
 
-interface SpotRow {
+type SpotRow = {
   id: string;
   created_by: string;
   name: string;
@@ -95,16 +100,16 @@ interface SpotRow {
   is_hidden: boolean;
   created_at: string;
   updated_at: string;
-}
+};
 
-interface ReportRow {
+type ReportRow = {
   id: string;
   reporter_id: string;
   target_type: 'move' | 'spot' | 'profile';
   target_id: string;
   reason: string;
   created_at: string;
-}
+};
 
 interface NearbyMoveResult {
   id: string;
@@ -156,9 +161,89 @@ interface NearbySpotResult {
 type Insertable<Row, Required extends keyof Row> =
   Pick<Row, Required> & Partial<Omit<Row, Required>>;
 
+type ActivityFeedRow = {
+  id: string;
+  user_id: string;
+  actor_id: string | null;
+  move_id: string | null;
+  type: 'rsvp_on_your_move' | 'squad_confirmed' | 'move_trending' | 'move_starting_soon' | 'waitlist_promoted';
+  read: boolean;
+  created_at: string;
+};
+
+type MoveMessageRow = {
+  id: string;
+  move_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+};
+
+type MoveChatReadRow = {
+  move_id: string;
+  user_id: string;
+  last_read_at: string;
+};
+
+type MoveReactionRow = {
+  move_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+};
+
+type MoveReactionCountRow = {
+  move_id: string;
+  emoji: string;
+  total: number;
+  i_reacted: boolean;
+};
+
 export interface Database {
   public: {
     Tables: {
+      activity_feed: {
+        Row: ActivityFeedRow;
+        Insert: Insertable<ActivityFeedRow, 'user_id' | 'type'>;
+        Update: Partial<ActivityFeedRow>;
+        Relationships: [{
+          foreignKeyName: 'activity_feed_actor_id_fkey';
+          columns: ['actor_id'];
+          isOneToOne: false;
+          referencedRelation: 'profiles';
+          referencedColumns: ['id'];
+        }, {
+          foreignKeyName: 'activity_feed_move_id_fkey';
+          columns: ['move_id'];
+          isOneToOne: false;
+          referencedRelation: 'moves';
+          referencedColumns: ['id'];
+        }];
+      };
+      move_messages: {
+        Row: MoveMessageRow;
+        Insert: Insertable<MoveMessageRow, 'move_id' | 'user_id' | 'content'>;
+        Update: Partial<MoveMessageRow>;
+        Relationships: [{
+          foreignKeyName: 'move_messages_user_id_fkey';
+          columns: ['user_id'];
+          isOneToOne: false;
+          referencedRelation: 'profiles';
+          referencedColumns: ['id'];
+        }];
+      };
+      move_chat_reads: {
+        Row: MoveChatReadRow;
+        Insert: Insertable<MoveChatReadRow, 'move_id' | 'user_id'>;
+        Update: Partial<MoveChatReadRow>;
+        Relationships: [];
+      };
+      move_reactions: {
+        Row: MoveReactionRow;
+        Insert: Insertable<MoveReactionRow, 'move_id' | 'user_id' | 'emoji'>;
+        Update: Partial<MoveReactionRow>;
+        Relationships: [];
+      };
       profiles: {
         Row: ProfileRow;
         Insert: Insertable<ProfileRow, 'id' | 'username'>;
@@ -221,11 +306,28 @@ export interface Database {
       };
     };
     Views: {
+      move_reaction_counts: {
+        Row: MoveReactionCountRow;
+        Relationships: [];
+      };
       moves_with_counts: {
         Row: MoveWithCountsRow;
+        Relationships: [];
       };
     };
     Functions: {
+      mark_activity_read: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      mark_chat_read: {
+        Args: { p_move_id: string };
+        Returns: undefined;
+      };
+      waitlist_position: {
+        Args: { p_move_id: string };
+        Returns: number | null;
+      };
       nearby_moves: {
         Args: {
           lat: number;

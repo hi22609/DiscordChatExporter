@@ -141,7 +141,7 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <Ionicons name="location-outline" size={13} color="#606060" />
-                <Text style={{ color: '#808080', fontSize: 13 }} numberOfLines={1} style={{ maxWidth: 140 }}>
+                <Text style={{ color: '#808080', fontSize: 13, maxWidth: 140 }} numberOfLines={1}>
                   {move.location_name}
                 </Text>
               </View>

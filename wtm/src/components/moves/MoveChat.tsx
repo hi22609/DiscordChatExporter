@@ -140,7 +140,7 @@ export function MoveChat({ moveId }: MoveChatProps) {
               renderItem={({ item }) => (
                 <MessageBubble msg={item} isMe={item.user_id === userId} />
               )}
-              onEndReached={hasOlder ? fetchOlder : undefined}
+              onEndReached={hasOlder ? () => { void fetchOlder(); } : undefined}
               onEndReachedThreshold={0.1}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}

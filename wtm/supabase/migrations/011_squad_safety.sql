@@ -97,7 +97,7 @@ create or replace function public.nearby_moves(
     case when m.max_attendees is null then null
          else m.max_attendees - count(r.id) filter (where r.status = 'going')
     end                                                                     as spots_left,
-    max(r.status) filter (where r.user_id = uid)                           as my_status,
+    max(r.status::text) filter (where r.user_id = uid)                     as my_status,
     coalesce((
       select squad_with from public.rsvps
       where move_id = m.id and user_id = uid and status = 'going'
@@ -114,11 +114,11 @@ create or replace function public.nearby_moves(
     and m.is_public    = true
     and m.starts_at   >= now()
     and m.starts_at   <= now() + interval '24 hours'
-    and (filter_category is null or m.category = filter_category)
+    and (filter_category is null or m.category::text = filter_category)
     -- exclude banned creators
     and creator.is_banned = false
     -- exclude blocked-either-direction (reuse helper from migration 010)
-    and not public.blocked_either(uid, m.creator_id)
+    and not public.blocked_either(m.creator_id)
   group by m.id
   order by m.starts_at asc;
 $$;
@@ -127,7 +127,7 @@ $$;
 -- First 24h after joining: can RSVP but can't create moves (prevents fresh predator accounts).
 drop policy if exists "moves_insert" on public.moves;
 create policy "moves_insert" on public.moves
-  for insert to authenticated
+  as restrictive for insert to authenticated
   with check (
     creator_id = auth.uid()
     and exists (
@@ -139,13 +139,14 @@ create policy "moves_insert" on public.moves
   );
 
 -- ---- 6. RLS: banned users see nothing ----
--- Drop and recreate moves SELECT to exclude banned viewer
-drop policy if exists "moves_select_public" on public.moves;
-create policy "moves_select_public" on public.moves
-  for select using (
-    is_public = true
-    and is_cancelled = false
-    and not exists (
+-- RESTRICTIVE so it ANDs with the permissive policy in 004 rather than being
+-- OR-ed away. It carries ONLY the ban check: visibility (public vs. own move,
+-- cancelled or not) stays the job of `moves_public_read` in 004. Repeating the
+-- visibility clause here would lock creators out of their own private moves.
+drop policy if exists "moves_select_not_banned" on public.moves;
+create policy "moves_select_not_banned" on public.moves
+  as restrictive for select using (
+    not exists (
       select 1 from public.profiles
       where id = auth.uid() and is_banned = true
     )
