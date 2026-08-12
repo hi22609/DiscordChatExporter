@@ -10,14 +10,19 @@ git checkout overnight/2026-08-12
 
 **See everything I changed, in one command:**
 ```bash
-git log --oneline claude/wtm-app-concept-rci97r..overnight/2026-08-12
-git diff claude/wtm-app-concept-rci97r..overnight/2026-08-12 --stat
+git fetch origin
+git log  --oneline origin/claude/wtm-app-concept-rci97r..overnight/2026-08-12
+git diff --stat origin/claude/wtm-app-concept-rci97r..overnight/2026-08-12
 ```
+Use the **`origin/`** base. Your local `claude/wtm-app-concept-rci97r` was stale when I
+started (it predates the whole `wtm/` subtree), so diffing against it shows every file in
+the project as new.
 
 **Undo the entire night, in one command:**
 ```bash
 git checkout claude/wtm-app-concept-rci97r && git branch -D overnight/2026-08-12
 ```
+(`-D` rather than `-d` because the branch was never merged anywhere.)
 Nothing was pushed, nothing was merged, nothing was deployed. Your original branch is
 untouched. The night is one branch deletion away from never having happened.
 
