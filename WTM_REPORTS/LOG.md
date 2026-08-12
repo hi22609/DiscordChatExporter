@@ -21,3 +21,22 @@ Format: `[UTC time] WAVE — event`
 [05:16] WAVE 0 — Wrote 00_ORIENTATION.md.
 [05:17] WAVE 1/2 — Launched 2 parallel read-only subagents: (A) RAW slop + correctness/resilience; (B) RAW security/RLS + performance/cost. Serializing all surgery to myself per doctrine.
 [05:17] WAVE 3 — Starting visual identity on BETA myself while recon runs.
+
+[05:20] WAVE 3 — Tell audit on beta/: 19 distinct border-radius values, 6 gradient-text uses, 11 backdrop-filter, 4 competing accent hues, emoji tab bar, 4 identical section rhythms, and a stats strip of invented numbers ("137 people locked in"). Essentially the full checklist.
+[05:25] WAVE 3 — Chose sodium-vapour amber #FF9E3D as the single accent (colour of a Pittsburgh street at night = where/when the app is opened). Neutrals biased blue as the complement. Subset 4 real typefaces to woff2 data URIs, 45KB total.
+[05:30] WAVE 3 — SELF-CAUGHT: I wrote estimated WCAG ratios into the report. Computed them properly: --paper-600 was 2.96 (fails even large text) and light-theme accent 4.15 (fails AA). Re-derived both. Report now carries measured values only.
+[05:40] WAVE 2 — Security subagent returned 34 findings. Independently verified its top claim (migrations 011/014 cannot apply) by reading the conflicting declarations myself. Confirmed.
+[05:55] WAVE 2 — Correctness subagent returned 35 findings, independently reaching the same migration conclusion. Notable non-finding it reported honestly: RAW has almost no textual AI slop (0 TODO, 0 lorem, 0 marketing filler). The slop is structural.
+[06:10] WAVE 4 — Root-caused the 72 type errors to `interface` vs `type`: interfaces get no implicit index signature, so the Database type never satisfied supabase-js's GenericSchema and every table collapsed to `never`. One malformed view entry compounded it. 72 -> 0.
+[06:20] WAVE 4 — Types then caught two of MY OWN errors: I declared `is_read` (actual: `read`) and `body` (actual: `content`). Code was right, my types were wrong. Fixed.
+[06:35] WAVE 4 — STOPPED AND REVERTED: my first restrictive RLS policy repeated `is_public = true`, which would have locked creators out of their own private moves. Narrowed to carry only the ban check.
+[06:40] WAVE 4 — REJECTED a unique index on activity_feed: notify_creator_on_rsvp inserts without on-conflict, so it would abort the whole RSVP transaction on a normal leave-then-rejoin. Array cap is the real fix. Reasoning left in the migration.
+[06:45] WAVE 4 — DECIDED NOT TO FIX profiles read exposure (audit C2). Every safe repair breaks 3 call sites and PostgREST view-embedding, and cannot be verified without a live DB. Wrote exact SQL into DECISIONS_FOR_MICHAEL.md instead of shipping blind.
+[07:00] WAVE 4 — Deleted send-push-notification entirely (unauthenticated, service-role key, client-invoked). The activity row it duplicated is already written by a trigger.
+[07:20] WAVE 3 — SELF-CAUGHT: while fixing MoveCard's prefetch I created a duplicate onPress prop, the exact bug class I'd fixed 40 minutes earlier in the same file. tsc caught it before commit.
+[07:35] WAVE 6 — SELF-CAUGHT: I reintroduced 7 em dashes into user-visible copy after Michael explicitly said he dislikes them. Removed. Also found the visual work had drifted: move covers, story rings and the welcome canvas were still the old saturated palette. Harmonised.
+[07:50] WAVE 7 — Clean clone verified. NOTE: first `npm install` in the clean clone silently under-installed (151 phantom errors) until `rm -rf node_modules`. That is the missing-lockfile finding from Wave 0 reproducing itself. Recorded.
+[07:55] WAVE 7 — Screenshots: 14 files, 3 viewports x 2 themes + 4 app screens. GAP ACKNOWLEDGED: no `-before` images; I did not capture them before starting. Prior state is documented by grep counts and recoverable via `git show 022e9d9`.
+[08:00] WAVE 5 — CUT. Per the brief, feature scope is cut first when behind. Wrote the scored candidate list and the rejected list instead of half-building.
+[08:05] WAVE 8 — Deliverables written. Did NOT republish the live artifact links: updating a link people already hold is a deploy, and Rule 2 forbids it. Left as a one-action decision for Michael.
+[08:10] RUN COMPLETE — 6 commits on overnight/2026-08-12. Nothing pushed, nothing merged, nothing deployed. Undo is one branch deletion.

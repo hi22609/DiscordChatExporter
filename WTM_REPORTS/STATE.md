@@ -21,19 +21,21 @@ Repo: `/home/user/DiscordChatExporter`
 - Deliberately NOT republished tonight. Publishing = deploying. Left for Michael.
 
 ## Wave status
-- [x] WAVE 0 — orientation (BETA rescued, branch created)
-- [ ] WAVE 1 — cartography
-- [ ] WAVE 2 — audit
-- [ ] WAVE 3 — visual identity
-- [ ] WAVE 4 — remediation
-- [ ] WAVE 5 — construction
-- [ ] WAVE 6 — adversarial pass
-- [ ] WAVE 7 — verification
-- [ ] WAVE 8 — morning deliverables
+- [x] WAVE 0 — orientation (BETA rescued into git, branch created)
+- [x] WAVE 1 — cartography (both builds + drift)
+- [x] WAVE 2 — audit (2 parallel subagents + my own verification)
+- [x] WAVE 3 — visual identity (BETA rebuilt on a real token system)
+- [x] WAVE 4 — remediation (3 commits)
+- [~] WAVE 5 — construction — **CUT, deliberately.** Waves 2/4 ran long because the
+      migrations turned out to be unappliable. Scored candidate list written instead.
+- [x] WAVE 6 — adversarial pass (7 of my own errors found and fixed)
+- [x] WAVE 7 — verification (clean clone, both builds, screenshots)
+- [x] WAVE 8 — morning deliverables
 
 ## NEXT
-Finish WAVE 0 report (`00_ORIENTATION.md`): confirm RAW install/build/test commands
-by running them. Then WAVE 1 cartography.
+Run complete. Start at `MORNING_BRIEF.md`.
+If resuming work: the highest-value next job is error/retry states for the 8 RAW screens
+that report "nothing exists" on network failure (see 05_FEATURES.md scoring).
 
 ## In-flight / uncommitted
-None. Last commit: 022e9d9 (BETA rescue).
+None.
