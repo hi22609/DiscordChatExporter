@@ -605,7 +605,7 @@ const STORIES=[
  {id:'s2',name:'Bar Crawl',emoji:'🍺',grad:['#10B981','#032018'],moveId:'m3',slides:[
    {title:'5 stops. 1 wristband.',sub:'Round Corner → Spirit → Nova → Cattivo → wherever'},
    {title:'41 people locked in',sub:'Biggest crawl of the summer. $20 covers everything.'}]},
- {id:'s3',name:'Rooftop Set',emoji:'🎵',grad:['#0EA5E9','#083344'],moveId:'m1',slides:[
+ {id:'s3',name:'Rooftop Set',emoji:'🎵',grad:['#2C4A63','#101822'],moveId:'m1',slides:[
    {title:'Golden hour session',sub:'Live beats over the whole city skyline.'},
    {title:'4 spots left',sub:'Small group on purpose. Alex and Devon are in.'}]},
  {id:'s4',name:'Night Market',emoji:'🍕',grad:['#F59E0B','#6B2E00'],moveId:'m2',slides:[
@@ -1280,6 +1280,7 @@ const HEAT_ZONES=[
 // here from the same tokens. Keep in sync with :root.
 const SIGNAL='#FF9E3D', SIGNAL_GLOW='rgba(255,158,61,.30)', SIGNAL_EDGE='rgba(255,158,61,.55)';
 const SLATE='#63708A', SLATE_EDGE='rgba(99,112,138,.45)';
+const ME_RING='#4C6B8A', ME_HALO='rgba(76,107,138,.20)';
 let mapInited=false,pins=[];
 let dragStart=null,lastTouch=null,lastPinchDist=null;
 
@@ -1607,19 +1608,19 @@ function drawMap(){
     const rad=18*us;
     const ringPulse=(.5+.5*Math.sin(t*2))*6*us;
     ctx.beginPath();ctx.arc(x,y,rad+ringPulse+4*us,0,Math.PI*2);
-    ctx.fillStyle='rgba(14,165,233,.18)';ctx.fill();
+    ctx.fillStyle=ME_HALO;ctx.fill();
     ctx.save();
     ctx.shadowColor='rgba(60,50,30,.35)';ctx.shadowBlur=10*us;ctx.shadowOffsetY=3*us;
     ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);
     ctx.fillStyle='#FFFFFF';ctx.fill();
     ctx.restore();
-    ctx.strokeStyle='#0EA5E9';ctx.lineWidth=3*us;
+    ctx.strokeStyle=ME_RING;ctx.lineWidth=3*us;
     ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.stroke();
     ctx.font=`${21*us}px 'WTM Sans',system-ui,sans-serif`;ctx.textAlign='center';
     ctx.fillText(ME.face,x,y+7*us);
     ctx.font=`800 ${9.5*us}px 'WTM Sans',system-ui,sans-serif`;
     const nw=ctx.measureText('YOU').width+12*us;
-    ctx.fillStyle='#0EA5E9';
+    ctx.fillStyle=ME_RING;
     roundedRect(ctx,x-nw/2,y+rad+4*us,nw,15*us,7.5*us);ctx.fill();
     ctx.fillStyle='#fff';ctx.fillText('YOU',x,y+rad+15*us);
     ctx.textAlign='left';

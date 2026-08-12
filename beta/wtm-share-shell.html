@@ -112,7 +112,7 @@ h2{font-size:clamp(27px,4vw,38px);letter-spacing:-.01em}
 .demo-wrap{display:flex;justify-content:center}
 .phone{width:min(380px,94vw);border:1px solid var(--ink-600);border-radius:var(--r-md);
        background:var(--ink-800);padding:8px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
-.phone-screen{position:relative;border-radius:8px;overflow:hidden;background:var(--ink-900);height:min(760px,78vh)}
+.phone-screen{position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--ink-900);height:min(760px,78vh)}
 .phone iframe{width:100%;height:100%;border:0;display:block}
 .launch{display:none;border:1px solid var(--ink-600);border-radius:var(--r-md);background:var(--ink-800);
         padding:28px 22px;max-width:420px;margin:0 auto}
@@ -240,7 +240,7 @@ textarea.fld{min-height:82px;resize:vertical}
     </div>
     <dl class="hero-side">
       <dt>What it is</dt>
-      <dd>A working demo of the WTM beta — the real interface, with a simulated Friday night running through it.</dd>
+      <dd>A working demo of the WTM beta: the real interface, with a simulated Friday night running through it.</dd>
       <dt>What it isn't</dt>
       <dd>A video, a mockup, or a waitlist page. Everything you tap does something.</dd>
     </dl>
@@ -274,7 +274,7 @@ textarea.fld{min-height:82px;resize:vertical}
     <article class="feat">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
       <h3>The live map</h3>
-      <p>Real Pittsburgh geography — the three rivers, the bridges, the street grid. Heat where the night is
+      <p>Real Pittsburgh geography: the three rivers, the bridges, the street grid. Heat where the night is
         concentrated, your friends' faces where they actually are, every move pinned to its real address.</p>
     </article>
     <article class="feat">
@@ -319,7 +319,7 @@ textarea.fld{min-height:82px;resize:vertical}
     <details><summary>Is this the real app?</summary><div class="faq-a">It's the real interface running a simulated Friday night. Joining, chatting, stories and the map all work. The production app connects to real people and real events.</div></details>
     <details><summary>Does it track me?</summary><div class="faq-a">No. No account, no location permission, no analytics. Nothing you do here leaves your device unless you choose to send feedback.</div></details>
     <details><summary>Which cities?</summary><div class="faq-a">Pittsburgh first. The demo map covers the whole metro, from Cranberry down to McKeesport.</div></details>
-    <details><summary>How do I get in?</summary><div class="faq-a">Beta access spreads through friends. If someone sent you this, you're already on the path — leave feedback with your name and you're on the list.</div></details>
+    <details><summary>How do I get in?</summary><div class="faq-a">Beta access spreads through friends. If someone sent you this, you're already on the path. Leave feedback with your name and you're on the list.</div></details>
   </div>
 </section>
 
@@ -488,7 +488,7 @@ function submitFb(){
 
   const text=buildReport(entry);
   window._report=text;
-  const subj=encodeURIComponent('WTM demo feedback — '+entry.name);
+  const subj=encodeURIComponent('WTM demo feedback from '+entry.name);
   const body=encodeURIComponent(text);
   document.getElementById('fb-card').innerHTML=`
     <button class="fb-x" onclick="closeFb()" aria-label="Close">✕</button>
@@ -513,7 +513,7 @@ async function writeClip(text){
   }
 }
 async function copyReport(btn){
-  btn.textContent = await writeClip(window._report) ? 'Copied — now send it' : 'Select the text above to copy';
+  btn.textContent = await writeClip(window._report) ? 'Copied, now send it' : 'Select the text above to copy';
 }
 
 /* ── founder log ── */
@@ -533,7 +533,7 @@ function showLog(){
       <div class="log-stat"><div class="n mono">${would}</div><div class="l">Would use it</div></div>`;
     list.innerHTML=all.slice().reverse().map(e=>`
       <div class="entry">
-        <div class="who">${esc(e.name)} — ${e.stars}/5</div>
+        <div class="who">${esc(e.name)} · ${e.stars}/5</div>
         <div class="meta">${esc(e.device)} · ${e.secs}s · ${new Date(e.at).toLocaleString()}</div>
         ${e.tags.length?`<div class="meta">${esc(e.tags.join(', '))}</div>`:''}
         ${e.note?`<div class="cmt">${esc(e.note)}</div>`:''}
@@ -544,7 +544,7 @@ function showLog(){
 }
 async function copyAll(btn){
   const all=readLog();
-  const txt=all.length?all.map(buildReport).join('\n\n————————\n\n'):'No feedback yet.';
+  const txt=all.length?all.map(buildReport).join('\n\n--------\n\n'):'No feedback yet.';
   btn.textContent = await writeClip(txt) ? 'Copied' : 'Copy failed';
   setTimeout(()=>btn.textContent='Copy all as text',2000);
 }
