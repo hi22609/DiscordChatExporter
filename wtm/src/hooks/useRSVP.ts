@@ -38,11 +38,10 @@ export function useRSVP(moveId: string) {
         if (error.message.includes('move_full')) throw new Error('move_full');
         throw error;
       }
-      supabase.functions
-        .invoke('send-push-notification', {
-          body: { type: 'new_rsvp', moveId, actorId: userId },
-        })
-        .catch((err) => console.warn('rsvp push notify failed', err));
+      // The activity row is written server-side by the notify_rsvp_to_creator
+      // trigger (012:79). The edge function that used to be invoked here was
+      // unauthenticated and held the service-role key, so anyone with the
+      // bundled anon key could drive unbounded invocations. Removed.
     },
     onMutate: async () => {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

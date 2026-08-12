@@ -22,11 +22,22 @@ serve(async (req) => {
 
   // Admin only — verify secret key
   const authHeader = req.headers.get('Authorization');
-  if (authHeader !== `Bearer ${Deno.env.get('ADMIN_SECRET')}`) {
+  // Fail closed. When ADMIN_SECRET is unset, Deno.env.get returns undefined and
+  // the template literal became the string "Bearer undefined" — which anyone
+  // could send to get in holding the service-role key.
+  const adminSecret = Deno.env.get('ADMIN_SECRET');
+  if (!adminSecret || authHeader !== `Bearer ${adminSecret}`) {
     return new Response('Unauthorized', { status: 401, headers: corsHeaders });
   }
 
-  const { count = 10, maxUses = 1, expiresInDays } = await req.json();
+  // Unvalidated, `count` went straight into Array.from({ length: count }) —
+  // `{"count": 50000000}` either OOMs the isolate or fills the free-tier
+  // database. Parsing is also moved inside the guarded path so a malformed body
+  // returns 400 instead of an unhandled rejection.
+  const body = await req.json().catch(() => ({} as Record<string, unknown>));
+  const count = Math.min(Math.max(1, Number(body?.count) || 10), 100);
+  const maxUses = Math.min(Math.max(1, Number(body?.maxUses) || 1), 50);
+  const expiresInDays = body?.expiresInDays;
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,

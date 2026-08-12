@@ -55,11 +55,14 @@ function MoveCardInner({ move, index = 0, showRSVP = true }: MoveCardProps) {
     >
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => router.push(`/move/${move.id}`)}
-        onPressIn={() => {
-          scale.value = withSpring(0.97, { damping: 15 });
+        onPress={() => {
+          // Prefetch here rather than on press-in: press-in also fires on the
+          // finger-down that turns into a scroll, so flicking a 40-card feed
+          // issued ~80 requests for moves nobody opened.
           prefetchMove(qc, move.id);
+          router.push(`/move/${move.id}`);
         }}
+        onPressIn={() => { scale.value = withSpring(0.97, { damping: 15 }); }}
         onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
         style={{ backgroundColor: '#1A1A1A', borderRadius: 24, overflow: 'hidden', marginBottom: 14 }}
       >

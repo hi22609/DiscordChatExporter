@@ -27,18 +27,30 @@ export function useMoveChat(moveId: string) {
     },
     initialPageParam: 0,
     getNextPageParam: (last, all) => last.length === PAGE ? all.length : undefined,
-    staleTime: 0,
+    staleTime: 30_000, // history that already loaded cannot change
     gcTime: 2 * 60 * 1000,
   });
 
-  // Realtime: new messages arrive → prepend + invalidate for accurate profile data
+  // Realtime: append the new row to the first page instead of invalidating.
+  // Invalidating an infinite query refetches EVERY loaded page, so in a busy
+  // chat each message multiplied into (attendees x loaded pages) joined
+  // queries — thousands per minute on one move.
   useEffect(() => {
     const channel = supabase
       .channel(`chat-${moveId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'move_messages', filter: `move_id=eq.${moveId}` },
-        () => { client.invalidateQueries({ queryKey: KEY }); }
+        (payload) => {
+          const row = payload.new as ChatMessage | undefined;
+          if (!row) return;
+          client.setQueryData<{ pages: ChatMessage[][]; pageParams: unknown[] }>(KEY, (prev) => {
+            if (!prev?.pages?.length) return prev;
+            const [first, ...rest] = prev.pages;
+            if (first.some((m) => m.id === row.id)) return prev; // already have it
+            return { ...prev, pages: [[row, ...first], ...rest] };
+          });
+        }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -62,7 +74,9 @@ export function useMoveChat(moveId: string) {
         .insert({ move_id: moveId, user_id: userId!, content: content.trim() });
       if (error) throw error;
     },
-    onSettled: () => { client.invalidateQueries({ queryKey: KEY }); },
+    // No invalidate here: the realtime INSERT echo above already lands this
+    // message in the cache. Invalidating as well refetched every loaded page.
+    onError: (err) => { log.warn('chat', `send failed: ${String(err)}`); },
   });
 
   // Messages in chronological order (oldest first, scroll to bottom)

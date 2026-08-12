@@ -64,7 +64,9 @@ export default function MapHomeScreen() {
   const coords = getCoords();
 
   const fetchLayer = useCallback(async (region: Region) => {
-    const radiusM = Math.max(regionToMeters(region), 5000);
+    // Capped: an uncapped radius at continent zoom turns ST_DWithin into a scan
+  // of the whole moves table, and returns nothing a user can act on anyway.
+  const radiusM = Math.min(Math.max(regionToMeters(region), 5000), 50_000);
     if (layer === 'moves') {
       const { data } = await supabase.rpc('nearby_moves', {
         lat: region.latitude,

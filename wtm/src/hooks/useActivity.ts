@@ -63,7 +63,9 @@ export function useUnreadCount() {
     queryKey: UNREAD_KEY,
     enabled: !!userId,
     staleTime: 15_000,
-    refetchInterval: 60_000,
+    // No refetchInterval: the realtime INSERT subscription above already
+    // invalidates this key. Polling every 60s per user per foreground minute
+    // was ~60k redundant count queries a day at 2k users.
     queryFn: async () => {
       const { count, error } = await supabase
         .from('activity_feed')
