@@ -40,3 +40,6 @@ Format: `[UTC time] WAVE — event`
 [08:00] WAVE 5 — CUT. Per the brief, feature scope is cut first when behind. Wrote the scored candidate list and the rejected list instead of half-building.
 [08:05] WAVE 8 — Deliverables written. Did NOT republish the live artifact links: updating a link people already hold is a deploy, and Rule 2 forbids it. Left as a one-action decision for Michael.
 [08:10] RUN COMPLETE — 6 commits on overnight/2026-08-12. Nothing pushed, nothing merged, nothing deployed. Undo is one branch deletion.
+[08:15] WAVE 6 (cont) — SELF-CAUGHT: I committed wtm/node_modules (47,145 files) in 186e8f7, because the repo's .gitignore is DiscordChatExporter's C# one and I used `git add -A wtm` after npm install. Untracked in a follow-up commit rather than rewriting history. Added a Node .gitignore. Side benefit: the install also produced wtm/package-lock.json, which was a Wave 0 gap, so installs are now reproducible.
+[08:18] WAVE 6 (cont) — SELF-CAUGHT: ACCESS.md told Michael to diff against the LOCAL base branch, which is stale and predates the wtm/ subtree, so his "show me what changed" command would have shown the entire project as new. Corrected to the origin/ base.
+[08:20] WAVE 7 (re-verify) — After the cleanup commits: working tree clean, 0 tracked build artifacts, beta rebuild round-trip verified, test-flow passes with zero console errors.

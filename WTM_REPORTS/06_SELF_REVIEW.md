@@ -50,6 +50,21 @@ caught both. Worth noting the direction: the types I added were wrong, the app c
 leave-then-rejoin would have raised and rolled back the whole RSVP. Removed before commit,
 with the reasoning left in the migration.
 
+### 8. I committed `node_modules` — 47,145 files
+`git add -A wtm` after an `npm install`, against a repo whose `.gitignore` is the C# one from
+DiscordChatExporter and has no `node_modules` rule. The diffstat read "47,295 files changed",
+which is how I noticed. Untracked in a follow-up commit rather than by rewriting history,
+per the no-rewrite rule; a proper Node `.gitignore` is now in place. I also left the generated
+`beta/wtm-share.html` tracked in the first commit — likewise untracked.
+
+**One accidental good outcome:** that install also produced `wtm/package-lock.json`, which was
+missing (a Wave 0 finding). It is now committed, so installs are reproducible.
+
+### 9. My own undo instructions were wrong
+`ACCESS.md` told Michael to diff against `claude/wtm-app-concept-rci97r`. That local branch
+was stale — it predates the entire `wtm/` subtree — so the command would have shown every file
+in the project as new and buried the actual changes. Corrected to the `origin/` base.
+
 ## Checks run against my own work
 
 | Question | Answer |
