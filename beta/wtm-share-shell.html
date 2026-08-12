@@ -1,523 +1,565 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>WTM · Know what's moving. Tonight.</title>
+<title>WTM · What's The Move</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+__FONTS__
+
+/* ─────────────────────────────────────────────────────────────
+   WTM design tokens.
+   Accent is sodium-vapour amber: the colour of a Pittsburgh street
+   at night. It means "live / act now" and is used for nothing else.
+   Neutrals are biased blue (wet asphalt under that lamp) so they read
+   as chosen rather than inherited grey.
+   ───────────────────────────────────────────────────────────── */
 :root{
-  --bg:#06050D;--bg2:#0D0B1A;--bg3:#13112A;--bg4:#1A1835;
-  --blaze:#FF4500;--violet:#7C3AED;--violet2:#A78BFA;
-  --green:#10B981;
-  --text1:#EEEAFA;--text2:#9D99B4;--text3:#5A5674;
-  --border:rgba(238,234,250,.09);--border2:rgba(238,234,250,.16);
+  --ink-900:#0B0E14; --ink-800:#12161F; --ink-700:#1A1F2B; --ink-600:#262C3A;
+  --paper-100:#E8EAF0; --paper-400:#8A93A6; --paper-600:#77849D;
+  --signal:#FF9E3D; --signal-ink:#0B0E14;
+  --ok:#3FB37F; --warn:#E0A44A; --stop:#E5544B;
+  --r-sm:6px; --r-md:14px;
+  --t:140ms cubic-bezier(.2,.7,.4,1);
+  --measure:64ch;
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text1);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',Segoe UI,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --ink-900:#F2F3F7; --ink-800:#FFFFFF; --ink-700:#E9EBF1; --ink-600:#D3D7E0;
+    --paper-100:#141821; --paper-400:#5A6375; --paper-600:#79839A;
+    --signal:#945C23; --signal-ink:#FFFFFF;
+    --ok:#1F7A52; --warn:#8A5A12; --stop:#B3352C;
+  }
+}
+:root[data-theme="light"]{
+  --ink-900:#F2F3F7; --ink-800:#FFFFFF; --ink-700:#E9EBF1; --ink-600:#D3D7E0;
+  --paper-100:#141821; --paper-400:#5A6375; --paper-600:#79839A;
+  --signal:#945C23; --signal-ink:#FFFFFF;
+  --ok:#1F7A52; --warn:#8A5A12; --stop:#B3352C;
+}
+:root[data-theme="dark"]{
+  --ink-900:#0B0E14; --ink-800:#12161F; --ink-700:#1A1F2B; --ink-600:#262C3A;
+  --paper-100:#E8EAF0; --paper-400:#8A93A6; --paper-600:#77849D;
+  --signal:#FF9E3D; --signal-ink:#0B0E14;
+  --ok:#3FB37F; --warn:#E0A44A; --stop:#E5544B;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink-900); color:var(--paper-100);
+  font-family:'WTM Sans',system-ui,sans-serif; font-weight:400;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
 body.locked{overflow:hidden}
-.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}
-.reveal.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{animation:none!important}}
+h1,h2,h3{font-family:'WTM Display','WTM Sans',system-ui,sans-serif;font-weight:700;line-height:1.02;text-wrap:balance}
+.mono{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+a{color:inherit}
 
-/* ambient glow */
-.glow{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
-.glow1{width:520px;height:520px;background:rgba(124,58,237,.16);top:-140px;left:-120px}
-.glow2{width:460px;height:460px;background:rgba(255,69,0,.10);top:30%;right:-160px}
-.glow3{width:400px;height:400px;background:rgba(217,70,239,.08);bottom:-100px;left:20%}
+/* ── signature: the sodium rule ──
+   A hairline carrying a single amber bloom, like a streetlight seen
+   down a long block. The only decorative use of the accent. */
+.rule{position:relative;height:1px;background:var(--ink-600);border:0;margin:0}
+.rule::after{
+  content:'';position:absolute;top:-1px;left:var(--at,18%);
+  width:clamp(120px,22vw,260px);height:3px;transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,var(--signal),transparent);
+  opacity:.85;filter:blur(.5px);
+}
 
-/* nav */
-nav{position:sticky;top:0;z-index:50;background:rgba(6,5,13,.82);backdrop-filter:blur(24px);border-bottom:0.5px solid var(--border)}
-.nav-inner{max-width:1080px;margin:0 auto;padding:15px 24px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{font-size:22px;font-weight:900;letter-spacing:-1.5px;background:linear-gradient(135deg,#fff,var(--violet2) 55%,var(--blaze));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-cta{background:linear-gradient(135deg,var(--violet),var(--blaze));color:#fff;font-size:13.5px;font-weight:800;padding:10px 22px;border-radius:50px;text-decoration:none;letter-spacing:-.1px;border:none;cursor:pointer}
+/* ── nav ── */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--ink-900) 88%,transparent);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--ink-600)}
+.nav-in{max-width:1040px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wordmark{font-family:'WTM Display','WTM Sans',sans-serif;font-weight:700;font-size:25px;letter-spacing:.04em;line-height:1;color:var(--paper-100)}
+.wordmark i{color:var(--signal);font-style:normal}
+.btn{font-family:'WTM Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em;
+     border:0;border-radius:var(--r-sm);padding:11px 18px;cursor:pointer;
+     display:inline-flex;align-items:center;gap:8px;transition:background var(--t),color var(--t);
+     text-decoration:none;line-height:1}
+.btn-primary{background:var(--signal);color:var(--signal-ink)}
+.btn-primary:hover{background:color-mix(in srgb,var(--signal) 86%,var(--paper-100))}
+.btn-quiet{background:transparent;color:var(--paper-100);border:1px solid var(--ink-600)}
+.btn-quiet:hover{background:var(--ink-700)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible,a:focus-visible,summary:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
 
-/* hero */
-.hero{position:relative;z-index:1;padding:76px 0 36px;text-align:center}
-.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,69,0,.09);border:0.5px solid rgba(255,69,0,.28);border-radius:50px;padding:7px 16px;font-size:12.5px;font-weight:700;color:#FF7A45;margin-bottom:26px}
-.hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--blaze);animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-h1{font-size:clamp(42px,7.5vw,76px);font-weight:900;letter-spacing:-3px;line-height:1.02;margin-bottom:20px}
-h1 .grad{background:linear-gradient(135deg,var(--violet2),var(--blaze));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:clamp(16px,2.4vw,19px);color:var(--text2);font-weight:500;line-height:1.65;max-width:560px;margin:0 auto 34px}
-.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
-.btn-main{background:linear-gradient(135deg,var(--violet),var(--blaze));color:#fff;font-size:16px;font-weight:800;padding:16px 38px;border-radius:50px;text-decoration:none;letter-spacing:-.2px;box-shadow:0 0 44px rgba(124,58,237,.4);transition:transform .15s;border:none;cursor:pointer;display:inline-block}
-.btn-main:hover{transform:translateY(-2px)}
-.btn-ghost{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text1);font-size:16px;font-weight:700;padding:16px 32px;border-radius:50px;text-decoration:none;cursor:pointer;display:inline-block}
-.hero-note{font-size:12.5px;color:var(--text3);font-weight:600}
+/* ── hero: left-aligned, asymmetric on purpose ── */
+.hero{padding:72px 0 44px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+@media (min-width:860px){.hero-grid{grid-template-columns:1.15fr .85fr;align-items:end;gap:48px}}
+.eyebrow{font-family:'WTM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+         color:var(--signal);display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.eyebrow .pip{width:6px;height:6px;border-radius:50%;background:var(--signal);flex:none}
+h1{font-size:clamp(46px,9vw,86px);letter-spacing:-.015em}
+h1 em{font-style:normal;color:var(--signal)}
+.lede{margin-top:18px;font-size:17px;color:var(--paper-400);max-width:46ch}
+.hero-cta{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.hero-note{margin-top:14px;font-family:'WTM Mono',monospace;font-size:11.5px;color:var(--paper-600);letter-spacing:.02em}
+.hero-side{border-left:1px solid var(--ink-600);padding-left:22px}
+@media (max-width:859px){.hero-side{border-left:0;padding-left:0;border-top:1px solid var(--ink-600);padding-top:22px}}
+.hero-side dt{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-600);margin-bottom:4px}
+.hero-side dd{font-size:14.5px;color:var(--paper-400);margin-bottom:16px}
+.hero-side dd:last-child{margin-bottom:0}
 
-/* stats strip */
-.stats{display:flex;justify-content:center;gap:clamp(28px,6vw,72px);padding:40px 0 4px;position:relative;z-index:1;flex-wrap:wrap}
-.stat{text-align:center}
-.stat-n{font-size:clamp(26px,4vw,36px);font-weight:900;letter-spacing:-1.5px;background:linear-gradient(135deg,#fff,var(--violet2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat-l{font-size:12px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-top:4px}
+/* ── sections ── */
+section{padding:56px 0}
+.sec-head{margin-bottom:28px;max-width:var(--measure)}
+h2{font-size:clamp(27px,4vw,38px);letter-spacing:-.01em}
+.sec-head p{margin-top:10px;color:var(--paper-400);font-size:16px}
 
-/* demo section */
-.demo-sec{position:relative;z-index:1;padding:66px 0 26px;text-align:center}
-.sec-eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--violet2);margin-bottom:14px}
-h2{font-size:clamp(28px,4.5vw,42px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:14px}
-.sec-sub{font-size:16px;color:var(--text2);font-weight:500;line-height:1.6;max-width:520px;margin:0 auto 38px}
-.phone-stage{display:none;justify-content:center;position:relative}
-.phone-glow{position:absolute;top:8%;left:50%;transform:translateX(-50%);width:min(560px,90vw);height:80%;background:radial-gradient(closest-side,rgba(124,58,237,.22),transparent);filter:blur(50px);pointer-events:none}
-.phone{position:relative;width:min(392px,92vw);border-radius:52px;background:#101018;padding:12px;box-shadow:0 0 0 1.5px rgba(238,234,250,.14),0 44px 90px rgba(0,0,0,.65)}
-.phone-screen{position:relative;border-radius:41px;overflow:hidden;background:#06050D;height:min(796px,82vh)}
-.phone-notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:112px;height:28px;background:#000;border-radius:20px;z-index:20;pointer-events:none}
+/* ── demo ── */
+.demo-wrap{display:flex;justify-content:center}
+.phone{width:min(380px,94vw);border:1px solid var(--ink-600);border-radius:var(--r-md);
+       background:var(--ink-800);padding:8px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.phone-screen{position:relative;border-radius:8px;overflow:hidden;background:var(--ink-900);height:min(760px,78vh)}
 .phone iframe{width:100%;height:100%;border:0;display:block}
-.launch-card{display:none;background:var(--bg2);border:0.5px solid var(--border2);border-radius:28px;padding:40px 28px;max-width:400px;margin:0 auto;text-align:center}
-.launch-emoji{font-size:52px;margin-bottom:16px}
-.launch-card h3{font-size:20px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
-.launch-card p{font-size:14px;color:var(--text2);font-weight:500;line-height:1.6;margin-bottom:24px}
-.demo-hint{display:inline-flex;align-items:center;gap:8px;margin-top:24px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:50px;padding:11px 20px;font-size:13px;font-weight:700;color:var(--text2);max-width:92vw}
-.fs-under{margin-top:16px}
-@media (min-width:760px){.phone-stage{display:flex}.launch-card{display:none!important}}
-@media (max-width:759.9px){.launch-card{display:block}}
+.launch{display:none;border:1px solid var(--ink-600);border-radius:var(--r-md);background:var(--ink-800);
+        padding:28px 22px;max-width:420px;margin:0 auto}
+.launch h3{font-size:21px;margin-bottom:8px}
+.launch p{color:var(--paper-400);font-size:14.5px;margin-bottom:20px}
+.demo-tip{margin-top:18px;text-align:center;font-family:'WTM Mono',monospace;font-size:12px;color:var(--paper-600);letter-spacing:.02em}
+@media (max-width:759px){.launch{display:block}.demo-wrap{display:none}}
 
-/* fullscreen demo */
-#fs{position:fixed;inset:0;z-index:300;background:#06050D;display:none;flex-direction:column}
+/* ── features: deliberately uneven grid ── */
+.feats{display:grid;grid-template-columns:1fr;gap:1px;background:var(--ink-600);
+       border:1px solid var(--ink-600);border-radius:var(--r-md);overflow:hidden}
+@media (min-width:720px){.feats{grid-template-columns:repeat(3,1fr)}
+  .feats > :first-child{grid-column:span 2}}
+.feat{background:var(--ink-900);padding:26px 24px}
+.feat h3{font-size:19px;margin:14px 0 8px;letter-spacing:-.005em}
+.feat p{color:var(--paper-400);font-size:14.5px}
+.ico{width:22px;height:22px;stroke:var(--signal);stroke-width:1.6;fill:none;
+     stroke-linecap:round;stroke-linejoin:round;display:block}
+
+/* ── steps ── */
+.steps{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:720px){.steps{grid-template-columns:repeat(3,1fr);gap:28px}}
+.step{padding:20px 0;border-top:1px solid var(--ink-600)}
+.step .n{font-family:'WTM Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--signal);display:block;margin-bottom:8px}
+.step h3{font-size:17px;margin-bottom:6px}
+.step p{color:var(--paper-400);font-size:14.5px}
+
+/* ── faq ── */
+.faq{max-width:var(--measure)}
+details{border-bottom:1px solid var(--ink-600)}
+summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:700;font-size:15.5px;
+        display:flex;justify-content:space-between;align-items:center;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'';width:9px;height:9px;border-right:1.5px solid var(--paper-400);
+               border-bottom:1.5px solid var(--paper-400);transform:rotate(45deg);
+               transition:transform var(--t);flex:none;margin-bottom:3px}
+details[open] summary::after{transform:rotate(225deg);margin-bottom:-3px}
+.faq-a{padding:0 0 18px;color:var(--paper-400);font-size:14.5px;max-width:58ch}
+
+/* ── closing ── */
+.close-cta{border:1px solid var(--ink-600);border-radius:var(--r-md);padding:40px 28px;background:var(--ink-800)}
+.close-cta h2{margin-bottom:10px}
+.close-cta p{color:var(--paper-400);margin-bottom:22px;max-width:48ch}
+
+footer{border-top:1px solid var(--ink-600);padding:26px 0 40px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.foot p{font-family:'WTM Mono',monospace;font-size:11.5px;color:var(--paper-600);letter-spacing:.02em}
+
+/* ── fullscreen demo ── */
+#fs{position:fixed;inset:0;z-index:300;background:var(--ink-900);display:none;flex-direction:column}
 #fs.open{display:flex}
-.fs-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));background:#0A0916;border-bottom:0.5px solid var(--border2);flex-shrink:0}
-.fs-title{font-size:14px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,var(--violet2) 55%,var(--blaze));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.fs-actions{display:flex;gap:8px}
-.fs-btn{background:var(--bg3);border:0.5px solid var(--border2);color:var(--text1);font-size:12.5px;font-weight:700;padding:8px 16px;border-radius:50px;cursor:pointer}
-.fs-btn.hot{background:linear-gradient(135deg,var(--violet),var(--blaze));border:none;color:#fff}
+.fs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+        padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));
+        background:var(--ink-800);border-bottom:1px solid var(--ink-600);flex:none}
 #fs iframe{flex:1;border:0;width:100%}
 
-/* features */
-.features{position:relative;z-index:1;padding:86px 0 16px}
-.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:42px}
-.feat{background:var(--bg2);border:0.5px solid var(--border);border-radius:24px;padding:28px 26px;text-align:left;transition:transform .2s,border-color .2s}
-.feat:hover{transform:translateY(-4px);border-color:rgba(124,58,237,.35)}
-.feat-icon{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px}
-.feat h3{font-size:18px;font-weight:800;letter-spacing:-.4px;margin-bottom:9px}
-.feat p{font-size:14.5px;color:var(--text2);font-weight:500;line-height:1.65}
+/* ── feedback ── */
+#fb-open{position:fixed;right:18px;bottom:18px;z-index:220}
+#fb-scrim{position:fixed;inset:0;background:rgba(4,6,10,.72);z-index:230;display:none;align-items:flex-end;justify-content:center}
+#fb-scrim.open{display:flex}
+@media (min-width:600px){#fb-scrim.open{align-items:center}}
+.fb{background:var(--ink-800);border:1px solid var(--ink-600);border-radius:var(--r-md) var(--r-md) 0 0;
+    width:100%;max-width:470px;max-height:92vh;overflow-y:auto;padding:24px 22px 32px;position:relative}
+@media (min-width:600px){.fb{border-radius:var(--r-md)}}
+.fb-x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:var(--r-sm);
+      border:1px solid var(--ink-600);background:transparent;color:var(--paper-400);cursor:pointer;font-size:15px;line-height:1}
+.fb h2{font-size:23px;margin-bottom:6px}
+.fb-sub{color:var(--paper-400);font-size:14px;margin-bottom:20px}
+.lbl{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+     color:var(--paper-600);display:block;margin:18px 0 9px}
+.rate{display:flex;gap:6px}
+.rate button{flex:1;padding:11px 0;border:1px solid var(--ink-600);background:transparent;border-radius:var(--r-sm);
+             color:var(--paper-400);font-family:'WTM Mono',monospace;font-size:15px;cursor:pointer;transition:all var(--t)}
+.rate button[aria-pressed="true"]{background:var(--signal);color:var(--signal-ink);border-color:var(--signal);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:8px 13px;border-radius:var(--r-sm);border:1px solid var(--ink-600);background:transparent;
+      color:var(--paper-400);font-size:13.5px;font-family:inherit;cursor:pointer;transition:all var(--t)}
+.chip[aria-pressed="true"]{border-color:var(--signal);color:var(--signal);background:color-mix(in srgb,var(--signal) 10%,transparent)}
+.fld{width:100%;background:var(--ink-900);border:1px solid var(--ink-600);border-radius:var(--r-sm);
+     padding:11px 13px;font:inherit;font-size:16px;color:var(--paper-100);outline:none}
+.fld:focus{border-color:var(--signal)}
+textarea.fld{min-height:82px;resize:vertical}
+.fb-send{width:100%;margin-top:20px;justify-content:center;padding:14px}
+.fb-send[disabled]{opacity:.4;cursor:not-allowed}
+.report{background:var(--ink-900);border:1px solid var(--ink-600);border-radius:var(--r-sm);padding:13px 15px;
+        font-family:'WTM Mono',monospace;font-size:11.5px;line-height:1.65;color:var(--paper-400);
+        white-space:pre-wrap;max-height:170px;overflow-y:auto;margin:14px 0}
+.send-row{display:flex;gap:8px;flex-wrap:wrap}
+.send-row .btn{flex:1;min-width:130px;justify-content:center}
 
-/* how */
-.how{position:relative;z-index:1;padding:86px 0 16px;text-align:center}
-.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:42px}
-.how-step{background:var(--bg2);border:0.5px solid var(--border);border-radius:24px;padding:34px 26px}
-.how-n{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--blaze));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:0 auto 18px}
-.how-step h3{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:9px}
-.how-step p{font-size:14px;color:var(--text2);font-weight:500;line-height:1.6}
+/* ── founder log ── */
+#log-sec{display:none}
+#log-sec.show{display:block}
+.log-stats{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:20px}
+.log-stat .n{font-family:'WTM Display',sans-serif;font-size:34px;line-height:1}
+.log-stat .l{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-600);margin-top:4px}
+.entry{border-top:1px solid var(--ink-600);padding:16px 0}
+.entry .who{font-weight:700;font-size:14.5px}
+.entry .meta{font-family:'WTM Mono',monospace;font-size:11px;color:var(--paper-600);margin:3px 0 7px}
+.entry .cmt{color:var(--paper-400);font-size:14.5px}
+.empty{color:var(--paper-600);padding:26px 0;font-size:14.5px}
 
-/* FAQ */
-.faq{position:relative;z-index:1;padding:86px 0 16px;max-width:720px;margin:0 auto}
-.faq h2{text-align:center}
-.faq-list{margin-top:36px;display:flex;flex-direction:column;gap:10px}
-details{background:var(--bg2);border:0.5px solid var(--border);border-radius:18px;padding:0;overflow:hidden}
-summary{list-style:none;cursor:pointer;padding:19px 22px;font-size:15.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px}
-summary::-webkit-details-marker{display:none}
-summary::after{content:'+';font-size:20px;color:var(--violet2);font-weight:600;flex-shrink:0}
-details[open] summary::after{content:'–'}
-.faq-a{padding:0 22px 20px;font-size:14.5px;color:var(--text2);font-weight:500;line-height:1.7}
-
-/* final cta */
-.final{position:relative;z-index:1;padding:96px 0 84px;text-align:center}
-.final-card{background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(255,69,0,.10));border:0.5px solid rgba(124,58,237,.3);border-radius:32px;padding:clamp(40px,7vw,72px) 30px}
-.final h2{margin-bottom:14px}
-.final p{font-size:16px;color:var(--text2);font-weight:500;margin-bottom:32px}
-
-footer{position:relative;z-index:1;border-top:0.5px solid var(--border);padding:34px 0 44px;text-align:center}
-footer .f-logo{font-size:19px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#fff,var(--violet2) 55%,var(--blaze));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;cursor:pointer;user-select:none}
-footer p{font-size:12.5px;color:var(--text3);font-weight:600}
-
-/* ── FEEDBACK ── */
-#fb-fab{position:fixed;bottom:22px;right:20px;z-index:220;background:linear-gradient(135deg,var(--violet),var(--blaze));color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 8px 30px rgba(124,58,237,.45);display:flex;align-items:center;gap:8px;transition:transform .15s;letter-spacing:-.1px}
-#fb-fab:active{transform:scale(.95)}
-#fb-overlay{position:fixed;inset:0;background:rgba(3,2,9,.7);backdrop-filter:blur(6px);z-index:230;display:none;align-items:flex-end;justify-content:center}
-#fb-overlay.open{display:flex}
-@media (min-width:600px){#fb-overlay.open{align-items:center}}
-.fb-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:28px 28px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;padding:26px 24px 40px;position:relative}
-@media (min-width:600px){.fb-card{border-radius:28px;padding-bottom:30px}}
-.fb-close{position:absolute;top:18px;right:18px;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text2);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
-.fb-title{font-size:21px;font-weight:900;letter-spacing:-.6px;margin-bottom:5px}
-.fb-sub{font-size:13.5px;color:var(--text2);font-weight:500;margin-bottom:22px;line-height:1.5}
-.fb-label{font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin:18px 0 9px}
-.stars{display:flex;gap:8px}
-.star{font-size:32px;cursor:pointer;filter:grayscale(1);opacity:.35;transition:all .12s;background:none;border:none;padding:2px}
-.star.on{filter:none;opacity:1;transform:scale(1.08)}
-.fb-chips{display:flex;flex-wrap:wrap;gap:8px}
-.fb-chip{padding:8px 15px;border-radius:50px;border:0.5px solid var(--border2);background:var(--bg3);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .13s}
-.fb-chip.on{background:var(--violet);border-color:var(--violet2);color:#fff}
-.fb-input,.fb-ta{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:14px;padding:13px 16px;font-size:15px;color:var(--text1);font-family:inherit;font-weight:500;outline:none}
-.fb-input:focus,.fb-ta:focus{border-color:rgba(124,58,237,.5)}
-.fb-ta{min-height:88px;resize:vertical;line-height:1.5}
-.fb-submit{width:100%;margin-top:22px;background:linear-gradient(135deg,var(--violet),var(--blaze));border:none;color:#fff;font-size:15.5px;font-weight:800;padding:16px;border-radius:16px;cursor:pointer;letter-spacing:-.2px}
-.fb-submit:disabled{opacity:.45;cursor:default}
-/* thanks state */
-.fb-thanks{text-align:center;padding:8px 0 4px}
-.fb-thanks .big{font-size:52px;margin-bottom:12px}
-.fb-thanks h3{font-size:21px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
-.fb-thanks p{font-size:13.5px;color:var(--text2);font-weight:500;line-height:1.6;margin-bottom:20px}
-.fb-report{background:var(--bg3);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;font-size:12px;color:var(--text2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-align:left;white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-bottom:16px;line-height:1.6}
-.fb-actions{display:flex;gap:10px;flex-wrap:wrap}
-.fb-act{flex:1;min-width:130px;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text1);font-size:13.5px;font-weight:800;padding:13px;border-radius:14px;cursor:pointer}
-.fb-act.hot{background:linear-gradient(135deg,var(--violet),var(--blaze));border:none;color:#fff}
-
-/* founder report */
-#report-sec{position:relative;z-index:1;padding:60px 0 80px;display:none}
-#report-sec.show{display:block}
-.rep-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px}
-.rep-stats{display:flex;gap:26px;flex-wrap:wrap}
-.rep-stat .n{font-size:30px;font-weight:900;letter-spacing:-1px}
-.rep-stat .l{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.rep-tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 26px}
-.rep-tag{background:var(--bg3);border:0.5px solid var(--border2);border-radius:50px;padding:7px 14px;font-size:12.5px;font-weight:700;color:var(--text2)}
-.rep-entry{background:var(--bg2);border:0.5px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:12px}
-.rep-entry .who{font-size:14px;font-weight:800;margin-bottom:4px}
-.rep-entry .meta{font-size:11.5px;color:var(--text3);font-weight:600;margin-bottom:8px}
-.rep-entry .cmt{font-size:14px;color:var(--text2);font-weight:500;line-height:1.6}
-.rep-empty{color:var(--text3);font-size:15px;font-weight:600;padding:30px 0;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 </style>
 
-<div class="glow glow1"></div><div class="glow glow2"></div><div class="glow glow3"></div>
-
-<nav><div class="nav-inner">
-  <div class="nav-logo">WTM</div>
-  <button class="nav-cta" onclick="launchFS()">▶ Launch demo</button>
-</div></nav>
-
-<section class="hero wrap">
-  <div class="hero-badge"><span class="dot"></span>Now in beta · Pittsburgh</div>
-  <h1>Know what's moving.<br><span class="grad">Tonight.</span></h1>
-  <p class="hero-sub">WTM is the live map of everything happening around you, and which of your friends are already there. No more "wyd" texts bouncing around three group chats.</p>
-  <div class="hero-ctas">
-    <button class="btn-main" onclick="launchFS()">▶ Launch the live demo</button>
-    <a class="btn-ghost" href="#features">See what it does</a>
+<nav>
+  <div class="nav-in">
+    <span class="wordmark">WT<i>M</i></span>
+    <button class="btn btn-primary" onclick="launch()">Open the demo</button>
   </div>
-  <div class="hero-note">Fully interactive. This is the real app, not screenshots</div>
-</section>
+</nav>
 
-<div class="stats reveal">
-  <div class="stat"><div class="stat-n">8</div><div class="stat-l">Moves live</div></div>
-  <div class="stat"><div class="stat-n">137</div><div class="stat-l">People locked in</div></div>
-  <div class="stat"><div class="stat-n">4</div><div class="stat-l">Friends out tonight</div></div>
-  <div class="stat"><div class="stat-n">3</div><div class="stat-l">Rivers, 1 city</div></div>
-</div>
-
-<section class="demo-sec wrap" id="demo">
-  <div class="sec-eyebrow reveal">Live demo</div>
-  <h2 class="reveal">Tap around. Everything works.</h2>
-  <p class="sec-sub reveal">Join a move, watch the group chat fire off, open the map and zoom from street level out to Cranberry. The city keeps moving while you watch.</p>
-
-  <div class="launch-card reveal">
-    <div class="launch-emoji">📲</div>
-    <h3>Best experienced fullscreen</h3>
-    <p>You're on a phone. Launch the demo fullscreen and use it like the real app.</p>
-    <button class="btn-main" style="width:100%" onclick="launchFS()">▶ Launch the demo</button>
-  </div>
-
-  <div class="phone-stage reveal">
-    <div class="phone-glow"></div>
-    <div class="phone">
-      <div class="phone-screen">
-        <div class="phone-notch"></div>
-        <iframe id="app-frame" title="WTM live demo"></iframe>
+<header class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow"><span class="pip"></span>Beta · Pittsburgh</p>
+      <h1>Know what's<br>moving. <em>Tonight.</em></h1>
+      <p class="lede">A live map of what's happening around you and which of your
+        friends are already there. No more "wyd" across three group chats.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="launch()">Open the demo</button>
+        <a class="btn btn-quiet" href="#how">How it works</a>
       </div>
+      <p class="hero-note">Runs in your browser. Nothing to install.</p>
+    </div>
+    <dl class="hero-side">
+      <dt>What it is</dt>
+      <dd>A working demo of the WTM beta — the real interface, with a simulated Friday night running through it.</dd>
+      <dt>What it isn't</dt>
+      <dd>A video, a mockup, or a waitlist page. Everything you tap does something.</dd>
+    </dl>
+  </div>
+</header>
+
+<hr class="rule" style="--at:22%">
+
+<section class="wrap" id="demo">
+  <div class="sec-head">
+    <h2>Tap around.</h2>
+    <p>Lock into a move, watch the group chat fill up, then open the map and zoom
+      from a street corner out to Cranberry.</p>
+  </div>
+  <div class="launch">
+    <h3>Best fullscreen</h3>
+    <p>You're on a phone. Open it fullscreen and use it the way it's meant to be used.</p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="launch()">Open the demo</button>
+  </div>
+  <div class="demo-wrap">
+    <div class="phone"><div class="phone-screen"><iframe id="frame" title="WTM demo" loading="lazy"></iframe></div></div>
+  </div>
+  <p class="demo-tip">Try the Map tab → pinch to zoom out</p>
+</section>
+
+<hr class="rule" style="--at:64%">
+
+<section class="wrap">
+  <div class="sec-head"><h2>Built for the two hours before you leave the house.</h2></div>
+  <div class="feats">
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
+      <h3>The live map</h3>
+      <p>Real Pittsburgh geography — the three rivers, the bridges, the street grid. Heat where the night is
+        concentrated, your friends' faces where they actually are, every move pinned to its real address.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg>
+      <h3>Friends first</h3>
+      <p>Every move leads with who you know is going. "Devon and Casey are in" beats a flyer.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <h3>Just Us</h3>
+      <p>Private, capped, invite-only. Four people and a couch. The address only appears once you're in.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 8l14 8M19 8 5 16"/></svg>
+      <h3>The Scene</h3>
+      <p>Rooftops, DJ sets, the big rooms. Watch the count climb and get in before it caps.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      <h3>One tap in</h3>
+      <p>"I'm in" is the whole RSVP. Full moves open a waitlist. Every move has a chat.</p>
+    </article>
+  </div>
+</section>
+
+<hr class="rule" style="--at:38%">
+
+<section class="wrap" id="how">
+  <div class="sec-head"><h2>Three taps to a better night.</h2></div>
+  <div class="steps">
+    <div class="step"><span class="n">STEP 01</span><h3>Open the map</h3><p>Everything happening tonight, and where your friends are, live.</p></div>
+    <div class="step"><span class="n">STEP 02</span><h3>Lock in</h3><p>One tap. You're on the list and in the chat.</p></div>
+    <div class="step"><span class="n">STEP 03</span><h3>Pull up</h3><p>Your friends see you're coming. The rest sorts itself out.</p></div>
+  </div>
+</section>
+
+<hr class="rule" style="--at:78%">
+
+<section class="wrap">
+  <div class="sec-head"><h2>Questions.</h2></div>
+  <div class="faq">
+    <details><summary>Is this the real app?</summary><div class="faq-a">It's the real interface running a simulated Friday night. Joining, chatting, stories and the map all work. The production app connects to real people and real events.</div></details>
+    <details><summary>Does it track me?</summary><div class="faq-a">No. No account, no location permission, no analytics. Nothing you do here leaves your device unless you choose to send feedback.</div></details>
+    <details><summary>Which cities?</summary><div class="faq-a">Pittsburgh first. The demo map covers the whole metro, from Cranberry down to McKeesport.</div></details>
+    <details><summary>How do I get in?</summary><div class="faq-a">Beta access spreads through friends. If someone sent you this, you're already on the path — leave feedback with your name and you're on the list.</div></details>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="close-cta">
+    <h2>Stop asking what the move is.</h2>
+    <p>Try it, then tell me what you actually think. Twenty seconds, and blunt is better.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="launch()">Open the demo</button>
+      <button class="btn btn-quiet" onclick="openFb()">Leave feedback</button>
     </div>
   </div>
-  <div style="display:block" class="fs-under">
-    <div class="demo-hint">💡 Tap "See what's up", then hit the Map tab. Pinch, drag, zoom out to Cranberry</div>
-  </div>
 </section>
 
-<section class="features wrap" id="features">
-  <div style="text-align:center">
-    <div class="sec-eyebrow reveal">Why WTM</div>
-    <h2 class="reveal">Your night, organized by nobody.</h2>
+<section class="wrap" id="log-sec">
+  <hr class="rule" style="--at:50%" >
+  <div class="sec-head" style="margin-top:40px">
+    <h2>Feedback log</h2>
+    <p>Everything submitted on this device. Reports friends send you by email or text land in your inbox, not here.</p>
   </div>
-  <div class="feat-grid">
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(255,69,0,.14)">🗺</div>
-      <h3>The Live Map</h3><p>A real map of the city with heat zones where the night is concentrated, your friends' avatars where they actually are, and every move pinned to its real spot.</p></div>
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(124,58,237,.16)">👥</div>
-      <h3>Friends first</h3><p>Every move shows you who you know is going before anything else. "Devon & Casey are already locked in" hits different than a flyer.</p></div>
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(245,158,11,.14)">🤝</div>
-      <h3>Just Us</h3><p>Private, capped, invite-only moves for the inner circle. Four people, one couch, no randos. The move nobody else can see.</p></div>
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(217,70,239,.15)">🎉</div>
-      <h3>The Scene</h3><p>The big nights: rooftop parties, DJ sets, mixed crowds. Watch the count climb in real time and get in before it caps.</p></div>
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(16,185,129,.13)">⚡</div>
-      <h3>One-tap lock in</h3><p>"I'm in." That's the whole RSVP. Full moves get a waitlist, every move gets a live group chat, and your streak keeps itself.</p></div>
-    <div class="feat reveal"><div class="feat-icon" style="background:rgba(14,165,233,.14)">📸</div>
-      <h3>Stories from the move</h3><p>Hosts post to the move's story: soundcheck clips, "26 spots left", golden hour on the roof. The FOMO is the feature.</p></div>
+  <div class="log-stats" id="log-stats"></div>
+  <div class="hero-cta" style="margin-bottom:20px">
+    <button class="btn btn-quiet" onclick="copyAll(this)">Copy all as text</button>
+    <button class="btn btn-quiet" onclick="clearLog(this)">Clear log</button>
   </div>
-</section>
-
-<section class="how wrap">
-  <div class="sec-eyebrow reveal">How it works</div>
-  <h2 class="reveal">Three taps to a better night.</h2>
-  <div class="how-grid">
-    <div class="how-step reveal"><div class="how-n">1</div><h3>Open the map</h3><p>See every move happening tonight and where your friends are at, live.</p></div>
-    <div class="how-step reveal"><div class="how-n">2</div><h3>Lock in</h3><p>Tap "I'm in" on the move that hits. You're on the list, in the chat, done.</p></div>
-    <div class="how-step reveal"><div class="how-n">3</div><h3>Pull up</h3><p>Your friends see you're coming. The group chat coordinates itself.</p></div>
-  </div>
-</section>
-
-<section class="faq wrap">
-  <div class="sec-eyebrow reveal" style="text-align:center">Questions</div>
-  <h2 class="reveal">Quick answers.</h2>
-  <div class="faq-list">
-    <details class="reveal"><summary>Is this the real app?</summary><div class="faq-a">This is a fully interactive demo of the WTM beta: real interface, real map, simulated city activity. Everything you tap works: joining moves, chats, stories, the map. The production app connects to real people and real events.</div></details>
-    <details class="reveal"><summary>Is my data safe in this demo?</summary><div class="faq-a">Nothing you do in the demo leaves your device. No account, no location access, no tracking. Feedback is only shared if you choose to send it.</div></details>
-    <details class="reveal"><summary>What cities does WTM cover?</summary><div class="faq-a">The beta is Pittsburgh-first. The demo map covers the whole metro, from Cranberry to McKeesport. More cities are on the roadmap.</div></details>
-    <details class="reveal"><summary>How do I get in?</summary><div class="faq-a">Beta access rolls out through friends. If someone sent you this demo, you're already on the path. Leave feedback with your name and you're on the list.</div></details>
-  </div>
-</section>
-
-<section class="final wrap">
-  <div class="final-card reveal">
-    <h2>Stop asking "what's the move?"</h2>
-    <p>Try the demo, then tell us what you think. It takes 20 seconds.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <button class="btn-main" onclick="launchFS()">▶ Launch the demo</button>
-      <button class="btn-ghost" onclick="openFb()">💬 Leave feedback</button>
-    </div>
-  </div>
-</section>
-
-<!-- FOUNDER REPORT (hidden: #report or 5 taps on footer logo) -->
-<section id="report-sec" class="wrap">
-  <div class="sec-eyebrow">Founder view</div>
-  <h2>Feedback report</h2>
-  <p class="sec-sub" style="margin:10px 0 26px;max-width:640px">Feedback submitted <b>on this device</b>. Friends' reports arrive as emails and texts. This panel aggregates everything collected on this device.</p>
-  <div class="rep-head">
-    <div class="rep-stats" id="rep-stats"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="fb-act" onclick="copyAllReports()">📋 Copy all</button>
-      <button class="fb-act" id="rep-dl" onclick="downloadAllReports()">⬇ Download JSON</button>
-    </div>
-  </div>
-  <div class="rep-tags" id="rep-tags"></div>
-  <div id="rep-list"></div>
+  <div id="log-list"></div>
 </section>
 
 <footer>
-  <div class="f-logo" id="footer-logo">WTM</div>
-  <p>What's The Move · Beta · Pittsburgh, PA</p>
+  <div class="wrap foot">
+    <span class="wordmark" id="mark" style="font-size:20px;cursor:pointer;user-select:none">WT<i>M</i></span>
+    <p>What's The Move · Beta · Pittsburgh PA</p>
+  </div>
 </footer>
 
-<!-- FULLSCREEN DEMO -->
+<button class="btn btn-primary" id="fb-open" onclick="openFb()">Feedback</button>
+
+<div id="fb-scrim" role="dialog" aria-modal="true" aria-labelledby="fb-title"><div class="fb" id="fb-card"></div></div>
+
 <div id="fs">
   <div class="fs-bar">
-    <div class="fs-title">WTM · Live Demo</div>
-    <div class="fs-actions">
-      <button class="fs-btn hot" onclick="closeFS();openFb()">💬 Feedback</button>
-      <button class="fs-btn" onclick="closeFS()">✕ Exit</button>
-    </div>
+    <span class="wordmark" style="font-size:19px">WT<i>M</i></span>
+    <span style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="closeFs();openFb()">Feedback</button>
+      <button class="btn btn-quiet" onclick="closeFs()">Close</button>
+    </span>
   </div>
-  <iframe id="fs-frame" title="WTM live demo fullscreen"></iframe>
-</div>
-
-<!-- FEEDBACK -->
-<button id="fb-fab" onclick="openFb()">💬 Feedback</button>
-<div id="fb-overlay">
-  <div class="fb-card" id="fb-card"></div>
+  <iframe id="fs-frame" title="WTM demo fullscreen"></iframe>
 </div>
 
 <script>
 const APP_SRC=__APP_SRC__;
 
-// ── demo frames (lazy) ──
-let mockLoaded=false,fsLoaded=false;
-function loadMock(){
-  if(mockLoaded)return;
-  const f=document.getElementById('app-frame');
-  if(f&&f.offsetParent!==null){f.srcdoc=APP_SRC;mockLoaded=true;}
+/* ── demo frames, loaded on demand ── */
+let deskLoaded=false, fsLoaded=false;
+function loadDesk(){
+  const f=document.getElementById('frame');
+  if(deskLoaded||!f||f.offsetParent===null)return;
+  f.srcdoc=APP_SRC; deskLoaded=true;
 }
-function launchFS(){
-  const fs=document.getElementById('fs');
+function launch(){
   if(!fsLoaded){document.getElementById('fs-frame').srcdoc=APP_SRC;fsLoaded=true;}
-  fs.classList.add('open');document.body.classList.add('locked');
-  track('fullscreen_open');
+  document.getElementById('fs').classList.add('open');
+  document.body.classList.add('locked');
+  note('opened_demo');
 }
-function closeFS(){
+function closeFs(){
   document.getElementById('fs').classList.remove('open');
   document.body.classList.remove('locked');
 }
-window.addEventListener('load',loadMock);
-window.addEventListener('resize',loadMock);
-
-// ── usage telemetry from the embedded app ──
-const usage={};const t0=Date.now();
-window.addEventListener('message',e=>{
-  const n=e&&e.data&&e.data.wtmEvt;
-  if(typeof n==='string'&&n.length<40)usage[n]=(usage[n]||0)+1;
+addEventListener('load',loadDesk);
+addEventListener('resize',loadDesk);
+addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(document.getElementById('fb-scrim').classList.contains('open'))closeFb();
+  else if(document.getElementById('fs').classList.contains('open'))closeFs();
 });
-function track(n){usage[n]=(usage[n]||0)+1;}
 
-// ── reveal animations ──
-const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+/* ── what the visitor actually did, for the report ── */
+const used={}, t0=Date.now();
+function note(n){used[n]=(used[n]||0)+1;}
+addEventListener('message',e=>{
+  const n=e&&e.data&&e.data.wtmEvt;
+  if(typeof n==='string'&&n.length<40)note(n);
+});
 
-// ── FEEDBACK ──
-const FB_CHIPS=['🗺 The map','🎨 The design','👥 Friends features','⚡ Fast & smooth','😕 Something confused me','🐛 Found a bug','📱 I would use this'];
-let fb={stars:0,chips:new Set(),comment:'',name:''};
+/* ── feedback ── */
+const TAGS=['The map','The design','Friends features','Felt fast','Something confused me','Hit a bug','I would use this'];
+let stars=0; const picked=new Set();
 
 function openFb(){
-  fb={stars:0,chips:new Set(),comment:'',name:''};
-  renderFbForm();
-  document.getElementById('fb-overlay').classList.add('open');
+  stars=0; picked.clear(); drawFb();
+  document.getElementById('fb-scrim').classList.add('open');
   document.body.classList.add('locked');
+  document.getElementById('fb-rate1')?.focus();
 }
 function closeFb(){
-  document.getElementById('fb-overlay').classList.remove('open');
+  document.getElementById('fb-scrim').classList.remove('open');
   document.body.classList.remove('locked');
 }
-document.getElementById('fb-overlay').addEventListener('click',e=>{if(e.target.id==='fb-overlay')closeFb();});
+document.getElementById('fb-scrim').addEventListener('click',e=>{if(e.target.id==='fb-scrim')closeFb();});
 
-function renderFbForm(){
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function drawFb(){
   document.getElementById('fb-card').innerHTML=`
-    <button class="fb-close" onclick="closeFb()">✕</button>
-    <div class="fb-title">What'd you think?</div>
-    <div class="fb-sub">20 seconds. Brutal honesty welcome. This is how the beta gets better.</div>
-    <div class="fb-label">Rate it</div>
-    <div class="stars">${[1,2,3,4,5].map(i=>`<button class="star" data-s="${i}" onclick="setStars(${i})">🔥</button>`).join('')}</div>
-    <div class="fb-label">What stood out? <span style="font-weight:600;text-transform:none;letter-spacing:0">(pick any)</span></div>
-    <div class="fb-chips">${FB_CHIPS.map((c,i)=>`<button class="fb-chip" data-i="${i}" onclick="togChip(${i})">${c}</button>`).join('')}</div>
-    <div class="fb-label">Anything else?</div>
-    <textarea class="fb-ta" id="fb-comment" placeholder="What you'd change, what you loved, what broke…"></textarea>
-    <div class="fb-label">Your name <span style="font-weight:600;text-transform:none;letter-spacing:0">(for the beta list)</span></div>
-    <input class="fb-input" id="fb-name" placeholder="First name is fine">
-    <button class="fb-submit" id="fb-go" onclick="submitFb()" disabled>Send feedback</button>`;
+    <button class="fb-x" onclick="closeFb()" aria-label="Close">✕</button>
+    <h2 id="fb-title">What did you think?</h2>
+    <p class="fb-sub">Twenty seconds. Blunt is more useful than kind.</p>
+    <span class="lbl" id="rate-lbl">Rating</span>
+    <div class="rate" role="group" aria-labelledby="rate-lbl">
+      ${[1,2,3,4,5].map(i=>`<button id="fb-rate${i}" aria-pressed="false" aria-label="${i} out of 5" onclick="setStars(${i})">${i}</button>`).join('')}
+    </div>
+    <span class="lbl" id="tag-lbl">What stood out</span>
+    <div class="chips" role="group" aria-labelledby="tag-lbl">
+      ${TAGS.map((t,i)=>`<button class="chip" aria-pressed="false" onclick="tog(${i},this)">${t}</button>`).join('')}
+    </div>
+    <label class="lbl" for="fb-note">Anything else</label>
+    <textarea class="fld" id="fb-note" placeholder="What you'd change, what worked, what broke."></textarea>
+    <label class="lbl" for="fb-name">Your name</label>
+    <input class="fld" id="fb-name" placeholder="First name is fine" autocomplete="given-name">
+    <button class="btn btn-primary fb-send" id="fb-send" onclick="submitFb()" disabled>Pick a rating first</button>`;
 }
 function setStars(n){
-  fb.stars=n;
-  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.s<=n));
-  document.getElementById('fb-go').disabled=false;
+  stars=n;
+  for(let i=1;i<=5;i++)document.getElementById('fb-rate'+i).setAttribute('aria-pressed',String(i===n));
+  const b=document.getElementById('fb-send'); b.disabled=false; b.textContent='Send feedback';
 }
-function togChip(i){
-  fb.chips.has(i)?fb.chips.delete(i):fb.chips.add(i);
-  document.querySelector(`.fb-chip[data-i="${i}"]`).classList.toggle('on');
+function tog(i,el){
+  picked.has(i)?picked.delete(i):picked.add(i);
+  el.setAttribute('aria-pressed',String(picked.has(i)));
 }
 
-function buildEntry(){
-  const secs=Math.round((Date.now()-t0)/1000);
-  return{
-    name:(document.getElementById('fb-name')?.value||'').trim()||'Anonymous',
-    stars:fb.stars,
-    tags:[...fb.chips].map(i=>FB_CHIPS[i]),
-    comment:(document.getElementById('fb-comment')?.value||'').trim(),
-    device:/Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop',
-    screen:`${screen.width}×${screen.height}`,
-    secondsOnPage:secs,
-    usage:{...usage},
-    when:new Date().toISOString()
-  };
-}
-function formatReport(e){
-  const u=e.usage||{};
-  const did=[
-    u.entered?'opened the app':null,
+function buildReport(e){
+  const u=e.used, did=[
+    u.opened_demo?'opened the demo':null,
     u.joined_move?`joined ${u.joined_move} move${u.joined_move>1?'s':''}`:null,
     u.tab_map?`opened the map ${u.tab_map}×`:null,
     u.watched_story?`watched ${u.watched_story} stor${u.watched_story>1?'ies':'y'}`:null,
-    u.sent_chat?`sent ${u.sent_chat} chat${u.sent_chat>1?'s':''}`:null,
-    u.created_move?'created a move':null,
-  ].filter(Boolean).join(', ')||'browsed the page';
-  return [
-    '🔥 WTM DEMO FEEDBACK',
-    '────────────────────',
-    `From: ${e.name}`,
-    `Rating: ${'🔥'.repeat(e.stars)}${'·'.repeat(5-e.stars)} (${e.stars}/5)`,
-    e.tags.length?`Stood out: ${e.tags.join(' · ')}`:null,
-    e.comment?`Notes: "${e.comment}"`:null,
-    `Session: ${e.device} · ${e.secondsOnPage}s · ${did}`,
-    `${new Date(e.when).toLocaleString()}`
+    u.sent_chat?`sent ${u.sent_chat} message${u.sent_chat>1?'s':''}`:null,
+    u.created_move?'created a move':null
+  ].filter(Boolean).join(', ')||'looked around the page';
+  return ['WTM demo feedback','',
+    `From:    ${e.name}`,
+    `Rating:  ${e.stars}/5`,
+    e.tags.length?`Liked:   ${e.tags.join(', ')}`:null,
+    e.note?`Notes:   ${e.note}`:null,
+    `Session: ${e.device}, ${e.secs}s, ${did}`,
+    `Sent:    ${new Date(e.at).toLocaleString()}`
   ].filter(Boolean).join('\n');
 }
 
 function submitFb(){
-  const entry=buildEntry();
+  const entry={
+    name:(document.getElementById('fb-name').value||'').trim()||'Anonymous',
+    stars, tags:[...picked].map(i=>TAGS[i]),
+    note:(document.getElementById('fb-note').value||'').trim(),
+    device:matchMedia('(pointer:coarse)').matches?'phone':'desktop',
+    secs:Math.round((Date.now()-t0)/1000),
+    used:{...used}, at:new Date().toISOString()
+  };
   try{
-    const all=JSON.parse(localStorage.getItem('wtm-fb')||'[]');
-    all.push(entry);
-    localStorage.setItem('wtm-fb',JSON.stringify(all));
-  }catch(e){}
-  const report=formatReport(entry);
-  const enc=encodeURIComponent(report);
-  const mailHref=`mailto:owedog18@gmail.com?subject=${encodeURIComponent('WTM demo feedback from '+entry.name)}&body=${enc}`;
-  const smsHref=`sms:?&body=${enc}`;
+    const all=JSON.parse(localStorage.getItem('wtm-feedback')||'[]');
+    all.push(entry); localStorage.setItem('wtm-feedback',JSON.stringify(all));
+  }catch(err){ /* private mode: the report below still works */ }
+
+  const text=buildReport(entry);
+  window._report=text;
+  const subj=encodeURIComponent('WTM demo feedback — '+entry.name);
+  const body=encodeURIComponent(text);
   document.getElementById('fb-card').innerHTML=`
-    <button class="fb-close" onclick="closeFb()">✕</button>
-    <div class="fb-thanks">
-      <div class="big">🙌</div>
-      <h3>Appreciate you, ${entry.name.split(' ')[0]}.</h3>
-      <p>One tap and it's on its way. Your report is already written, just hit send.</p>
-      <div class="fb-actions" style="margin-bottom:14px">
-        <a class="fb-act hot" style="text-decoration:none;display:flex;align-items:center;justify-content:center" href="${mailHref}">📧 Email it in</a>
-        <a class="fb-act" style="text-decoration:none;display:flex;align-items:center;justify-content:center" href="${smsHref}">💬 Text it</a>
-      </div>
-      <div class="fb-report">${report.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
-      <div class="fb-actions">
-        <button class="fb-act" onclick="copyReport(this)">📋 Or copy it</button>
-      </div>
-    </div>`;
-  window._lastReport=report;
-  window._lastEntry=entry;
-}
-async function copyReport(btn){
-  try{await navigator.clipboard.writeText(window._lastReport);btn.textContent='✓ Copied, now send it';}
-  catch(e){
-    const ta=document.createElement('textarea');ta.value=window._lastReport;document.body.appendChild(ta);
-    ta.select();try{document.execCommand('copy');btn.textContent='✓ Copied, now send it';}catch(_){btn.textContent='Select the text above manually';}
-    ta.remove();
-  }
-}
-async function dlReport(btn){
-  try{
-    await window.claude.downloads.save({filename:'wtm-feedback.txt',data:window._lastReport});
-    btn.textContent='✓ Saved';
-  }catch(err){
-    if(err&&err.code==='declined'){btn.textContent='⬇ Save as file';}
-    else if(err&&err.code==='rate_limited'){btn.textContent='One sec, try again…';}
-    else{btn.style.display='none';}
-  }
+    <button class="fb-x" onclick="closeFb()" aria-label="Close">✕</button>
+    <h2>Thanks, ${esc(entry.name.split(' ')[0])}.</h2>
+    <p class="fb-sub">It's written. One tap and it's sent.</p>
+    <div class="send-row">
+      <a class="btn btn-primary" href="mailto:owedog18@gmail.com?subject=${subj}&body=${body}">Email it</a>
+      <a class="btn btn-quiet" href="sms:?&body=${body}">Text it</a>
+    </div>
+    <div class="report">${esc(text)}</div>
+    <div class="send-row"><button class="btn btn-quiet" onclick="copyReport(this)">Copy instead</button></div>`;
 }
 
-// ── FOUNDER REPORT ──
-function getAll(){try{return JSON.parse(localStorage.getItem('wtm-fb')||'[]');}catch(e){return[];}}
-function showReport(){
-  const sec=document.getElementById('report-sec');
-  sec.classList.add('show');
-  const all=getAll();
-  const stats=document.getElementById('rep-stats');
-  const tags=document.getElementById('rep-tags');
-  const list=document.getElementById('rep-list');
+async function writeClip(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){}
+    ta.remove(); return ok;
+  }
+}
+async function copyReport(btn){
+  btn.textContent = await writeClip(window._report) ? 'Copied — now send it' : 'Select the text above to copy';
+}
+
+/* ── founder log ── */
+function readLog(){ try{ return JSON.parse(localStorage.getItem('wtm-feedback')||'[]'); }catch(e){ return []; } }
+function showLog(){
+  const all=readLog();
+  const stats=document.getElementById('log-stats'), list=document.getElementById('log-list');
   if(!all.length){
-    stats.innerHTML='';tags.innerHTML='';
-    list.innerHTML='<div class="rep-empty">No feedback collected on this device yet.<br>Reports from friends arrive by email and text once they hit 💬 Feedback.</div>';
+    stats.innerHTML='';
+    list.innerHTML='<p class="empty">Nothing on this device yet. Friends\' reports arrive by email or text once they hit Feedback.</p>';
   }else{
     const avg=(all.reduce((s,e)=>s+e.stars,0)/all.length).toFixed(1);
-    const wouldUse=all.filter(e=>e.tags.some(t=>t.includes('would use'))).length;
+    const would=all.filter(e=>e.tags.includes('I would use this')).length;
     stats.innerHTML=`
-      <div class="rep-stat"><div class="n">${all.length}</div><div class="l">Responses</div></div>
-      <div class="rep-stat"><div class="n">${avg}<span style="font-size:16px;color:var(--text3)">/5</span></div><div class="l">Avg rating</div></div>
-      <div class="rep-stat"><div class="n">${wouldUse}</div><div class="l">Would use it</div></div>`;
-    const tc={};all.forEach(e=>e.tags.forEach(t=>tc[t]=(tc[t]||0)+1));
-    tags.innerHTML=Object.entries(tc).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span class="rep-tag">${t} × ${n}</span>`).join('');
+      <div class="log-stat"><div class="n mono">${all.length}</div><div class="l">Responses</div></div>
+      <div class="log-stat"><div class="n mono">${avg}</div><div class="l">Avg rating</div></div>
+      <div class="log-stat"><div class="n mono">${would}</div><div class="l">Would use it</div></div>`;
     list.innerHTML=all.slice().reverse().map(e=>`
-      <div class="rep-entry">
-        <div class="who">${String(e.name).replace(/</g,'&lt;')} · ${'🔥'.repeat(e.stars)}</div>
-        <div class="meta">${e.device} · ${new Date(e.when).toLocaleString()} · ${e.secondsOnPage}s on page</div>
-        ${e.comment?`<div class="cmt">"${String(e.comment).replace(/</g,'&lt;')}"</div>`:''}
+      <div class="entry">
+        <div class="who">${esc(e.name)} — ${e.stars}/5</div>
+        <div class="meta">${esc(e.device)} · ${e.secs}s · ${new Date(e.at).toLocaleString()}</div>
+        ${e.tags.length?`<div class="meta">${esc(e.tags.join(', '))}</div>`:''}
+        ${e.note?`<div class="cmt">${esc(e.note)}</div>`:''}
       </div>`).join('');
   }
-  sec.scrollIntoView({behavior:'smooth'});
+  document.getElementById('log-sec').classList.add('show');
+  document.getElementById('log-sec').scrollIntoView({behavior:'smooth'});
 }
-async function copyAllReports(){
-  const all=getAll();
-  const txt=all.length?all.map(formatReport).join('\n\n'):'No feedback yet.';
-  try{await navigator.clipboard.writeText(txt);}catch(e){}
+async function copyAll(btn){
+  const all=readLog();
+  const txt=all.length?all.map(buildReport).join('\n\n————————\n\n'):'No feedback yet.';
+  btn.textContent = await writeClip(txt) ? 'Copied' : 'Copy failed';
+  setTimeout(()=>btn.textContent='Copy all as text',2000);
 }
-async function downloadAllReports(){
-  const btn=document.getElementById('rep-dl');
-  if(!(window.claude&&window.claude.downloads)){btn.style.display='none';return;}
-  try{await window.claude.downloads.save({filename:'wtm-feedback-report.json',data:JSON.stringify(getAll(),null,2)});btn.textContent='✓ Saved';}
-  catch(err){if(err&&err.code!=='declined'&&err.code!=='rate_limited')btn.style.display='none';}
+function clearLog(btn){
+  if(btn.dataset.armed!=='1'){
+    btn.dataset.armed='1'; btn.textContent='Tap again to erase';
+    setTimeout(()=>{btn.dataset.armed='';btn.textContent='Clear log';},4000);
+    return;
+  }
+  localStorage.removeItem('wtm-feedback'); btn.dataset.armed=''; btn.textContent='Clear log'; showLog();
 }
-// unlock: #report in URL, or 5 taps on the footer logo
-if(location.hash==='#report')setTimeout(showReport,300);
-let logoTaps=0,logoTimer;
-document.getElementById('footer-logo').addEventListener('click',()=>{
-  logoTaps++;clearTimeout(logoTimer);
-  logoTimer=setTimeout(()=>logoTaps=0,1600);
-  if(logoTaps>=5){logoTaps=0;showReport();}
+if(location.hash==='#log')addEventListener('load',()=>setTimeout(showLog,200));
+let taps=0,tapTimer;
+document.getElementById('mark').addEventListener('click',()=>{
+  taps++; clearTimeout(tapTimer); tapTimer=setTimeout(()=>taps=0,1500);
+  if(taps>=5){taps=0;showLog();}
 });
 </script>

@@ -6,9 +6,9 @@ const {chromium} = require('playwright-core');
   const errors=[];
   page.on('pageerror',e=>errors.push('PAGE: '+e.message.slice(0,120)));
   page.on('console',m=>{if(m.type()==='error')errors.push('CON: '+m.text().slice(0,120));});
-  await page.goto('file://'+__dirname+'/wtm-share.html',{timeout:15000});
+  await page.goto('file://'+__dirname+'/../dist/wtm-share.html',{timeout:15000});
   await page.waitForTimeout(700);
-  await page.click('button.nav-cta'); await page.waitForTimeout(1100);
+  await page.click('nav button.btn-primary'); await page.waitForTimeout(1100);
   let frame=null;
   for(const f of page.frames()){if(f===page.mainFrame())continue;if(await f.locator('button.wlc-btn').count()>0){frame=f;break;}}
   await frame.click('button.wlc-btn'); await page.waitForTimeout(700);

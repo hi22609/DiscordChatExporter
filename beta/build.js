@@ -6,8 +6,15 @@ const fs = require('fs');
 const path = require('path');
 const dir = __dirname;
 
-const app = fs.readFileSync(path.join(dir, 'wtm-beta.html'), 'utf8');
-const shell = fs.readFileSync(path.join(dir, 'wtm-share-shell.html'), 'utf8');
+const faces = fs.readFileSync(path.join(dir, 'fonts', 'faces.css'), 'utf8');
+
+// Fonts are injected at build time rather than pasted into the sources: the
+// four subset faces are ~45 KB of base64 and would make the sources unreadable.
+// The Artifact CSP blocks font CDNs, so they must be inlined as data URIs.
+const inject = (html) => html.replace('__FONTS__', () => faces);
+
+const app = inject(fs.readFileSync(path.join(dir, 'wtm-beta.html'), 'utf8'));
+const shell = inject(fs.readFileSync(path.join(dir, 'wtm-share-shell.html'), 'utf8'));
 
 if (!shell.includes('__APP_SRC__')) {
   console.error('build failed: shell is missing the __APP_SRC__ placeholder');
@@ -16,7 +23,12 @@ if (!shell.includes('__APP_SRC__')) {
 
 const literal = JSON.stringify(app).replace(/<\//g, '<\\/');
 const out = shell.replace('__APP_SRC__', literal);
-const target = path.join(dir, 'wtm-share.html');
+fs.mkdirSync(path.join(dir, 'dist'), { recursive: true });
+
+// Standalone app, fonts inlined — open directly in a browser.
+fs.writeFileSync(path.join(dir, 'dist', 'wtm-app.html'), app);
+
+const target = path.join(dir, 'dist', 'wtm-share.html');
 fs.writeFileSync(target, out);
 
 // Verify the embedded literal parses back to the exact source.
