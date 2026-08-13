@@ -1,0 +1,347 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WTM Map</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+:root{
+  --ink-900:#0B0E14;--ink-800:#12161F;--ink-700:#1A1F2B;--ink-600:#262C3A;
+  --paper-100:#E8EAF0;--paper-400:#8A93A6;--paper-600:#77849D;
+  --signal:#FF9E3D;--signal-ink:#0B0E14;--ok:#3FB37F;
+  --r-sm:6px;--r-md:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--ink-900);color:var(--paper-100);
+  font-family:system-ui,-apple-system,sans-serif;overflow:hidden}
+#map{position:absolute;inset:0}
+
+/* chrome floats over a full-bleed map, same as Snap */
+.bar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 18px 30px;
+  background:linear-gradient(180deg,rgba(11,14,20,.75),rgba(11,14,20,.28) 60%,transparent);
+  pointer-events:none}
+.title{font-size:21px;font-weight:800;letter-spacing:-.5px;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.live{display:flex;align-items:center;gap:7px;background:rgba(11,14,20,.8);
+  border:1px solid rgba(255,158,61,.4);border-radius:20px;padding:6px 12px;
+  font-size:12px;font-weight:700;color:var(--signal);pointer-events:auto;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--signal);animation:p 1.4s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+
+.ctrls{position:absolute;right:14px;bottom:calc(24px + env(safe-area-inset-bottom));
+  z-index:5;display:flex;flex-direction:column;gap:8px}
+.ctrl{width:44px;height:44px;border-radius:50%;background:#fff;border:0;cursor:pointer;
+  font-size:19px;font-weight:700;color:#39424F;box-shadow:0 3px 12px rgba(20,16,10,.3);
+  display:flex;align-items:center;justify-content:center}
+.ctrl:active{transform:scale(.92)}
+
+/* Move pin: white card on a stem, like the canvas version but on real tiles */
+.pin{cursor:pointer;transform:translate(-50%,-100%);will-change:transform}
+.pin-card{display:flex;align-items:center;gap:6px;background:#fff;border-radius:11px;
+  padding:6px 10px;box-shadow:0 3px 10px rgba(20,16,10,.28);white-space:nowrap;
+  font-size:12.5px;font-weight:700;color:#22262E;border:1.5px solid transparent}
+.pin.hot .pin-card{border-color:rgba(255,158,61,.85)}
+.pin-stem{width:2px;height:9px;background:rgba(20,16,10,.32);margin:0 auto}
+.pin-dot{width:11px;height:11px;border-radius:50%;background:#63708A;border:2.5px solid #fff;
+  margin:0 auto;box-shadow:0 1px 4px rgba(20,16,10,.4)}
+.pin.hot .pin-dot{background:var(--signal)}
+.pin-friend{width:8px;height:8px;border-radius:50%;background:var(--signal);flex:none}
+
+/* Friend head, Snap's bitmoji slot */
+.face{width:42px;height:42px;border-radius:50%;background:#fff;display:flex;align-items:center;
+  justify-content:center;font-size:21px;border:2.5px solid var(--ok);cursor:pointer;
+  box-shadow:0 3px 10px rgba(20,16,10,.3);transform:translate(-50%,-50%)}
+.face-name{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:#fff;
+  color:#39424F;font-size:10px;font-weight:800;padding:2px 7px;border-radius:7px;white-space:nowrap}
+.me{width:50px;height:50px;border-color:#4C6B8A;font-size:25px}
+
+/* Bottom sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:6;background:var(--ink-800);
+  border-top:1px solid var(--ink-600);border-radius:18px 18px 0 0;padding:16px 20px
+  calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);
+  transition:transform .32s cubic-bezier(.2,.8,.35,1)}
+.sheet.open{transform:none}
+.sheet h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px}
+.sheet .meta{font-size:13px;color:var(--paper-400);margin-bottom:12px}
+.sheet .row{display:flex;gap:9px}
+.sheet button{flex:1;border:0;border-radius:var(--r-sm);padding:13px;font:inherit;
+  font-weight:700;font-size:14px;cursor:pointer}
+.go{background:var(--signal);color:var(--signal-ink)}
+.dismiss{background:transparent;color:var(--paper-100);border:1px solid var(--ink-600)!important}
+
+/* Honest failure state: this page needs the network, and says so when it lacks it */
+#fail{position:absolute;inset:0;z-index:9;display:none;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:32px;gap:10px;
+  background:var(--ink-900)}
+#fail.show{display:flex}
+#fail h2{font-size:20px;font-weight:800}
+#fail p{font-size:14.5px;color:var(--paper-400);line-height:1.6;max-width:44ch}
+#fail code{font-family:ui-monospace,monospace;font-size:12.5px;color:var(--signal)}
+</style>
+
+<div id="map"></div>
+
+<div class="bar">
+  <span class="title">Live Map</span>
+  <span class="live"><span class="dot"></span><span id="count">8 moves live</span></span>
+</div>
+
+<div class="ctrls">
+  <button class="ctrl" id="zin"  aria-label="Zoom in">+</button>
+  <button class="ctrl" id="zout" aria-label="Zoom out">&minus;</button>
+  <button class="ctrl" id="home" aria-label="Recentre" style="font-size:15px">⌖</button>
+</div>
+
+<div class="sheet" id="sheet">
+  <h2 id="s-title"></h2>
+  <div class="meta" id="s-meta"></div>
+  <div class="row">
+    <button class="go" id="s-go">I'm in</button>
+    <button class="dismiss" id="s-close">Close</button>
+  </div>
+</div>
+
+<div id="fail">
+  <h2>The map needs a connection</h2>
+  <p id="fail-why">Vector tiles are fetched at runtime, so this page cannot draw the map offline.</p>
+  <p>Open it with internet access, or host it (Cloudflare Pages, Netlify, GitHub Pages) and it works from anywhere.</p>
+</div>
+
+<script>
+// Classic script, deliberately not a module: this must still run when the
+// module import below fails, which is exactly when the user needs to be told.
+window.__wtmMapReady = false;
+window.addEventListener('error', function (e) {
+  var t = e.target;
+  if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) window.__wtmAssetFailed = true;
+}, true);
+setTimeout(function () {
+  if (window.__wtmMapReady) return;
+  if (window.__wtmAssetFailed) {
+    document.getElementById('fail-why').textContent =
+      'The map library could not be downloaded, so there was nothing to draw with.';
+  }
+  document.getElementById('fail').classList.add('show');
+}, 6000);
+</script>
+
+<script type="module">
+import maplibregl from 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/+esm';
+
+// ── Data ────────────────────────────────────────────────────────────────────
+const ME = { lat: 40.4408, lng: -79.9995, face: '🤙' };
+
+const MOVES = [
+  {id:'m1',title:'Mt. Washington Rooftop',emoji:'🎵',lat:40.4392,lng:-80.0165,att:8, max:12, hot:true,  friends:2,at:'9 PM'},
+  {id:'m2',title:'Strip Night Market',    emoji:'🍕',lat:40.4498,lng:-79.9765,att:22,max:80, hot:false, friends:0,at:'7 PM'},
+  {id:'m3',title:'Lawrenceville Crawl',   emoji:'🍺',lat:40.4655,lng:-79.9605,att:41,max:100,hot:true,  friends:2,at:'10 PM'},
+  {id:'m4',title:'Frick Park Dawn Run',   emoji:'🌿',lat:40.4378,lng:-79.9015,att:14,max:30, hot:false, friends:0,at:'7 AM'},
+  {id:'m5',title:'CMU Late Studio',       emoji:'🎨',lat:40.4418,lng:-79.9430,att:6, max:8,  hot:false, friends:3,at:'11 PM'},
+  {id:'m6',title:'North Shore Hoops',     emoji:'🏀',lat:40.4468,lng:-80.0082,att:10,max:14, hot:false, friends:1,at:'6 PM'},
+  {id:'m7',title:'Smoke & Mario Kart',    emoji:'🎮',lat:40.4562,lng:-79.9650,att:2, max:4,  hot:false, friends:1,at:'8 PM'},
+  {id:'m8',title:'Larimer Rooftop',       emoji:'🎉',lat:40.4652,lng:-79.9205,att:34,max:60, hot:true,  friends:2,at:'11 PM'},
+];
+
+const FRIENDS = [
+  {name:'Alex',  face:'😎',lat:40.4390,lng:-80.0192},
+  {name:'Devon', face:'🧢',lat:40.4638,lng:-79.9218},
+  {name:'Mia',   face:'💅',lat:40.4648,lng:-79.9580},
+  {name:'Casey', face:'🕺',lat:40.4548,lng:-79.9342},
+];
+
+// ── Base map ────────────────────────────────────────────────────────────────
+// Snap Map is Mapbox vector tiles with a custom style. This is the same idea on
+// a source that needs no key and bills nothing: OpenFreeMap serves OpenStreetMap
+// vector tiles free, with Carto's public basemap as a fallback.
+const PROVIDERS = [
+  { name: 'OpenFreeMap Liberty', url: 'https://tiles.openfreemap.org/styles/liberty' },
+  { name: 'Carto Positron',      url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' },
+];
+
+// The WTM palette, applied over whatever the provider ships. Every road, park
+// and label already exists in the tiles; this only recolours them.
+const PAINT = {
+  land:    '#F2EFE7',
+  water:   '#A9D2F0',
+  park:    '#C8E2B0',
+  road:    '#FFFFFF',
+  roadCase:'#E2DDCF',
+  major:   '#FDF6DE',
+  majorCase:'#E8D9A8',
+  building:'#E5E1D6',
+  label:   '#7C8698',
+  labelHalo:'#FFFFFF',
+};
+
+const map = new maplibregl.Map({
+  container: 'map',
+  style: PROVIDERS[0].url,
+  center: [-79.9720, 40.4445],
+  zoom: 12.2,
+  pitch: 0,
+  attributionControl: { compact: true },
+});
+
+let providerIndex = 0;
+let styled = false;
+
+map.on('error', (e) => {
+  const msg = String(e && e.error && e.error.message || '');
+  // Only fall through on a style/source failure, not on one missing tile.
+  if (!styled && /style|Failed to fetch|NetworkError|load/i.test(msg)) {
+    providerIndex += 1;
+    if (providerIndex < PROVIDERS.length) {
+      map.setStyle(PROVIDERS[providerIndex].url);
+    } else {
+      document.getElementById('fail-why').textContent =
+        'Neither tile provider could be reached, so there is nothing to draw.';
+      document.getElementById('fail').classList.add('show');
+    }
+  }
+});
+
+// ── Restyle to the WTM palette ──────────────────────────────────────────────
+// Rather than hand-authoring a full style, walk the provider's layers and
+// recolour by layer id and source-layer. This survives provider differences:
+// anything unmatched keeps the provider's own colour instead of disappearing.
+function restyle() {
+  const layers = map.getStyle().layers || [];
+  for (const layer of layers) {
+    const id = (layer.id || '').toLowerCase();
+    const sl = (layer['source-layer'] || '').toLowerCase();
+    try {
+      if (layer.type === 'background') {
+        map.setPaintProperty(layer.id, 'background-color', PAINT.land);
+      } else if (/water|ocean|sea|river|lake/.test(id + sl) && layer.type === 'fill') {
+        map.setPaintProperty(layer.id, 'fill-color', PAINT.water);
+      } else if (/water|river|stream|canal/.test(id + sl) && layer.type === 'line') {
+        map.setPaintProperty(layer.id, 'line-color', PAINT.water);
+      } else if (/park|wood|forest|grass|golf|pitch|garden|landcover|landuse/.test(id + sl) && layer.type === 'fill') {
+        map.setPaintProperty(layer.id, 'fill-color', PAINT.park);
+        map.setPaintProperty(layer.id, 'fill-opacity', 0.75);
+      } else if (/building/.test(id + sl)) {
+        if (layer.type === 'fill') {
+          map.setPaintProperty(layer.id, 'fill-color', PAINT.building);
+          map.setPaintProperty(layer.id, 'fill-opacity', 0.85);
+        } else if (layer.type === 'fill-extrusion') {
+          map.setPaintProperty(layer.id, 'fill-extrusion-color', PAINT.building);
+        }
+      } else if (layer.type === 'line' && /motorway|trunk|primary/.test(id)) {
+        map.setPaintProperty(layer.id, 'line-color', /case|outline|casing/.test(id) ? PAINT.majorCase : PAINT.major);
+      } else if (layer.type === 'line' && /road|street|highway|transport|bridge|tunnel/.test(id + sl)) {
+        map.setPaintProperty(layer.id, 'line-color', /case|outline|casing/.test(id) ? PAINT.roadCase : PAINT.road);
+      } else if (layer.type === 'symbol') {
+        if (layer.layout && layer.layout['text-field']) {
+          map.setPaintProperty(layer.id, 'text-color', PAINT.label);
+          map.setPaintProperty(layer.id, 'text-halo-color', PAINT.labelHalo);
+          map.setPaintProperty(layer.id, 'text-halo-width', 1.4);
+        }
+        // Snap keeps POI icon clutter down so its own pins read first.
+        if (/poi|shop|amenity/.test(id + sl)) map.setLayoutProperty(layer.id, 'visibility', 'none');
+      }
+    } catch { /* provider lacks this property; keep its own value */ }
+  }
+}
+
+// ── Heat: where the night actually is ───────────────────────────────────────
+function addHeat() {
+  if (map.getSource('wtm-heat')) return;
+  map.addSource('wtm-heat', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: MOVES.map(m => ({
+        type: 'Feature',
+        properties: { w: m.att / m.max + (m.hot ? 0.6 : 0) },
+        geometry: { type: 'Point', coordinates: [m.lng, m.lat] },
+      })),
+    },
+  });
+  map.addLayer({
+    id: 'wtm-heat',
+    type: 'heatmap',
+    source: 'wtm-heat',
+    paint: {
+      'heatmap-weight': ['get', 'w'],
+      'heatmap-intensity': 1.1,
+      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 34, 15, 90],
+      'heatmap-opacity': 0.55,
+      'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'],
+        0,    'rgba(255,225,120,0)',
+        0.25, 'rgba(255,214,90,0.35)',
+        0.55, 'rgba(255,158,61,0.5)',
+        0.8,  'rgba(255,110,45,0.6)',
+        1,    'rgba(255,64,40,0.7)'],
+    },
+  });
+}
+
+// ── Markers ─────────────────────────────────────────────────────────────────
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+
+function addMarkers() {
+  for (const m of MOVES) {
+    const node = el(`
+      <div class="pin ${m.hot ? 'hot' : ''}">
+        <div class="pin-card">
+          ${m.friends ? '<span class="pin-friend"></span>' : ''}
+          <span>${m.emoji}</span><span>${m.title}</span>
+        </div>
+        <div class="pin-stem"></div>
+        <div class="pin-dot"></div>
+      </div>`);
+    node.addEventListener('click', (ev) => { ev.stopPropagation(); openSheet(m); });
+    new maplibregl.Marker({ element: node, anchor: 'bottom' })
+      .setLngLat([m.lng, m.lat]).addTo(map);
+  }
+  for (const f of FRIENDS) {
+    const node = el(`<div class="face">${f.face}<span class="face-name">${f.name}</span></div>`);
+    node.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      map.flyTo({ center: [f.lng, f.lat], zoom: 15, duration: 700 });
+    });
+    new maplibregl.Marker({ element: node }).setLngLat([f.lng, f.lat]).addTo(map);
+  }
+  const meNode = el(`<div class="face me">${ME.face}<span class="face-name">You</span></div>`);
+  new maplibregl.Marker({ element: meNode }).setLngLat([ME.lng, ME.lat]).addTo(map);
+}
+
+// ── Sheet ───────────────────────────────────────────────────────────────────
+const sheet = document.getElementById('sheet');
+function openSheet(m) {
+  document.getElementById('s-title').textContent = m.title;
+  document.getElementById('s-meta').textContent =
+    `${m.at} · ${m.att}/${m.max} going` + (m.friends ? ` · ${m.friends} friend${m.friends > 1 ? 's' : ''} in` : '');
+  sheet.classList.add('open');
+  map.easeTo({ center: [m.lng, m.lat], offset: [0, -90], duration: 500 });
+}
+document.getElementById('s-close').onclick = () => sheet.classList.remove('open');
+document.getElementById('s-go').onclick = (e) => {
+  e.target.textContent = 'Going ✓';
+  e.target.style.background = 'transparent';
+  e.target.style.border = '1px solid rgba(255,158,61,.5)';
+  e.target.style.color = 'var(--signal)';
+};
+map.on('click', () => sheet.classList.remove('open'));
+
+// ── Controls ────────────────────────────────────────────────────────────────
+document.getElementById('zin').onclick  = () => map.zoomIn({ duration: 220 });
+document.getElementById('zout').onclick = () => map.zoomOut({ duration: 220 });
+document.getElementById('home').onclick = () =>
+  map.flyTo({ center: [-79.9720, 40.4445], zoom: 12.2, duration: 600 });
+
+document.getElementById('count').textContent = `${MOVES.length} moves live`;
+
+// `style.load` fires again after a provider fallback, so everything that
+// depends on the style is registered here rather than on first load only.
+map.on('style.load', () => {
+  styled = true;
+  window.__wtmMapReady = true;
+  restyle();
+  addHeat();
+});
+map.once('load', addMarkers);
+
+// The watchdog that reveals the failure panel lives in the classic script at
+// the top of this file, so it still runs when this module fails to load.
+</script>

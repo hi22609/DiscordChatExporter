@@ -4,6 +4,39 @@ Things I could not decide for you. Ordered by what blocks the most.
 
 ---
 
+## 0. The map cannot reach Snap Map parity inside a claude.ai artifact
+
+**Blocks:** the demo's single most-judged screen. **Cost:** zero either way.
+
+Snap Map is **Mapbox vector tiles with a custom Snap style**. They do not draw roads;
+they license a tile service and skin it. Every street, building, park and label in the
+world arrives as data. A hand-authored canvas map cannot compete with that and never will,
+because I am typing coordinates for about forty roads.
+
+The free equivalent of what Snap pays for is **MapLibre GL + OpenFreeMap**: OpenStreetMap
+vector tiles, no API key, no signup, no bill, no rate limit. Built and committed as
+`beta/map-real.html`, styled to the WTM palette, with the move pins, friend heads, heat
+layer and sheet already wired.
+
+**The blocker is not the map, it is where the demo is hosted.** claude.ai artifacts run
+under a CSP that blocks every external host, so tiles can never load there. That is why
+the shared link still uses the canvas map.
+
+| Option | Result |
+|---|---|
+| Keep the demo on claude.ai | Canvas map forever. No amount of work changes this. |
+| **Host `beta/dist/` on Cloudflare Pages (free)** | **Real vector map, Snap-grade.** Also fixes decision 3, since the page can then POST feedback to you. **Recommended.** |
+
+For RAW, the same answer in native form: `@rnmapbox/maps` or MapLibre React Native
+against the same free tile source, replacing `react-native-maps`.
+
+**[UNVERIFIED]** I could not render `map-real.html` here: this container's network policy
+blocks every tile host and CDN (only package registries are allowed). I verified the
+*failure* path only, which now shows an honest message instead of a blank screen. Open it
+on a normal connection to see the map itself.
+
+---
+
 ## 1. Was the database ever actually deployed?
 
 **Blocks:** every other RAW decision.
