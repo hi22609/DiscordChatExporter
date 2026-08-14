@@ -6,6 +6,7 @@
  */
 
 type MoveCategory =
+  | 'just_us' | 'the_scene'
   | 'bars' | 'sports' | 'food' | 'music' | 'outdoor'
   | 'gaming' | 'art' | 'social' | 'other';
 type RsvpStatus = 'going' | 'maybe' | 'waitlist' | 'left';
@@ -129,13 +130,23 @@ interface NearbyMoveResult {
   vibes: string[];
   created_at: string;
   updated_at: string;
+  cancellation_reason: string | null;
   attendee_count: number;
+  waitlist_count: number;
   spots_left: number | null;
+  is_empty: boolean;
   is_full: boolean;
   latitude: number;
   longitude: number;
   distance_m: number;
+  hot_score: number;
   my_status: string | null;
+  crew_going: Array<{
+    id: string;
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  }>;
 }
 
 interface NearbySpotResult {
@@ -334,6 +345,14 @@ export interface Database {
           lng: number;
           radius_m?: number;
           filter_cat?: string | null;
+          /**
+           * Caller's profile id. PostgREST binds RPC arguments by name, so
+           * omitting this leaves it null and the function falls back to
+           * auth.uid(). Passing it explicitly is what makes my_status and
+           * crew_going resolve on the very first render, before the session
+           * round-trip settles.
+           */
+          uid?: string | null;
           page_offset?: number;
           page_size?: number;
         };
