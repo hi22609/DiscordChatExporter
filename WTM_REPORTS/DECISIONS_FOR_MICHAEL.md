@@ -67,36 +67,36 @@ nothing here touched a hosted service.
 
 ---
 
-## 2. The `profiles` table publishes every user's push token, birthdate and Instagram handle
+## 2. `profiles` published every user's push token, birthdate and Instagram handle — FIXED
 
-**Blocks:** any public launch. **Cost:** zero. **I did not fix this, on purpose.**
+**Was:** the most serious exposure in the product. **Cost:** zero.
 
-`profiles_public_read` is `using (true)` — no role restriction, no column restriction. Anyone
-with the anon key (which ships inside the app bundle) can read the whole table. For a 17–25
+`profiles_public_read` was `using (true)` — no role restriction, no column restriction. Anyone
+with the anon key (which ships inside the app bundle) could read the whole table. For a 17-25
 app that is birthdate + social handle + push token per user.
 
-I did not change it because every safe repair breaks working code and I could not verify a fix
-without a database:
-- `app/user/[id].tsx:78` reads another member's profile
-- `useMoveChat.ts:21` embeds `profiles(...)` to label chat messages
-- `useSession.ts:34` uses `select('*')`, which needs whole-table SELECT
+I left it alone the first night because every safe repair breaks a read the client depends on
+and there was no database to verify a fix against. Decision 1 removed that blocker, so it is
+now done, in `019_profiles_exposure.sql`:
 
-**The fix, when you have a database to test against:**
-```sql
-drop policy "profiles_public_read" on public.profiles;
-create policy "profiles_read_own" on public.profiles for select using (auth.uid() = id);
+- `profiles` is own-row-only. Your own `select('*')` still works, which is what the age gate
+  in `app/_layout.tsx` routes on.
+- `public_profiles` exposes the ten columns another member is allowed to see, and filters
+  banned accounts so no caller can forget to. `user/[id].tsx` and `useSearchUsers.ts` point
+  at it.
+- Chat moved off the `profiles(...)` embed to a `move_chat_page` function. PostgREST resolves
+  embeds through RLS, so the embed would have rendered every message but your own with a
+  blank author.
 
-create view public.public_profiles with (security_invoker = on) as
-  select id, username, display_name, avatar_url, bio, city, created_at from public.profiles;
-grant select on public.public_profiles to anon, authenticated;
-```
-Then: point `user/[id].tsx` and `useSearchUsers.ts` at `public_profiles`, change
-`useSession.ts` to an explicit column list, and either declare a computed relationship for the
-chat embed or denormalise `username`/`avatar_url` onto `move_messages` at insert time.
+Verified as a real member under RLS rather than as superuser: one row of `profiles` visible,
+zero rows of anyone else's, all non-banned members through the view, no private column in it,
+a banned member gone from it, chat readable by attendees with author names attached and
+invisible to everyone else.
 
-**Do this before registering any push tokens.** Tokens in a world-readable table are worse
-than no tokens: Expo's push endpoint needs no auth for a token you hold, so anyone could push
-to your entire install base under your icon.
+**Push tokens were the part that mattered most.** Expo's push endpoint needs no auth for a
+token you already hold, so a world-readable token column meant anyone could push a
+notification to your entire install base under your icon. That is closed now — but see
+decision 4: nothing writes tokens yet either.
 
 ---
 
