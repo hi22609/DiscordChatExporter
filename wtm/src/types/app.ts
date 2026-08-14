@@ -1,4 +1,6 @@
 export type MoveCategory =
+  | 'just_us'
+  | 'the_scene'
   | 'bars'
   | 'sports'
   | 'food'
@@ -9,7 +11,7 @@ export type MoveCategory =
   | 'social'
   | 'other';
 
-export type RsvpStatus = 'going' | 'waitlist' | 'left';
+export type RsvpStatus = 'going' | 'maybe' | 'waitlist' | 'left';
 
 export interface Profile {
   id: string;
@@ -91,8 +93,14 @@ export interface NearbyMove extends MoveWithCounts {
   hot_score: number;
   /** How many people are currently queued on the waitlist. */
   waitlist_count: number;
-  /** Up to 3 invite-tree peers (crew) who are going — drives social proof on cards. */
-  crew_going: Array<{ username: string; avatar_url: string | null }>;
+  /** Friends already going — whoever invited you, whoever you invited, and
+   *  anyone in your squad on this move. Drives the social-proof row on cards. */
+  crew_going: Array<{
+    id: string;
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  }>;
 }
 
 export type ActivityType =
@@ -181,7 +189,11 @@ export interface CategoryMeta {
   gradient: [string, string];
 }
 
+// Order matters: this is the order the picker and the filter bar render in, and
+// the first two are the ones the whole product is organised around.
 export const CATEGORY_META: Record<MoveCategory, CategoryMeta> = {
+  just_us: { label: 'Just Us', emoji: '🛋️', gradient: ['#FF9E3D', '#8A4A12'] },
+  the_scene: { label: 'The Scene', emoji: '🌃', gradient: ['#7C3AED', '#2E1065'] },
   bars: { label: 'Bars & Nightlife', emoji: '🍺', gradient: ['#7C3AED', '#4C1D95'] },
   sports: { label: 'Sports', emoji: '🏀', gradient: ['#059669', '#064E3B'] },
   food: { label: 'Food', emoji: '🍕', gradient: ['#DC2626', '#7F1D1D'] },
