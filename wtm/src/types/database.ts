@@ -36,6 +36,36 @@ type ProfileRow = {
   updated_at: string;
 };
 
+/**
+ * The columns of a profile any member is allowed to see about any other member.
+ * This is the whole security boundary of the public_profiles view — adding a
+ * column here means publishing it to everyone holding the anon key.
+ */
+type PublicProfileRow = Pick<
+  ProfileRow,
+  | 'id'
+  | 'username'
+  | 'display_name'
+  | 'avatar_url'
+  | 'bio'
+  | 'city'
+  | 'follower_count'
+  | 'following_count'
+  | 'moves_created'
+  | 'created_at'
+>;
+
+type ChatMessagePageRow = {
+  id: string;
+  move_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
 type MoveRow = {
   id: string;
   creator_id: string;
@@ -325,6 +355,10 @@ export interface Database {
         Row: MoveWithCountsRow;
         Relationships: [];
       };
+      public_profiles: {
+        Row: PublicProfileRow;
+        Relationships: [];
+      };
     };
     Functions: {
       mark_activity_read: {
@@ -334,6 +368,10 @@ export interface Database {
       mark_chat_read: {
         Args: { p_move_id: string };
         Returns: undefined;
+      };
+      move_chat_page: {
+        Args: { p_move_id: string; p_offset?: number; p_limit?: number };
+        Returns: ChatMessagePageRow[];
       };
       waitlist_position: {
         Args: { p_move_id: string };

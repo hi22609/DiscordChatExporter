@@ -16,14 +16,31 @@ export function useMoveChat(moveId: string) {
   const query = useInfiniteQuery({
     queryKey: KEY,
     queryFn: async ({ pageParam = 0 }) => {
-      const { data, error } = await supabase
-        .from('move_messages')
-        .select('*, profile:profiles(username, display_name, avatar_url)')
-        .eq('move_id', moveId)
-        .order('created_at', { ascending: false })
-        .range(pageParam * PAGE, pageParam * PAGE + PAGE - 1);
+      // An RPC, not an embed. `profiles` is own-row-only under RLS now, and
+      // PostgREST resolves embeds through RLS — so `profiles(...)` would have
+      // rendered every message but your own with a blank author. The function
+      // enforces the same visibility rule the table policy does: you can read a
+      // move's chat if you are going, or if it is your move.
+      const { data, error } = await supabase.rpc('move_chat_page', {
+        p_move_id: moveId,
+        p_offset: (pageParam as number) * PAGE,
+        p_limit: PAGE,
+      });
       if (error) throw error;
-      return (data ?? []) as ChatMessage[];
+      return (data ?? []).map(
+        (r): ChatMessage => ({
+          id: r.id,
+          move_id: r.move_id,
+          user_id: r.user_id,
+          content: r.content,
+          created_at: r.created_at,
+          profile: {
+            username: r.username,
+            display_name: r.display_name,
+            avatar_url: r.avatar_url,
+          },
+        })
+      );
     },
     initialPageParam: 0,
     getNextPageParam: (last, all) => last.length === PAGE ? all.length : undefined,
@@ -41,14 +58,31 @@ export function useMoveChat(moveId: string) {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'move_messages', filter: `move_id=eq.${moveId}` },
-        (payload) => {
-          const row = payload.new as ChatMessage | undefined;
+        async (payload) => {
+          const row = payload.new as Omit<ChatMessage, 'profile'> | undefined;
           if (!row) return;
+
+          // The realtime payload is the raw table row, so it carries no author.
+          // Reuse one already in the cache when we have it, and only reach for
+          // public_profiles the first time someone speaks.
+          const cached = client.getQueryData<{ pages: ChatMessage[][] }>(KEY);
+          let profile =
+            cached?.pages.flat().find((m) => m.user_id === row.user_id)?.profile ?? null;
+
+          if (!profile) {
+            const { data } = await supabase
+              .from('public_profiles')
+              .select('username, display_name, avatar_url')
+              .eq('id', row.user_id)
+              .single();
+            profile = data ?? null;
+          }
+
           client.setQueryData<{ pages: ChatMessage[][]; pageParams: unknown[] }>(KEY, (prev) => {
             if (!prev?.pages?.length) return prev;
             const [first, ...rest] = prev.pages;
             if (first.some((m) => m.id === row.id)) return prev; // already have it
-            return { ...prev, pages: [[row, ...first], ...rest] };
+            return { ...prev, pages: [[{ ...row, profile }, ...first], ...rest] };
           });
         }
       )

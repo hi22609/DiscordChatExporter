@@ -18,12 +18,13 @@ export function useSearchUsers(query: string) {
     staleTime: 30_000,
     queryFn: async () => {
       const term = query.trim().toLowerCase().replace(/^@/, '');
+      // public_profiles, not profiles: the table is own-row-only under RLS, and
+      // the view already excludes banned accounts so no caller can forget to.
       const { data, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('id, username, display_name, avatar_url')
         .ilike('username', `${term}%`)
         .neq('id', myId ?? '')
-        .eq('is_banned', false)
         .limit(12);
       if (error) throw error;
       return (data ?? []) as SearchUser[];

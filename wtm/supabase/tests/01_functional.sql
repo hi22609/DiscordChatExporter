@@ -195,12 +195,8 @@ end $$;
 do $$
 declare n int;
 begin
-  select count(*) into n from pg_class c join pg_namespace ns on ns.oid=c.relnamespace
-   where ns.nspname='public' and c.relkind='v'
-     and coalesce(array_to_string(c.reloptions,','),'') not like '%security_invoker=on%'
-     and not exists (select 1 from pg_depend d where d.objid=c.oid and d.deptype='e');
-  perform t('H12 every public view is security_invoker (offenders='||n||')', n = 0);
-
+  -- view security_invoker is asserted in H17, which knows about the one
+  -- deliberate exception.
   select count(*) into n from pg_proc p join pg_namespace ns on ns.oid=p.pronamespace
    where ns.nspname='public' and p.prosecdef and p.proconfig is null;
   perform t('H12 no SECURITY DEFINER function with mutable search_path (offenders='||n||')', n = 0);
@@ -219,6 +215,88 @@ begin
      and not exists (select 1 from pg_policy p where p.polrelid=c.oid)
      and not exists (select 1 from pg_depend d where d.objid=c.oid and d.deptype='e');
   perform t('H13 no RLS table left with zero policies (offenders='||n||')', n = 0);
+end $$;
+
+-- H14 profiles exposure — checked under RLS, as a real member, not as superuser
+grant usage on schema public to authenticated;
+grant select on public.profiles, public.public_profiles to authenticated;
+do $$
+declare v_alex uuid; v_m1 uuid; n int; leaked text;
+begin
+  select id into v_alex from public.profiles where username='alex';
+  select id into v_m1   from public.profiles where username='member1';
+
+  perform set_config('request.jwt.claim.sub', v_alex::text, false);
+  set local role authenticated;
+
+  select count(*) into n from public.profiles;
+  perform t('H14 a member reads only their own profiles row (saw '||n||')', n = 1);
+
+  select count(*) into n from public.profiles where id = v_m1;
+  perform t('H14 a member cannot read another member''s profiles row', n = 0);
+
+  select count(*) into n from public.public_profiles;
+  perform t('H14 public_profiles still shows every non-banned member (saw '||n||')', n >= 5);
+
+  select string_agg(column_name, ',' order by column_name) into leaked
+  from information_schema.columns
+  where table_schema='public' and table_name='public_profiles'
+    and column_name in ('push_token','birthdate','social_handle','is_banned',
+                        'photo_approved','age_range','invited_by','referral_code');
+  perform t('H14 public_profiles leaks no private column (leaked: '||coalesce(leaked,'none')||')',
+            leaked is null);
+
+  reset role;
+end $$;
+
+-- H15 banned members disappear from the public projection
+do $$
+declare n int; before int;
+begin
+  select count(*) into before from public.public_profiles;
+  update public.profiles set is_banned = true where username='member2';
+  select count(*) into n from public.public_profiles;
+  perform t('H15 banned member drops out of public_profiles', n = before - 1);
+  update public.profiles set is_banned = false where username='member2';
+end $$;
+
+-- H16 chat is readable by attendees, not by outsiders
+do $$
+declare v_move uuid := (select v from tkv where k='move'); v_alex uuid; v_out uuid; n int;
+begin
+  select id into v_alex from public.profiles where username='alex';
+  -- member4 never RSVP'd to this move
+  select id into v_out from public.profiles where username='member4';
+
+  insert into public.move_messages(move_id, user_id, content)
+  values (v_move, v_alex, 'door code is 2210');
+
+  perform set_config('request.jwt.claim.sub', v_alex::text, false);
+  select count(*) into n from public.move_chat_page(v_move, 0, 30);
+  perform t('H16 the creator can read the move chat (saw '||n||')', n = 1);
+
+  perform t('H16 chat rows carry the author name',
+            (select username from public.move_chat_page(v_move, 0, 30) limit 1) = 'alex');
+
+  perform set_config('request.jwt.claim.sub', v_out::text, false);
+  select count(*) into n from public.move_chat_page(v_move, 0, 30);
+  perform t('H16 a non-attendee reads nothing from the move chat (saw '||n||')', n = 0);
+
+  perform set_config('request.jwt.claim.sub', '', false);
+end $$;
+
+-- H17 every other view stays security_invoker; public_profiles is the one exception
+do $$
+declare offenders text;
+begin
+  select string_agg(c.relname, ',') into offenders
+  from pg_class c join pg_namespace ns on ns.oid=c.relnamespace
+  where ns.nspname='public' and c.relkind='v'
+    and c.relname <> 'public_profiles'
+    and coalesce(array_to_string(c.reloptions,','),'') not like '%security_invoker=on%'
+    and not exists (select 1 from pg_depend d where d.objid=c.oid and d.deptype='e');
+  perform t('H17 no view bypasses RLS except public_profiles (offenders: '
+            ||coalesce(offenders,'none')||')', offenders is null);
 end $$;
 
 drop function t(text, boolean);

@@ -55,6 +55,25 @@ export interface Referral {
   joined_at: string;
 }
 
+/**
+ * What one member is allowed to see about another. Backed by the
+ * `public_profiles` view — `profiles` itself is own-row-only under RLS, so this
+ * is the only shape available for anyone but yourself.
+ */
+export type PublicProfile = Pick<
+  Profile,
+  | 'id'
+  | 'username'
+  | 'display_name'
+  | 'avatar_url'
+  | 'bio'
+  | 'city'
+  | 'follower_count'
+  | 'following_count'
+  | 'moves_created'
+  | 'created_at'
+>;
+
 export interface Move {
   id: string;
   creator_id: string;

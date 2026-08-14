@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useIsBlocked, useBlockUser, submitReport } from '@/hooks/useSafety';
 import { Avatar } from '@/components/ui/Avatar';
 import { MoveCard } from '@/components/moves/MoveCard';
-import type { Profile, MoveWithCounts } from '@/types/app';
+import type { PublicProfile, MoveWithCounts } from '@/types/app';
 
 export default function UserProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -73,14 +73,17 @@ export default function UserProfileScreen() {
 
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: queryKeys.profiles.detail(id),
-    queryFn: async (): Promise<Profile> => {
+    queryFn: async (): Promise<PublicProfile> => {
+      // Someone else's profile, so it comes from the public projection.
+      // `profiles` itself is own-row-only, and select('*') on it would have
+      // asked for their birthdate, Instagram handle and push token.
       const { data, error } = await supabase
-        .from('profiles')
+        .from('public_profiles')
         .select('*')
         .eq('id', id)
         .single();
       if (error) throw error;
-      return data as Profile;
+      return data as PublicProfile;
     },
   });
 
