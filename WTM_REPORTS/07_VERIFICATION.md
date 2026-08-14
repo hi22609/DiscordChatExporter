@@ -32,6 +32,53 @@ fixed it. **This is the missing-lockfile problem from Wave 0 showing itself in p
 without `package-lock.json`, installs are not reproducible. Committing a lockfile is in the
 decisions file.
 
+## The database, executed
+
+Postgres 16 with PostGIS 3, on this machine. No Supabase project, no network, no cost.
+`supabase/tests/run.sh` builds a throwaway database, applies `migrations/*.sql` in order,
+then asserts against the result. It is committed, so this is repeatable rather than a
+one-off session.
+
+```
+cd wtm && supabase/tests/run.sh
+  migrations failed: 0   assertions: 33 passed, 0 failed
+```
+
+The first run was not that. **Seven of sixteen migrations errored on a clean database**, each
+one a hard stop — which settles the open question in the decisions file: nothing after 004
+had ever existed in any database, anywhere. Six distinct root causes, all now fixed and all
+listed in the commit `fix(db): make the migrations actually apply`.
+
+Then the assertions found three more things that reading the SQL had not:
+
+- **Signup was broken for every user.** `handle_new_user` set `invite_codes.used_by` before
+  inserting the profile that column references. Every sign-up died on a foreign key. This
+  was my own repair from earlier in the night, and it is exactly the class of bug that
+  cannot be caught by reading.
+- **`promote_from_waitlist` was still callable by anyone holding the anon key.** 015 revoked
+  EXECUTE from `anon` and `authenticated`, neither of which ever held a grant — they reached
+  it through the default grant to `PUBLIC`. The live ACL still read `=X/postgres`.
+- **`search_path = ''` broke the functions it was meant to harden.** Bodies written before
+  015 use unqualified names, so the empty path turned them into "relation does not exist" at
+  call time.
+
+What the 33 assertions cover: invite-gated signup (valid code, no code, exhausted code,
+admin-seeded code with a null creator), the invite chain, the age gate at 16 and at 19, the
+capacity trigger, the waitlist past capacity, the squad cap at 2 and at 3, waitlist
+auto-promotion and its notification, the single `nearby_moves` signature and every enriched
+column it returns, banned-creator exclusion from the feed, chain review on ban, column-level
+UPDATE privileges on `profiles`, EXECUTE privileges on the internal RPCs, `security_invoker`
+on every view, and RLS with at least one policy on every application table.
+
+Two of the failures in that run were bugs in the test, not the schema, and are recorded here
+because the distinction matters: banning `alex` could not flag an inviter because `alex` has
+none, and the "table without RLS" was the test's own scratch table. Both fixed in the
+harness; neither was a schema defect.
+
+Ordering is verified under both `C` and `en_US.UTF-8` collation, because the two disagree
+about whether `005a_` sorts before or after `005_`. That is why the views were folded into
+005 instead of living in a `005a` file.
+
 ## Test suite
 
 RAW's `package.json` declares `"test": "jest"` with `jest-expo`. **There are no test files** —

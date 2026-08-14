@@ -37,22 +37,31 @@ on a normal connection to see the map itself.
 
 ---
 
-## 1. Was the database ever actually deployed?
+## 1. The database was never deployed. Now it runs. — ANSWERED, nothing for you to decide
 
-**Blocks:** every other RAW decision.
+This was the biggest open question in the project. It is closed.
 
-Migrations 011 and 014 contain SQL that **cannot execute** (verified: `blocked_either` is
-declared with one argument at `010:27` and called with two at `011:121`; `'waitlist'` is not a
-member of the `rsvp_status` enum). So one of two things is true:
+I installed Postgres 16 and PostGIS locally and applied the migrations. **Seven of sixteen
+failed on a clean database**, each one a hard stop. That settles it: nothing after migration
+004 — ban enforcement, squad RSVPs, hot score, activity feed, move chat, waitlist, reactions —
+has ever existed in any database, while the client has been calling all of it.
 
-- **(a) They were never pushed.** Then everything after migration 010 — ban enforcement, squad
-  RSVPs, hot score, activity feed, move chat, waitlist, reactions — has never existed in any
-  database, and the client has been calling all of it. This is the likely case.
-- **(b) Someone hand-patched a live database.** Then the repo does not describe production and
-  nothing in `02_AUDIT.md` can be trusted about the real schema.
+All eighteen now apply with zero errors, and 33 behavioural assertions pass. Full detail in
+`07_VERIFICATION.md`. The harness is committed at `wtm/supabase/tests/run.sh`, so you can
+re-run it yourself:
 
-**Recommendation:** run `npx supabase db reset` locally and see what happens. My repairs are
-committed but **have never been executed against a real Postgres.**
+```
+sudo apt-get install -y postgresql-16 postgresql-16-postgis-3
+cd wtm && supabase/tests/run.sh
+```
+
+Three bugs surfaced that reading the SQL had not found — including one I had introduced
+earlier the same night that broke sign-up for every user, and a revoke in the security
+hardening that silently did nothing. Those are described in `07_VERIFICATION.md`.
+
+**What this means for you:** when you do provision a Supabase project, `supabase db push`
+should now go green on the first try instead of dying at 004. Nothing here costs money and
+nothing here touched a hosted service.
 
 **Cost:** zero.
 
@@ -120,17 +129,23 @@ plugin, the column and `daily-digest` and stop carrying dead weight. Do not leav
 
 ---
 
-## 5. BETA promises six things RAW cannot deliver
+## 5. BETA promises six things RAW cannot deliver — two of the six are now fixed
 
-Detailed in `01_DRIFT.md`. The two that will bite in a demo-to-signup conversation:
+Detailed in `01_DRIFT.md`. The two that would have bitten in a demo-to-signup conversation
+are closed:
 
-- **"Just Us" and "The Scene"** are the categories the entire demo is built around. They are
-  **not in RAW's `move_category` enum.** One migration + one constant.
-- **Trending, crew-going and waitlist** are visible in BETA and dead in RAW — partly from the
-  migration failure, partly because two `nearby_moves` overloads exist and the client binds
-  the old one, which returns neither `hot_score` nor `crew_going`.
+- **"Just Us" and "The Scene"** — the categories the entire demo is built around — were not
+  in RAW's `move_category` enum. Added in `017_category_parity.sql`, and added to
+  `CATEGORY_META`, which the picker and the filter bar both derive from.
+- **Trending, crew-going and waitlist** were visible in BETA and dead in RAW. I confirmed the
+  cause live: two `nearby_moves` overloads existed at once, and because PostgREST binds RPC
+  arguments by name, every call in the app bound the older one, which returns none of those
+  three columns. Nothing in the client was wrong. It was calling a function that could not
+  answer. Collapsed to one signature in `016`, and the feed now returns `hot_score`,
+  `waitlist_count` and the friends row — verified against real data.
 
-**Recommendation:** treat BETA as the spec. It is the more coherent product.
+The remaining four drift items still stand. **Recommendation:** treat BETA as the spec. It is
+the more coherent product.
 
 ---
 
