@@ -65,8 +65,13 @@ create policy "reads_own" on move_chat_reads
   with check (user_id = auth.uid());
 
 -- Realtime
+do $$
+begin
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    create publication supabase_realtime;
+  end if;
+end $$;
 alter publication supabase_realtime add table move_messages;
-
 -- Unread count helper — returns msgs after last_read for caller
 create or replace function chat_unread_count(p_move_id uuid)
 returns bigint language sql stable security definer as $$

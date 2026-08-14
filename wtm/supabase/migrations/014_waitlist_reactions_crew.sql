@@ -146,8 +146,13 @@ $$;
 -- ── 4. Feed enrichment — expose waitlist_count + crew ────────────────────
 -- Update nearby_moves to surface waitlist depth and crew-going list.
 -- Callers can display "3 on waitlist" and "Alex is going".
--- Parameter names must match the 011 signature exactly: `create or replace`
--- cannot rename an input parameter (error 42P13).
+-- This adds columns to the return table, and `create or replace` cannot change
+-- a function's return type (error 42P13 covers parameter names, 42P13 also
+-- rejects the new signature). Drop the exact 5-argument overload first.
+-- Parameter names must still match 011, since the drop/create pair is what
+-- makes the change legal, not a rename.
+drop function if exists public.nearby_moves(float, float, int, text, uuid);
+
 create or replace function public.nearby_moves(
   lat            float,
   lng            float,
@@ -246,7 +251,7 @@ language sql stable security definer as $$
     and m.is_public    = true
     and m.starts_at   >= now()
     and m.starts_at   <= now() + interval '24 hours'
-    and (filter_category is null or m.category = filter_category)
+    and (filter_category is null or m.category::text = filter_category)
     and (cr.is_banned is null or cr.is_banned = false)
   group by m.id
   order by m.hot_score desc, m.starts_at asc;

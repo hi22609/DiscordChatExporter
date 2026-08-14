@@ -87,7 +87,7 @@ create or replace function public.nearby_moves(
   spots_left      bigint,
   my_status       text,
   my_squad        uuid[]
-) language sql stable security definer set search_path = '' as $$
+) language sql stable security definer set search_path = public, extensions as $$
   select
     m.id, m.creator_id, m.title, m.description, m.category,
     m.location_name, m.location_point, m.address,
