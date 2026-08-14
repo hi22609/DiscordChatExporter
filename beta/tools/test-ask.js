@@ -7,7 +7,12 @@ const { chromium } = require('playwright-core');
   page.setDefaultTimeout(6000);
   const errs = [];
   page.on('pageerror', e => errs.push('PAGE: ' + e.message.slice(0, 140)));
-  page.on('console', m => { if (m.type() === 'error') errs.push('CON: ' + m.text().slice(0, 140)); });
+  page.on('console', m => {
+    if (m.type() !== 'error') return;
+    const t = m.text();
+    if (/ERR_TUNNEL_CONNECTION_FAILED|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|Failed to load resource/.test(t)) return;
+    errs.push('CON: ' + t.slice(0, 140));
+  });
   await page.goto('file://' + __dirname + '/../dist/wtm-share.html', { timeout: 15000 });
   await page.waitForTimeout(600);
   await page.click('nav button.btn-primary'); await page.waitForTimeout(1100);

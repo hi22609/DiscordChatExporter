@@ -1,0 +1,65 @@
+# Publishes the WTM demo to GitHub Pages.
+#
+# Why Pages: it is free, it needs no new account (this repo already exists), and
+# unlike a claude.ai artifact it has no Content-Security-Policy blocking external
+# hosts. That is what lets the map upgrade itself to real OpenStreetMap vector
+# tiles instead of falling back to the hand-drawn canvas.
+#
+# One-time setup, in this repo: Settings -> Pages -> Source: "GitHub Actions".
+# After that this runs on every push to the branch, or on demand from the
+# Actions tab.
+
+name: WTM demo → Pages
+
+on:
+  push:
+    branches: [overnight/2026-08-12]
+    paths: ['beta/**', '.github/workflows/wtm-demo-pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: wtm-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build the demo
+        working-directory: beta
+        run: node build.js
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site
+          # The share page is the landing page people are sent to.
+          cp beta/dist/wtm-share.html _site/index.html
+          cp beta/dist/wtm-app.html  _site/app.html
+          cp beta/map-real.html      _site/map.html
+          # Pages runs Jekyll by default, which ignores files it doesn't like.
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

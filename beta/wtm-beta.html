@@ -216,6 +216,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
 /* ── MAP ── */
 #scr-map{background:#F2EFE7;position:absolute;inset:0}
 /* full-bleed map: canvas fills the entire screen; chrome floats above it */
+#gl-map{position:absolute;inset:0;display:none}
+#gl-map.on{display:block}
 #map-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 #map-canvas:active{cursor:grabbing}
 .map-topbar{position:absolute;top:0;left:0;right:0;z-index:10;padding:52px 20px 30px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,rgba(6,5,13,.72) 0%,rgba(6,5,13,.32) 60%,transparent 100%);pointer-events:none}
@@ -261,6 +263,24 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .ask-browse{display:flex;flex-wrap:wrap;gap:8px}
 .ask-browse-chip{display:inline-flex;align-items:center;gap:7px}
 .ask-browse-n{font-family:'WTM Mono',ui-monospace,monospace;font-size:11px;color:var(--text3)}
+
+/* real-tile map markers */
+.glpin{cursor:pointer;transform:translate(-50%,-100%)}
+.glpin-card{display:flex;align-items:center;gap:6px;background:#fff;border-radius:11px;
+  padding:6px 10px;box-shadow:0 3px 10px rgba(20,16,10,.28);white-space:nowrap;
+  font:700 12.5px/1 'WTM Sans',system-ui,sans-serif;color:#22262E;border:1.5px solid transparent}
+.glpin.hot .glpin-card{border-color:var(--signal)}
+.glpin-stem{width:2px;height:9px;background:rgba(20,16,10,.32);margin:0 auto}
+.glpin-dot{width:11px;height:11px;border-radius:50%;background:#63708A;border:2.5px solid #fff;
+  margin:0 auto;box-shadow:0 1px 4px rgba(20,16,10,.4)}
+.glpin.hot .glpin-dot{background:var(--signal)}
+.glpin-fr{width:8px;height:8px;border-radius:50%;background:var(--signal);flex:none}
+.glface{position:relative;width:42px;height:42px;border-radius:50%;background:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:21px;border:2.5px solid var(--ok);
+  cursor:pointer;box-shadow:0 3px 10px rgba(20,16,10,.3);transform:translate(-50%,-50%)}
+.glface-name{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:#fff;
+  color:#39424F;font:800 10px/1 'WTM Sans',system-ui,sans-serif;padding:3px 7px;border-radius:7px;white-space:nowrap}
+.glme{width:50px;height:50px;border-color:#4C6B8A;font-size:25px}
 /* ── SHEET ── */
 .sheet-overlay{position:absolute;inset:0;background:rgba(3,2,9,.65);backdrop-filter:blur(6px);z-index:40;opacity:0;pointer-events:none;transition:opacity .3s}
 .sheet-overlay.open{opacity:1;pointer-events:all}
@@ -464,6 +484,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 
 <!-- MAP -->
 <div id="scr-map" class="scr">
+  <div id="gl-map"></div>
   <div class="map-topbar">
     <div class="map-title">Live Map</div>
     <div class="map-live-pill"><div class="map-live-dot"></div><span id="map-live-count">8 moves live</span></div>
@@ -776,7 +797,7 @@ function goScreen(id){
   document.getElementById(id).classList.add('active');
   S.screen=id;
   if(id==='scr-moves')buildFeed();
-  if(id==='scr-map')setTimeout(initMap,60);
+  if(id==='scr-map'){setTimeout(initMap,60);tryRealMap();}
   if(id==='scr-ask')buildAsk();
   if(id==='scr-friends')buildFriends();
   if(id==='scr-profile')buildProfile();
@@ -1485,6 +1506,7 @@ function roundedRect(ctx,lx,ty,w,h,rx){
 }
 
 function drawMap(){
+  if(glMap)return; // real tiles took over
   const canvas=document.getElementById('map-canvas');
   if(!canvas||!canvas.width)return;
   const ctx=canvas.getContext('2d');
@@ -1761,7 +1783,7 @@ function drawMap(){
     ctx.textAlign='left';
   }
 
-  if(S.screen==='scr-map')scheduleDraw();
+  if(S.screen==='scr-map'&&!glMap)scheduleDraw();
 }
 // Single-flight render loop: no matter how many pan/zoom events call drawMap
 // directly, only ONE animation chain ever runs.
@@ -1780,7 +1802,10 @@ function tryTap(px,py){
     }
   }
 }
-function zoomMap(f){mapState.scale=Math.max(ZMIN,Math.min(ZMAX,mapState.scale*f));drawMap();}
+function zoomMap(f){
+  if(glMap){ f>1?glMap.zoomIn({duration:220}):glMap.zoomOut({duration:220}); return; }
+  mapState.scale=Math.max(ZMIN,Math.min(ZMAX,mapState.scale*f));drawMap();
+}
 function centerOn(lat,lng){
   const canvas=document.getElementById('map-canvas');
   if(!canvas||!canvas.width)return;
@@ -1788,7 +1813,10 @@ function centerOn(lat,lng){
   mapState.ox=-(lng-C_LNG)*M_LNG*p0;
   mapState.oy=-(C_LAT-lat)*M_LAT*p0;
 }
-function resetMap(){mapState.scale=4.4;centerOn(40.4445,-79.9720);drawMap();}
+function resetMap(){
+  if(glMap){ glMap.flyTo({center:[-79.9720,40.4445],zoom:12.2,duration:600}); return; }
+  mapState.scale=4.4;centerOn(40.4445,-79.9720);drawMap();
+}
 
 
 // ══════════════════ SPOT FINDER ══════════════════
@@ -2026,6 +2054,134 @@ function openSpot(id){
     </div>`;
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('sheet').classList.add('open');
+}
+
+
+// ══════════════════ REAL VECTOR TILES (progressive upgrade) ══════════════════
+// The canvas map is hand-drawn and always works, including offline and inside
+// the artifact sandbox where all external hosts are blocked. When the page IS
+// allowed to reach the network (opened locally, or hosted anywhere), it upgrades
+// itself to real OpenStreetMap vector tiles via MapLibre, which is the same
+// approach Snap Map takes with Mapbox.
+//
+// Every failure path falls back to the canvas silently. Nothing here can break
+// the demo; it can only improve it.
+const TILE_PROVIDERS=[
+  'https://tiles.openfreemap.org/styles/liberty',
+  'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+];
+const GL_PAINT={land:'#F2EFE7',water:'#A9D2F0',park:'#C8E2B0',road:'#FFFFFF',
+  roadCase:'#E2DDCF',major:'#FDF6DE',majorCase:'#E8D9A8',building:'#E5E1D6',
+  label:'#7C8698',halo:'#FFFFFF'};
+let glMap=null, glTried=false;
+
+async function tryRealMap(){
+  if(glTried)return; glTried=true;
+  let maplibregl;
+  try{
+    // Style + library both live off-origin, so this throws under a strict CSP.
+    maplibregl=(await import('https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/+esm')).default;
+    window.__maplibregl=maplibregl;
+    if(!document.getElementById('maplibre-css')){
+      const l=document.createElement('link');
+      l.id='maplibre-css'; l.rel='stylesheet';
+      l.href='https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      document.head.appendChild(l);
+    }
+  }catch(err){ return; } // no network: keep the canvas
+
+  let idx=0, ready=false;
+  glMap=new maplibregl.Map({
+    container:'gl-map', style:TILE_PROVIDERS[0],
+    center:[-79.9720,40.4445], zoom:12.2, attributionControl:{compact:true},
+  });
+  glMap.on('error',()=>{
+    if(ready)return;
+    idx++;
+    if(idx<TILE_PROVIDERS.length) glMap.setStyle(TILE_PROVIDERS[idx]);
+    else { try{glMap.remove();}catch(e){} glMap=null; } // give up, canvas stays
+  });
+  glMap.on('style.load',()=>{
+    ready=true;
+    restyleGL();
+    addGLHeat();
+    document.getElementById('gl-map').classList.add('on');
+    const cv=document.getElementById('map-canvas'); if(cv)cv.style.display='none';
+    const hint=document.getElementById('map-hint'); if(hint)hint.textContent='Real map · pinch, drag, tap a pin';
+  });
+  glMap.once('load',addGLMarkers);
+}
+
+// Recolour the provider's own layers rather than hand-authoring a style, so
+// anything unmatched keeps the provider's colour instead of disappearing.
+function restyleGL(){
+  const layers=glMap.getStyle().layers||[];
+  for(const L of layers){
+    const id=(L.id||'').toLowerCase(), sl=(L['source-layer']||'').toLowerCase(), k=id+sl;
+    try{
+      if(L.type==='background') glMap.setPaintProperty(L.id,'background-color',GL_PAINT.land);
+      else if(/water|ocean|sea|river|lake/.test(k)&&L.type==='fill') glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.water);
+      else if(/water|river|stream|canal/.test(k)&&L.type==='line') glMap.setPaintProperty(L.id,'line-color',GL_PAINT.water);
+      else if(/park|wood|forest|grass|golf|pitch|garden|landcover|landuse/.test(k)&&L.type==='fill'){
+        glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.park);
+        glMap.setPaintProperty(L.id,'fill-opacity',.75);
+      }
+      else if(/building/.test(k)){
+        if(L.type==='fill'){glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.building);glMap.setPaintProperty(L.id,'fill-opacity',.85);}
+        else if(L.type==='fill-extrusion') glMap.setPaintProperty(L.id,'fill-extrusion-color',GL_PAINT.building);
+      }
+      else if(L.type==='line'&&/motorway|trunk|primary/.test(id))
+        glMap.setPaintProperty(L.id,'line-color',/case|outline|casing/.test(id)?GL_PAINT.majorCase:GL_PAINT.major);
+      else if(L.type==='line'&&/road|street|highway|transport|bridge|tunnel/.test(k))
+        glMap.setPaintProperty(L.id,'line-color',/case|outline|casing/.test(id)?GL_PAINT.roadCase:GL_PAINT.road);
+      else if(L.type==='symbol'){
+        if(L.layout&&L.layout['text-field']){
+          glMap.setPaintProperty(L.id,'text-color',GL_PAINT.label);
+          glMap.setPaintProperty(L.id,'text-halo-color',GL_PAINT.halo);
+          glMap.setPaintProperty(L.id,'text-halo-width',1.4);
+        }
+        // Keep POI clutter down so WTM's own pins read first, same as Snap.
+        if(/poi|shop|amenity/.test(k)) glMap.setLayoutProperty(L.id,'visibility','none');
+      }
+    }catch(e){ /* provider lacks this property */ }
+  }
+}
+
+function addGLHeat(){
+  if(glMap.getSource('wtm-heat'))return;
+  glMap.addSource('wtm-heat',{type:'geojson',data:{type:'FeatureCollection',
+    features:MOVES.map(m=>({type:'Feature',
+      properties:{w:m.att/m.max+(m.hot?.6:0)},
+      geometry:{type:'Point',coordinates:[m.lng,m.lat]}}))}});
+  glMap.addLayer({id:'wtm-heat',type:'heatmap',source:'wtm-heat',paint:{
+    'heatmap-weight':['get','w'],'heatmap-intensity':1.1,
+    'heatmap-radius':['interpolate',['linear'],['zoom'],10,34,15,90],
+    'heatmap-opacity':.55,
+    'heatmap-color':['interpolate',['linear'],['heatmap-density'],
+      0,'rgba(255,225,120,0)',0.25,'rgba(255,214,90,.35)',0.55,'rgba(255,158,61,.5)',
+      0.8,'rgba(255,110,45,.6)',1,'rgba(255,64,40,.7)']}});
+}
+
+function glEl(html){const d=document.createElement('div');d.innerHTML=html.trim();return d.firstElementChild;}
+
+function addGLMarkers(){
+  const M=window.__maplibregl; if(!M)return;
+  MOVES.forEach(m=>{
+    const fr=friendsForMove(m.id).length;
+    const node=glEl(`<div class="glpin${m.hot?' hot':''}">
+      <div class="glpin-card">${fr?'<span class="glpin-fr"></span>':''}<span>${m.emoji}</span>`
+      +`<span>${m.title.length>20?m.title.slice(0,18)+'…':m.title}</span></div>`
+      +`<div class="glpin-stem"></div><div class="glpin-dot"></div></div>`);
+    node.addEventListener('click',ev=>{ev.stopPropagation();openSheet(m.id);});
+    new M.Marker({element:node,anchor:'bottom'}).setLngLat([m.lng,m.lat]).addTo(glMap);
+  });
+  FRIENDS_LIST.filter(f=>f.online).forEach(f=>{
+    const node=glEl(`<div class="glface">${f.face}<span class="glface-name">${f.name.split(' ')[0]}</span></div>`);
+    node.addEventListener('click',ev=>{ev.stopPropagation();toast(f.name+' is out right now');});
+    new M.Marker({element:node}).setLngLat([f.lng,f.lat]).addTo(glMap);
+  });
+  const me=glEl(`<div class="glface glme">${ME.face}<span class="glface-name">You</span></div>`);
+  new M.Marker({element:me}).setLngLat([ME.lng,ME.lat]).addTo(glMap);
 }
 
 // ══════════════════ INIT ══════════════════
