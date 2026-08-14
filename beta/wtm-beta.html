@@ -281,6 +281,34 @@ input,textarea{-webkit-user-select:text;user-select:text}
 .glface-name{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:#fff;
   color:#39424F;font:800 10px/1 'WTM Sans',system-ui,sans-serif;padding:3px 7px;border-radius:7px;white-space:nowrap}
 .glme{width:50px;height:50px;border-color:#4C6B8A;font-size:25px}
+
+/* ── spot submission + review ── */
+.sb-out{margin-top:16px;border-top:1px solid var(--border);padding-top:16px}
+.sb-verdict{font-family:'WTM Display','WTM Sans',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.sb-sub{font-size:14px;color:var(--text2);line-height:1.55;margin:5px 0 14px}
+.sb-checks{display:flex;flex-direction:column;gap:7px}
+.sb-check{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--text2)}
+.sb-check b{color:var(--text1);font-weight:700}
+.sb-detail{color:var(--text3)}
+.sb-mark{width:17px;height:17px;border-radius:var(--r-sm);flex:none;display:flex;
+  align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-top:1px}
+.sb-pass .sb-mark{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.sb-review .sb-mark{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.sb-reject .sb-mark{background:color-mix(in srgb,var(--stop) 20%,transparent);color:var(--stop)}
+.rq-card{border:1px solid var(--border);border-radius:var(--r-md);padding:15px 16px;margin-bottom:12px;background:var(--bg2)}
+.rq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.rq-name{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.rq-meta{font-family:'WTM Mono',ui-monospace,monospace;font-size:11px;color:var(--text3);margin-top:2px}
+.rq-verdict{font-family:'WTM Mono',ui-monospace,monospace;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.1em;border:1px solid;border-radius:var(--r-sm);padding:3px 7px;flex:none}
+.rq-blurb{font-size:13.5px;color:var(--text2);line-height:1.5;margin-bottom:11px}
+.rq-actions{display:flex;gap:8px;margin-top:12px}
+.rq-btn{flex:1;border:1px solid var(--border2);background:transparent;color:var(--text1);
+  border-radius:var(--r-sm);padding:10px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.rq-yes{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+.ask-actions{display:flex;gap:8px;padding:0 18px 12px;flex-shrink:0}
+.ask-action{flex:1;border:1px solid var(--border2);background:transparent;color:var(--text2);
+  border-radius:var(--r-sm);padding:10px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
 /* ── SHEET ── */
 .sheet-overlay{position:absolute;inset:0;background:rgba(3,2,9,.65);backdrop-filter:blur(6px);z-index:40;opacity:0;pointer-events:none;transition:opacity .3s}
 .sheet-overlay.open{opacity:1;pointer-events:all}
@@ -519,6 +547,10 @@ input,textarea{-webkit-user-select:text;user-select:text}
     <button class="ask-go" onclick="submitAsk()">Find</button>
   </div>
   <div class="ask-chips" id="ask-examples"></div>
+  <div class="ask-actions">
+    <button class="ask-action" data-act="sb-open">Add a spot</button>
+    <button class="ask-action" data-act="rq-open">Review queue <span id="rq-n"></span></button>
+  </div>
   <div class="ask-scroll"><div id="ask-results"></div></div>
   <div class="tabbar">
     <div class="tab" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
@@ -1203,6 +1235,15 @@ document.addEventListener('click',e=>{
     if(S.openMoveId===mid)openSheet(mid);
     e.stopPropagation();
   }
+  else if(act==='sb-open'){openSubmitSpot();}
+  else if(act==='rq-open'){openReviewQueue();}
+  else if(act==='sb-check'){runSubmitCheck();}
+  else if(act==='sb-cat'){
+    S.submitCat=arg;
+    document.querySelectorAll('#sb-cats .create-cat').forEach(x=>
+      x.classList.toggle('sel',x.dataset.arg===arg));
+  }
+  else if(act==='rq-act'){actOnQueue(arg);}
   else if(act==='ask-eg'){submitAsk(arg);}
   else if(act==='ask-open'){openSpot(arg);}
   else if(act==='spot-map'){
@@ -1819,6 +1860,104 @@ function resetMap(){
 }
 
 
+
+// ══════════════════ SPOT SUBMISSION & TRIAGE ══════════════════
+// How the spot list grows: users submit, and every submission runs a
+// deterministic triage before a human ever sees it. This is all on-device
+// arithmetic and pattern matching, so it costs nothing per submission.
+//
+// The verdicts are deliberately three-way, not two:
+//   reject   - fails a hard rule, never reaches a queue
+//   review   - plausible but carries real-world risk, a person decides
+//   approve  - safe category, complete, from a trusted submitter
+//
+// An auto-approved spot still is not searchable until other people confirm it
+// on the ground. That community step, not the triage, is what actually keeps
+// the list honest: it is much harder to fake three people standing somewhere
+// than to write a convincing description.
+
+const SUBMIT_RULES={
+  // Physical-risk categories. A 17-year-old can act on these, so a machine
+  // does not get the final say.
+  riskCats:['urbex','swim'],
+  // Someone's home dressed up as a hangout is the main abuse vector here.
+  homeWords:/\b(my|his|her|their|folks?|parents?|moms?|dads?)\s+(house|place|crib|apartment|apt|spot|basement|garage)\b/i,
+  possessive:/\b[A-Z][a-z]{2,}'s\b/,
+  streetAddress:/\b\d{2,5}\s+[A-Z][a-z]+\s+(st|street|ave|avenue|rd|road|dr|drive|ln|lane|ct|court|way|blvd|pl|place)\b/i,
+  contact:/(\+?\d[\d\-\s().]{7,}\d)|([\w.+-]+@[\w-]+\.[a-z]{2,})|(@[A-Za-z0-9_]{3,})/,
+  banned:/\b(kill|shoot|jump\s+from|overdose|fight\s+club|steal|break\s?in)\b/i,
+  minBlurb:25,
+  dupeMetres:70,
+};
+
+function triageSpot(sub, opts){
+  opts=opts||{};
+  const trusted=!!opts.trusted;
+  const checks=[]; let worst='approve';
+  const raise=(level,label,detail)=>{
+    checks.push({level,label,detail});
+    if(level==='reject') worst='reject';
+    else if(level==='review'&&worst!=='reject') worst='review';
+  };
+  const pass=(label)=>checks.push({level:'pass',label});
+
+  const text=`${sub.name||''} ${sub.blurb||''}`.trim();
+
+  // 1. Inside the city we actually cover.
+  const km=kmBetween(ME.lat,ME.lng,sub.lat,sub.lng);
+  if(km>60) raise('reject','Outside coverage',`${km.toFixed(0)} km from Pittsburgh`);
+  else pass('Inside coverage');
+
+  // 2. Duplicate of somewhere already listed.
+  let dupe=null;
+  for(const sp of SPOTS){
+    const d=kmBetween(sp.lat,sp.lng,sub.lat,sub.lng)*1000;
+    if(d<=SUBMIT_RULES.dupeMetres){ dupe=sp; break; }
+  }
+  if(dupe) raise('reject','Already listed',`${Math.round(kmBetween(dupe.lat,dupe.lng,sub.lat,sub.lng)*1000)}m from ${dupe.name}`);
+  else pass('Not a duplicate');
+
+  // 3. Content that should never be published.
+  if(SUBMIT_RULES.banned.test(text)) raise('reject','Unsafe content','Describes harm or a crime');
+  else pass('No unsafe content');
+
+  // 4. Is this somebody's home? Highest-value check in the whole pipeline.
+  if(SUBMIT_RULES.homeWords.test(text)) raise('review','Possibly a private home','Reads like a residence, not a public place');
+  else if(SUBMIT_RULES.possessive.test(sub.name||'')) raise('review','Named after a person',"Could be someone's address");
+  else if(SUBMIT_RULES.streetAddress.test(text)) raise('review','Street address in the text','Verify it is a public place');
+  else pass('Reads as a public place');
+
+  // 5. Personal contact details.
+  if(SUBMIT_RULES.contact.test(text)) raise('review','Contact details included','Strip before publishing');
+  else pass('No contact details');
+
+  // 6. Categories where being wrong hurts someone.
+  if(SUBMIT_RULES.riskCats.includes(sub.cat))
+    raise('review','Risk category',sub.cat==='urbex'?'Trespass and structural risk':'Open water risk');
+  else pass('Low-risk category');
+
+  // 7. Enough substance to be useful.
+  if((sub.blurb||'').trim().length<SUBMIT_RULES.minBlurb) raise('review','Thin description','Under 25 characters');
+  else pass('Described properly');
+
+  // 8. Track record. Trust raises the ceiling, it never lowers the floor:
+  //    a trusted submitter still cannot auto-approve a risk category.
+  if(trusted) pass('Trusted submitter');
+  else if(worst==='approve') raise('review','First submission','No approved spots yet');
+
+  return {verdict:worst,checks,confirmsNeeded:worst==='approve'?3:0};
+}
+
+// Submissions live here until they clear. Nothing enters SPOTS unconfirmed.
+const SPOT_QUEUE=[
+  {id:'q1',name:"Connor's rooftop",cat:'view',lat:40.4471,lng:-79.9612,
+   blurb:'my boy has roof access, we go up after work all the time',by:'Devon T.',trusted:false},
+  {id:'q2',name:'Panhandle Trail Tunnel',cat:'urbex',lat:40.4102,lng:-80.0921,
+   blurb:'Old railway tunnel off the Panhandle Trail, walkable and covered in graffiti.',by:'Mia R.',trusted:true},
+  {id:'q3',name:'Riverview Park Overlook',cat:'view',lat:40.4790,lng:-80.0180,
+   blurb:'Quiet overlook above the observatory, you can see the whole North Side from here.',by:'Alex M.',trusted:true},
+];
+
 // ══════════════════ SPOT FINDER ══════════════════
 // Natural language in, ranked spots out, entirely on-device. No API call, no
 // key, no per-query cost, and it works with no signal.
@@ -1961,12 +2100,122 @@ function runAsk(query){
   return {intent,results,reason:results.length?'ok':'no-match',best};
 }
 
+
+// ── Submit + review UI ──
+function openSubmitSpot(){
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-title" style="margin-top:4px">Add a spot</div>
+    <div class="sheet-desc" style="margin-bottom:16px">
+      Somewhere worth knowing about. It gets checked, then confirmed by people who go there.
+    </div>
+    <div class="create-field"><label for="sb-name">Name</label>
+      <input class="create-input" id="sb-name" placeholder="What do people call it?"></div>
+    <div class="create-field"><label for="sb-blurb">What is it</label>
+      <textarea class="create-input" id="sb-blurb" rows="3"
+        placeholder="What you do there, when it's good, anything worth knowing."></textarea></div>
+    <div class="create-field"><label>Type</label>
+      <div class="create-cats" id="sb-cats"></div></div>
+    <div class="create-field"><label for="sb-area">Neighbourhood</label>
+      <input class="create-input" id="sb-area" placeholder="Polish Hill"></div>
+    <button class="sa sa-going" style="width:100%" data-act="sb-check">Submit for review</button>
+    <div id="sb-result"></div>`;
+  document.getElementById('sb-cats').innerHTML=Object.entries(SPOT_CATS)
+    .map(([id,label])=>`<div class="create-cat" data-act="sb-cat" data-arg="${id}">${label}</div>`).join('');
+  S.submitCat=null;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function runSubmitCheck(){
+  const name=(document.getElementById('sb-name').value||'').trim();
+  const blurb=(document.getElementById('sb-blurb').value||'').trim();
+  const area=(document.getElementById('sb-area').value||'').trim()||'Pittsburgh';
+  if(!name){ toast('Give it a name first'); return; }
+  if(!S.submitCat){ toast('Pick a type'); return; }
+  // In the real app this comes from the map pin the user dropped.
+  const sub={name,blurb,cat:S.submitCat,area,
+    lat:ME.lat+(Math.random()-.5)*.05, lng:ME.lng+(Math.random()-.5)*.06};
+  const {verdict,checks,confirmsNeeded}=triageSpot(sub,{trusted:false});
+  const head = verdict==='reject' ? {t:"Can't publish this",c:'var(--stop)'}
+             : verdict==='review' ? {t:'Sent for review',c:'var(--warn)'}
+             : {t:'Cleared the checks',c:'var(--ok)'};
+  const sub2 = verdict==='reject'
+    ? 'It failed a hard rule, so it stops here.'
+    : verdict==='review'
+      ? 'A person looks at this one before it goes live. Usually same day.'
+      : `Live once ${confirmsNeeded} people confirm it on the ground.`;
+  document.getElementById('sb-result').innerHTML=`
+    <div class="sb-out">
+      <div class="sb-verdict" style="color:${head.c}">${head.t}</div>
+      <div class="sb-sub">${sub2}</div>
+      <div class="sb-checks">${checks.map(c=>`
+        <div class="sb-check sb-${c.level}">
+          <span class="sb-mark">${c.level==='pass'?'✓':c.level==='review'?'!':'✕'}</span>
+          <span><b>${c.label}</b>${c.detail?` <span class="sb-detail">${c.detail}</span>`:''}</span>
+        </div>`).join('')}</div>
+    </div>`;
+  demoEvt('submitted_spot');
+}
+
+function openReviewQueue(){
+  const rows=SPOT_QUEUE.map(q=>{
+    const {verdict,checks}=triageSpot(q,{trusted:q.trusted});
+    const flags=checks.filter(c=>c.level!=='pass');
+    const tone=verdict==='reject'?'var(--stop)':verdict==='review'?'var(--warn)':'var(--ok)';
+    return `<div class="rq-card">
+      <div class="rq-top">
+        <div>
+          <div class="rq-name">${q.name}</div>
+          <div class="rq-meta">${SPOT_CATS[q.cat]||q.cat} · by ${q.by}${q.trusted?' · trusted':''}</div>
+        </div>
+        <span class="rq-verdict" style="color:${tone};border-color:${tone}">${verdict}</span>
+      </div>
+      <div class="rq-blurb">${q.blurb}</div>
+      ${flags.length?`<div class="sb-checks">${flags.map(c=>`
+        <div class="sb-check sb-${c.level}">
+          <span class="sb-mark">${c.level==='review'?'!':'✕'}</span>
+          <span><b>${c.label}</b>${c.detail?` <span class="sb-detail">${c.detail}</span>`:''}</span>
+        </div>`).join('')}</div>`:'<div class="sb-check sb-pass"><span class="sb-mark">✓</span><span>Passed every check</span></div>'}
+      <div class="rq-actions">
+        <button class="rq-btn rq-yes" data-act="rq-act" data-arg="${q.id}|approve">Publish</button>
+        <button class="rq-btn" data-act="rq-act" data-arg="${q.id}|reject">Decline</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-title" style="margin-top:4px">Review queue</div>
+    <div class="sheet-desc" style="margin-bottom:16px">
+      ${SPOT_QUEUE.length} waiting. Triage has already run; these are the ones it would not decide alone.
+    </div>${rows}`;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function actOnQueue(arg){
+  const [id,action]=arg.split('|');
+  const i=SPOT_QUEUE.findIndex(q=>q.id===id);
+  if(i<0)return;
+  const q=SPOT_QUEUE[i];
+  if(action==='approve'){
+    SPOTS.push({id:'sp'+Date.now(),name:q.name,cat:q.cat,emoji:'📍',lat:q.lat,lng:q.lng,
+      area:q.blurb.split(',')[0].slice(0,24),addr:'Added by '+q.by,fires:1,crowd:'low',
+      best:'afternoon',lit:false,free:true,indoor:false,
+      tags:[q.cat],blurb:q.blurb});
+    toast(q.name+' is live');
+  } else toast(q.name+' declined');
+  SPOT_QUEUE.splice(i,1);
+  openReviewQueue();
+  buildAsk();
+}
+
 // ── Ask screen ──
 const ASK_EXAMPLES=['skate spot near me','quiet place to watch the sunset',
                     'somewhere abandoned to photograph','chill spot to sit with friends',
                     'water, worth the drive'];
 
 function buildAsk(){
+  const n=document.getElementById('rq-n');
+  if(n)n.textContent=SPOT_QUEUE.length?`(${SPOT_QUEUE.length})`:'';
   document.getElementById('ask-examples').innerHTML=
     ASK_EXAMPLES.map(e=>`<button class="ask-chip" data-act="ask-eg" data-arg="${e}">${e}</button>`).join('');
   // Before the first search, show what there is to search. An empty screen
