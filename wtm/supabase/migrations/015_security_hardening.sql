@@ -62,6 +62,7 @@ as $$
 declare
   v_code_id  uuid;
   v_inviter  uuid;
+  v_used_id  uuid;
 begin
   v_code_id := (new.raw_user_meta_data ->> 'invite_code_id')::uuid;
 
@@ -70,16 +71,16 @@ begin
       using hint = 'Sign-up requires a valid invite code.';
   end if;
 
-  -- Burn one use atomically. A null return means the code was fake, exhausted
-  -- or already consumed by a concurrent signup.
+  -- Burn one use atomically. Test existence on the row's own id, not on
+  -- created_by: admin-seeded codes legitimately have a null creator, and
+  -- keying the check on created_by rejected every one of them.
   update public.invite_codes
-     set use_count = use_count + 1,
-         used_by   = coalesce(used_by, new.id)
+     set use_count = use_count + 1
    where id = v_code_id
      and use_count < max_uses
-  returning created_by into v_inviter;
+  returning id, created_by into v_used_id, v_inviter;
 
-  if v_inviter is null then
+  if v_used_id is null then
     raise exception 'invite_invalid_or_exhausted';
   end if;
 
@@ -89,6 +90,13 @@ begin
     coalesce(new.raw_user_meta_data ->> 'username', 'member_' || left(new.id::text, 8)),
     v_inviter
   );
+
+  -- used_by references profiles(id), so it can only be set once the profile
+  -- exists. Setting it in the UPDATE above violated that foreign key and broke
+  -- signup outright.
+  update public.invite_codes
+     set used_by = coalesce(used_by, new.id)
+   where id = v_code_id;
 
   return new;
 end;
@@ -125,12 +133,23 @@ revoke execute on function public.promote_from_waitlist(uuid) from anon, authent
 -- A mutable search_path lets any role that can create objects in a schema on
 -- the path shadow a table and have owner-privileged code read or write it.
 -- ALTER FUNCTION avoids re-declaring the bodies.
+--
+-- Every function gets `public, extensions`, not the empty path. The empty path
+-- is stricter, but only for a body that qualifies every single name — and these
+-- bodies do not. Most were written before this file existed and say `from
+-- rsvps`, not `from public.rsvps`; the PostGIS ones reach for `geography` and
+-- `st_dwithin` unqualified as well. Handing those an empty path does not harden
+-- them, it breaks them at call time with "relation does not exist", and the
+-- break is invisible until a member actually hits that path in production.
+-- What closes the vulnerability is that the path stops being *mutable* — the
+-- caller can no longer prepend a schema and shadow a table the owner-privileged
+-- body reads. A fixed `public, extensions` does that just as completely.
 do $$
 declare
   fn record;
 begin
   for fn in
-    select p.oid::regprocedure as sig
+    select p.oid, p.oid::regprocedure as sig
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
@@ -140,7 +159,7 @@ begin
         where c like 'search_path=%'
       )
   loop
-    execute format('alter function %s set search_path = %L', fn.sig, '');
+    execute format('alter function %s set search_path = public, extensions', fn.sig);
   end loop;
 end $$;
 
