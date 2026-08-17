@@ -1,0 +1,565 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WTM · What's The Move</title>
+<style>
+__FONTS__
+
+/* ─────────────────────────────────────────────────────────────
+   WTM design tokens.
+   Accent is sodium-vapour amber: the colour of a Pittsburgh street
+   at night. It means "live / act now" and is used for nothing else.
+   Neutrals are biased blue (wet asphalt under that lamp) so they read
+   as chosen rather than inherited grey.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ink-900:#0B0E14; --ink-800:#12161F; --ink-700:#1A1F2B; --ink-600:#262C3A;
+  --paper-100:#E8EAF0; --paper-400:#8A93A6; --paper-600:#77849D;
+  --signal:#FF9E3D; --signal-ink:#0B0E14;
+  --ok:#3FB37F; --warn:#E0A44A; --stop:#E5544B;
+  --r-sm:6px; --r-md:14px;
+  --t:140ms cubic-bezier(.2,.7,.4,1);
+  --measure:64ch;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --ink-900:#F2F3F7; --ink-800:#FFFFFF; --ink-700:#E9EBF1; --ink-600:#D3D7E0;
+    --paper-100:#141821; --paper-400:#5A6375; --paper-600:#79839A;
+    --signal:#945C23; --signal-ink:#FFFFFF;
+    --ok:#1F7A52; --warn:#8A5A12; --stop:#B3352C;
+  }
+}
+:root[data-theme="light"]{
+  --ink-900:#F2F3F7; --ink-800:#FFFFFF; --ink-700:#E9EBF1; --ink-600:#D3D7E0;
+  --paper-100:#141821; --paper-400:#5A6375; --paper-600:#79839A;
+  --signal:#945C23; --signal-ink:#FFFFFF;
+  --ok:#1F7A52; --warn:#8A5A12; --stop:#B3352C;
+}
+:root[data-theme="dark"]{
+  --ink-900:#0B0E14; --ink-800:#12161F; --ink-700:#1A1F2B; --ink-600:#262C3A;
+  --paper-100:#E8EAF0; --paper-400:#8A93A6; --paper-600:#77849D;
+  --signal:#FF9E3D; --signal-ink:#0B0E14;
+  --ok:#3FB37F; --warn:#E0A44A; --stop:#E5544B;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--ink-900); color:var(--paper-100);
+  font-family:'WTM Sans',system-ui,sans-serif; font-weight:400;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body.locked{overflow:hidden}
+h1,h2,h3{font-family:'WTM Display','WTM Sans',system-ui,sans-serif;font-weight:700;line-height:1.02;text-wrap:balance}
+.mono{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+a{color:inherit}
+
+/* ── signature: the sodium rule ──
+   A hairline carrying a single amber bloom, like a streetlight seen
+   down a long block. The only decorative use of the accent. */
+.rule{position:relative;height:1px;background:var(--ink-600);border:0;margin:0}
+.rule::after{
+  content:'';position:absolute;top:-1px;left:var(--at,18%);
+  width:clamp(120px,22vw,260px);height:3px;transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,var(--signal),transparent);
+  opacity:.85;filter:blur(.5px);
+}
+
+/* ── nav ── */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--ink-900) 88%,transparent);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--ink-600)}
+.nav-in{max-width:1040px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wordmark{font-family:'WTM Display','WTM Sans',sans-serif;font-weight:700;font-size:25px;letter-spacing:.04em;line-height:1;color:var(--paper-100)}
+.wordmark i{color:var(--signal);font-style:normal}
+.btn{font-family:'WTM Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em;
+     border:0;border-radius:var(--r-sm);padding:11px 18px;cursor:pointer;
+     display:inline-flex;align-items:center;gap:8px;transition:background var(--t),color var(--t);
+     text-decoration:none;line-height:1}
+.btn-primary{background:var(--signal);color:var(--signal-ink)}
+.btn-primary:hover{background:color-mix(in srgb,var(--signal) 86%,var(--paper-100))}
+.btn-quiet{background:transparent;color:var(--paper-100);border:1px solid var(--ink-600)}
+.btn-quiet:hover{background:var(--ink-700)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible,a:focus-visible,summary:focus-visible,button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+/* ── hero: left-aligned, asymmetric on purpose ── */
+.hero{padding:72px 0 44px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+@media (min-width:860px){.hero-grid{grid-template-columns:1.15fr .85fr;align-items:end;gap:48px}}
+.eyebrow{font-family:'WTM Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+         color:var(--signal);display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.eyebrow .pip{width:6px;height:6px;border-radius:50%;background:var(--signal);flex:none}
+h1{font-size:clamp(46px,9vw,86px);letter-spacing:-.015em}
+h1 em{font-style:normal;color:var(--signal)}
+.lede{margin-top:18px;font-size:17px;color:var(--paper-400);max-width:46ch}
+.hero-cta{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.hero-note{margin-top:14px;font-family:'WTM Mono',monospace;font-size:11.5px;color:var(--paper-600);letter-spacing:.02em}
+.hero-side{border-left:1px solid var(--ink-600);padding-left:22px}
+@media (max-width:859px){.hero-side{border-left:0;padding-left:0;border-top:1px solid var(--ink-600);padding-top:22px}}
+.hero-side dt{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-600);margin-bottom:4px}
+.hero-side dd{font-size:14.5px;color:var(--paper-400);margin-bottom:16px}
+.hero-side dd:last-child{margin-bottom:0}
+
+/* ── sections ── */
+section{padding:56px 0}
+.sec-head{margin-bottom:28px;max-width:var(--measure)}
+h2{font-size:clamp(27px,4vw,38px);letter-spacing:-.01em}
+.sec-head p{margin-top:10px;color:var(--paper-400);font-size:16px}
+
+/* ── demo ── */
+.demo-wrap{display:flex;justify-content:center}
+.phone{width:min(380px,94vw);border:1px solid var(--ink-600);border-radius:var(--r-md);
+       background:var(--ink-800);padding:8px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.phone-screen{position:relative;border-radius:var(--r-sm);overflow:hidden;background:var(--ink-900);height:min(760px,78vh)}
+.phone iframe{width:100%;height:100%;border:0;display:block}
+.launch{display:none;border:1px solid var(--ink-600);border-radius:var(--r-md);background:var(--ink-800);
+        padding:28px 22px;max-width:420px;margin:0 auto}
+.launch h3{font-size:21px;margin-bottom:8px}
+.launch p{color:var(--paper-400);font-size:14.5px;margin-bottom:20px}
+.demo-tip{margin-top:18px;text-align:center;font-family:'WTM Mono',monospace;font-size:12px;color:var(--paper-600);letter-spacing:.02em}
+@media (max-width:759px){.launch{display:block}.demo-wrap{display:none}}
+
+/* ── features: deliberately uneven grid ── */
+.feats{display:grid;grid-template-columns:1fr;gap:1px;background:var(--ink-600);
+       border:1px solid var(--ink-600);border-radius:var(--r-md);overflow:hidden}
+@media (min-width:720px){.feats{grid-template-columns:repeat(3,1fr)}
+  .feats > :first-child{grid-column:span 2}}
+.feat{background:var(--ink-900);padding:26px 24px}
+.feat h3{font-size:19px;margin:14px 0 8px;letter-spacing:-.005em}
+.feat p{color:var(--paper-400);font-size:14.5px}
+.ico{width:22px;height:22px;stroke:var(--signal);stroke-width:1.6;fill:none;
+     stroke-linecap:round;stroke-linejoin:round;display:block}
+
+/* ── steps ── */
+.steps{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:720px){.steps{grid-template-columns:repeat(3,1fr);gap:28px}}
+.step{padding:20px 0;border-top:1px solid var(--ink-600)}
+.step .n{font-family:'WTM Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--signal);display:block;margin-bottom:8px}
+.step h3{font-size:17px;margin-bottom:6px}
+.step p{color:var(--paper-400);font-size:14.5px}
+
+/* ── faq ── */
+.faq{max-width:var(--measure)}
+details{border-bottom:1px solid var(--ink-600)}
+summary{list-style:none;cursor:pointer;padding:16px 0;font-weight:700;font-size:15.5px;
+        display:flex;justify-content:space-between;align-items:center;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'';width:9px;height:9px;border-right:1.5px solid var(--paper-400);
+               border-bottom:1.5px solid var(--paper-400);transform:rotate(45deg);
+               transition:transform var(--t);flex:none;margin-bottom:3px}
+details[open] summary::after{transform:rotate(225deg);margin-bottom:-3px}
+.faq-a{padding:0 0 18px;color:var(--paper-400);font-size:14.5px;max-width:58ch}
+
+/* ── closing ── */
+.close-cta{border:1px solid var(--ink-600);border-radius:var(--r-md);padding:40px 28px;background:var(--ink-800)}
+.close-cta h2{margin-bottom:10px}
+.close-cta p{color:var(--paper-400);margin-bottom:22px;max-width:48ch}
+
+footer{border-top:1px solid var(--ink-600);padding:26px 0 40px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.foot p{font-family:'WTM Mono',monospace;font-size:11.5px;color:var(--paper-600);letter-spacing:.02em}
+
+/* ── fullscreen demo ── */
+#fs{position:fixed;inset:0;z-index:300;background:var(--ink-900);display:none;flex-direction:column}
+#fs.open{display:flex}
+.fs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+        padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));
+        background:var(--ink-800);border-bottom:1px solid var(--ink-600);flex:none}
+#fs iframe{flex:1;border:0;width:100%}
+
+/* ── feedback ── */
+#fb-open{position:fixed;right:18px;bottom:18px;z-index:220}
+#fb-scrim{position:fixed;inset:0;background:rgba(4,6,10,.72);z-index:230;display:none;align-items:flex-end;justify-content:center}
+#fb-scrim.open{display:flex}
+@media (min-width:600px){#fb-scrim.open{align-items:center}}
+.fb{background:var(--ink-800);border:1px solid var(--ink-600);border-radius:var(--r-md) var(--r-md) 0 0;
+    width:100%;max-width:470px;max-height:92vh;overflow-y:auto;padding:24px 22px 32px;position:relative}
+@media (min-width:600px){.fb{border-radius:var(--r-md)}}
+.fb-x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:var(--r-sm);
+      border:1px solid var(--ink-600);background:transparent;color:var(--paper-400);cursor:pointer;font-size:15px;line-height:1}
+.fb h2{font-size:23px;margin-bottom:6px}
+.fb-sub{color:var(--paper-400);font-size:14px;margin-bottom:20px}
+.lbl{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+     color:var(--paper-600);display:block;margin:18px 0 9px}
+.rate{display:flex;gap:6px}
+.rate button{flex:1;padding:11px 0;border:1px solid var(--ink-600);background:transparent;border-radius:var(--r-sm);
+             color:var(--paper-400);font-family:'WTM Mono',monospace;font-size:15px;cursor:pointer;transition:all var(--t)}
+.rate button[aria-pressed="true"]{background:var(--signal);color:var(--signal-ink);border-color:var(--signal);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:8px 13px;border-radius:var(--r-sm);border:1px solid var(--ink-600);background:transparent;
+      color:var(--paper-400);font-size:13.5px;font-family:inherit;cursor:pointer;transition:all var(--t)}
+.chip[aria-pressed="true"]{border-color:var(--signal);color:var(--signal);background:color-mix(in srgb,var(--signal) 10%,transparent)}
+.fld{width:100%;background:var(--ink-900);border:1px solid var(--ink-600);border-radius:var(--r-sm);
+     padding:11px 13px;font:inherit;font-size:16px;color:var(--paper-100);outline:none}
+.fld:focus{border-color:var(--signal)}
+textarea.fld{min-height:82px;resize:vertical}
+.fb-send{width:100%;margin-top:20px;justify-content:center;padding:14px}
+.fb-send[disabled]{opacity:.4;cursor:not-allowed}
+.report{background:var(--ink-900);border:1px solid var(--ink-600);border-radius:var(--r-sm);padding:13px 15px;
+        font-family:'WTM Mono',monospace;font-size:11.5px;line-height:1.65;color:var(--paper-400);
+        white-space:pre-wrap;max-height:170px;overflow-y:auto;margin:14px 0}
+.send-row{display:flex;gap:8px;flex-wrap:wrap}
+.send-row .btn{flex:1;min-width:130px;justify-content:center}
+
+/* ── founder log ── */
+#log-sec{display:none}
+#log-sec.show{display:block}
+.log-stats{display:flex;gap:32px;flex-wrap:wrap;margin-bottom:20px}
+.log-stat .n{font-family:'WTM Display',sans-serif;font-size:34px;line-height:1}
+.log-stat .l{font-family:'WTM Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-600);margin-top:4px}
+.entry{border-top:1px solid var(--ink-600);padding:16px 0}
+.entry .who{font-weight:700;font-size:14.5px}
+.entry .meta{font-family:'WTM Mono',monospace;font-size:11px;color:var(--paper-600);margin:3px 0 7px}
+.entry .cmt{color:var(--paper-400);font-size:14.5px}
+.empty{color:var(--paper-600);padding:26px 0;font-size:14.5px}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+
+<nav>
+  <div class="nav-in">
+    <span class="wordmark">WT<i>M</i></span>
+    <button class="btn btn-primary" onclick="launch()">Open the demo</button>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow"><span class="pip"></span>Beta · Pittsburgh</p>
+      <h1>Know what's<br>moving. <em>Tonight.</em></h1>
+      <p class="lede">A live map of what's happening around you and which of your
+        friends are already there. No more "wyd" across three group chats.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="launch()">Open the demo</button>
+        <a class="btn btn-quiet" href="#how">How it works</a>
+      </div>
+      <p class="hero-note">Runs in your browser. Nothing to install.</p>
+    </div>
+    <dl class="hero-side">
+      <dt>What it is</dt>
+      <dd>A working demo of the WTM beta: the real interface, with a simulated Friday night running through it.</dd>
+      <dt>What it isn't</dt>
+      <dd>A video, a mockup, or a waitlist page. Everything you tap does something.</dd>
+    </dl>
+  </div>
+</header>
+
+<hr class="rule" style="--at:22%">
+
+<section class="wrap" id="demo">
+  <div class="sec-head">
+    <h2>Tap around.</h2>
+    <p>Lock into a move, watch the group chat fill up, then open the map and zoom
+      from a street corner out to Cranberry.</p>
+  </div>
+  <div class="launch">
+    <h3>Best fullscreen</h3>
+    <p>You're on a phone. Open it fullscreen and use it the way it's meant to be used.</p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="launch()">Open the demo</button>
+  </div>
+  <div class="demo-wrap">
+    <div class="phone"><div class="phone-screen"><iframe id="frame" title="WTM demo" loading="lazy"></iframe></div></div>
+  </div>
+  <p class="demo-tip">Try the Map tab → pinch to zoom out</p>
+</section>
+
+<hr class="rule" style="--at:64%">
+
+<section class="wrap">
+  <div class="sec-head"><h2>Built for the two hours before you leave the house.</h2></div>
+  <div class="feats">
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
+      <h3>The live map</h3>
+      <p>Real Pittsburgh geography: the three rivers, the bridges, the street grid. Heat where the night is
+        concentrated, your friends' faces where they actually are, every move pinned to its real address.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg>
+      <h3>Friends first</h3>
+      <p>Every move leads with who you know is going. "Devon and Casey are in" beats a flyer.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <h3>Just Us</h3>
+      <p>Private, capped, invite-only. Four people and a couch. The address only appears once you're in.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 8l14 8M19 8 5 16"/></svg>
+      <h3>The Scene</h3>
+      <p>Rooftops, DJ sets, the big rooms. Watch the count climb and get in before it caps.</p>
+    </article>
+    <article class="feat">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      <h3>One tap in</h3>
+      <p>"I'm in" is the whole RSVP. Full moves open a waitlist. Every move has a chat.</p>
+    </article>
+  </div>
+</section>
+
+<hr class="rule" style="--at:38%">
+
+<section class="wrap" id="how">
+  <div class="sec-head"><h2>Three taps to a better night.</h2></div>
+  <div class="steps">
+    <div class="step"><span class="n">STEP 01</span><h3>Open the map</h3><p>Everything happening tonight, and where your friends are, live.</p></div>
+    <div class="step"><span class="n">STEP 02</span><h3>Lock in</h3><p>One tap. You're on the list and in the chat.</p></div>
+    <div class="step"><span class="n">STEP 03</span><h3>Pull up</h3><p>Your friends see you're coming. The rest sorts itself out.</p></div>
+  </div>
+</section>
+
+<hr class="rule" style="--at:78%">
+
+<section class="wrap">
+  <div class="sec-head"><h2>Questions.</h2></div>
+  <div class="faq">
+    <details><summary>Is this the real app?</summary><div class="faq-a">It's the real interface running a simulated Friday night. Joining, chatting, stories and the map all work. The production app connects to real people and real events.</div></details>
+    <details><summary>Does it track me?</summary><div class="faq-a">No. No account, no location permission, no analytics. Nothing you do here leaves your device unless you choose to send feedback.</div></details>
+    <details><summary>Which cities?</summary><div class="faq-a">Pittsburgh first. The demo map covers the whole metro, from Cranberry down to McKeesport.</div></details>
+    <details><summary>How do I get in?</summary><div class="faq-a">Beta access spreads through friends. If someone sent you this, you're already on the path. Leave feedback with your name and you're on the list.</div></details>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="close-cta">
+    <h2>Stop asking what the move is.</h2>
+    <p>Try it, then tell me what you actually think. Twenty seconds, and blunt is better.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="launch()">Open the demo</button>
+      <button class="btn btn-quiet" onclick="openFb()">Leave feedback</button>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="log-sec">
+  <hr class="rule" style="--at:50%" >
+  <div class="sec-head" style="margin-top:40px">
+    <h2>Feedback log</h2>
+    <p>Everything submitted on this device. Reports friends send you by email or text land in your inbox, not here.</p>
+  </div>
+  <div class="log-stats" id="log-stats"></div>
+  <div class="hero-cta" style="margin-bottom:20px">
+    <button class="btn btn-quiet" onclick="copyAll(this)">Copy all as text</button>
+    <button class="btn btn-quiet" onclick="clearLog(this)">Clear log</button>
+  </div>
+  <div id="log-list"></div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span class="wordmark" id="mark" style="font-size:20px;cursor:pointer;user-select:none">WT<i>M</i></span>
+    <p>What's The Move · Beta · Pittsburgh PA</p>
+  </div>
+</footer>
+
+<button class="btn btn-primary" id="fb-open" onclick="openFb()">Feedback</button>
+
+<div id="fb-scrim" role="dialog" aria-modal="true" aria-labelledby="fb-title"><div class="fb" id="fb-card"></div></div>
+
+<div id="fs">
+  <div class="fs-bar">
+    <span class="wordmark" style="font-size:19px">WT<i>M</i></span>
+    <span style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="closeFs();openFb()">Feedback</button>
+      <button class="btn btn-quiet" onclick="closeFs()">Close</button>
+    </span>
+  </div>
+  <iframe id="fs-frame" title="WTM demo fullscreen"></iframe>
+</div>
+
+<script>
+const APP_SRC=__APP_SRC__;
+
+/* ── demo frames, loaded on demand ── */
+let deskLoaded=false, fsLoaded=false;
+function loadDesk(){
+  const f=document.getElementById('frame');
+  if(deskLoaded||!f||f.offsetParent===null)return;
+  f.srcdoc=APP_SRC; deskLoaded=true;
+}
+function launch(){
+  if(!fsLoaded){document.getElementById('fs-frame').srcdoc=APP_SRC;fsLoaded=true;}
+  document.getElementById('fs').classList.add('open');
+  document.body.classList.add('locked');
+  note('opened_demo');
+}
+function closeFs(){
+  document.getElementById('fs').classList.remove('open');
+  document.body.classList.remove('locked');
+}
+addEventListener('load',loadDesk);
+addEventListener('resize',loadDesk);
+addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(document.getElementById('fb-scrim').classList.contains('open'))closeFb();
+  else if(document.getElementById('fs').classList.contains('open'))closeFs();
+});
+
+/* ── what the visitor actually did, for the report ── */
+const used={}, t0=Date.now();
+function note(n){used[n]=(used[n]||0)+1;}
+addEventListener('message',e=>{
+  const n=e&&e.data&&e.data.wtmEvt;
+  if(typeof n==='string'&&n.length<40)note(n);
+});
+
+/* ── feedback ── */
+const TAGS=['The map','The design','Friends features','Felt fast','Something confused me','Hit a bug','I would use this'];
+let stars=0; const picked=new Set();
+
+function openFb(){
+  stars=0; picked.clear(); drawFb();
+  document.getElementById('fb-scrim').classList.add('open');
+  document.body.classList.add('locked');
+  document.getElementById('fb-rate1')?.focus();
+}
+function closeFb(){
+  document.getElementById('fb-scrim').classList.remove('open');
+  document.body.classList.remove('locked');
+}
+document.getElementById('fb-scrim').addEventListener('click',e=>{if(e.target.id==='fb-scrim')closeFb();});
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function drawFb(){
+  document.getElementById('fb-card').innerHTML=`
+    <button class="fb-x" onclick="closeFb()" aria-label="Close">✕</button>
+    <h2 id="fb-title">What did you think?</h2>
+    <p class="fb-sub">Twenty seconds. Blunt is more useful than kind.</p>
+    <span class="lbl" id="rate-lbl">Rating</span>
+    <div class="rate" role="group" aria-labelledby="rate-lbl">
+      ${[1,2,3,4,5].map(i=>`<button id="fb-rate${i}" aria-pressed="false" aria-label="${i} out of 5" onclick="setStars(${i})">${i}</button>`).join('')}
+    </div>
+    <span class="lbl" id="tag-lbl">What stood out</span>
+    <div class="chips" role="group" aria-labelledby="tag-lbl">
+      ${TAGS.map((t,i)=>`<button class="chip" aria-pressed="false" onclick="tog(${i},this)">${t}</button>`).join('')}
+    </div>
+    <label class="lbl" for="fb-note">Anything else</label>
+    <textarea class="fld" id="fb-note" placeholder="What you'd change, what worked, what broke."></textarea>
+    <label class="lbl" for="fb-name">Your name</label>
+    <input class="fld" id="fb-name" placeholder="First name is fine" autocomplete="given-name">
+    <button class="btn btn-primary fb-send" id="fb-send" onclick="submitFb()" disabled>Pick a rating first</button>`;
+}
+function setStars(n){
+  stars=n;
+  for(let i=1;i<=5;i++)document.getElementById('fb-rate'+i).setAttribute('aria-pressed',String(i===n));
+  const b=document.getElementById('fb-send'); b.disabled=false; b.textContent='Send feedback';
+}
+function tog(i,el){
+  picked.has(i)?picked.delete(i):picked.add(i);
+  el.setAttribute('aria-pressed',String(picked.has(i)));
+}
+
+function buildReport(e){
+  const u=e.used, did=[
+    u.opened_demo?'opened the demo':null,
+    u.joined_move?`joined ${u.joined_move} move${u.joined_move>1?'s':''}`:null,
+    u.tab_map?`opened the map ${u.tab_map}×`:null,
+    u.watched_story?`watched ${u.watched_story} stor${u.watched_story>1?'ies':'y'}`:null,
+    u.sent_chat?`sent ${u.sent_chat} message${u.sent_chat>1?'s':''}`:null,
+    u.created_move?'created a move':null
+  ].filter(Boolean).join(', ')||'looked around the page';
+  return ['WTM demo feedback','',
+    `From:    ${e.name}`,
+    `Rating:  ${e.stars}/5`,
+    e.tags.length?`Liked:   ${e.tags.join(', ')}`:null,
+    e.note?`Notes:   ${e.note}`:null,
+    `Session: ${e.device}, ${e.secs}s, ${did}`,
+    `Sent:    ${new Date(e.at).toLocaleString()}`
+  ].filter(Boolean).join('\n');
+}
+
+function submitFb(){
+  const entry={
+    name:(document.getElementById('fb-name').value||'').trim()||'Anonymous',
+    stars, tags:[...picked].map(i=>TAGS[i]),
+    note:(document.getElementById('fb-note').value||'').trim(),
+    device:matchMedia('(pointer:coarse)').matches?'phone':'desktop',
+    secs:Math.round((Date.now()-t0)/1000),
+    used:{...used}, at:new Date().toISOString()
+  };
+  try{
+    const all=JSON.parse(localStorage.getItem('wtm-feedback')||'[]');
+    all.push(entry); localStorage.setItem('wtm-feedback',JSON.stringify(all));
+  }catch(err){ /* private mode: the report below still works */ }
+
+  const text=buildReport(entry);
+  window._report=text;
+  const subj=encodeURIComponent('WTM demo feedback from '+entry.name);
+  const body=encodeURIComponent(text);
+  document.getElementById('fb-card').innerHTML=`
+    <button class="fb-x" onclick="closeFb()" aria-label="Close">✕</button>
+    <h2>Thanks, ${esc(entry.name.split(' ')[0])}.</h2>
+    <p class="fb-sub">It's written. One tap and it's sent.</p>
+    <div class="send-row">
+      <a class="btn btn-primary" href="mailto:owedog18@gmail.com?subject=${subj}&body=${body}">Email it</a>
+      <a class="btn btn-quiet" href="sms:?&body=${body}">Text it</a>
+    </div>
+    <div class="report">${esc(text)}</div>
+    <div class="send-row"><button class="btn btn-quiet" onclick="copyReport(this)">Copy instead</button></div>`;
+}
+
+async function writeClip(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(_){}
+    ta.remove(); return ok;
+  }
+}
+async function copyReport(btn){
+  btn.textContent = await writeClip(window._report) ? 'Copied, now send it' : 'Select the text above to copy';
+}
+
+/* ── founder log ── */
+function readLog(){ try{ return JSON.parse(localStorage.getItem('wtm-feedback')||'[]'); }catch(e){ return []; } }
+function showLog(){
+  const all=readLog();
+  const stats=document.getElementById('log-stats'), list=document.getElementById('log-list');
+  if(!all.length){
+    stats.innerHTML='';
+    list.innerHTML='<p class="empty">Nothing on this device yet. Friends\' reports arrive by email or text once they hit Feedback.</p>';
+  }else{
+    const avg=(all.reduce((s,e)=>s+e.stars,0)/all.length).toFixed(1);
+    const would=all.filter(e=>e.tags.includes('I would use this')).length;
+    stats.innerHTML=`
+      <div class="log-stat"><div class="n mono">${all.length}</div><div class="l">Responses</div></div>
+      <div class="log-stat"><div class="n mono">${avg}</div><div class="l">Avg rating</div></div>
+      <div class="log-stat"><div class="n mono">${would}</div><div class="l">Would use it</div></div>`;
+    list.innerHTML=all.slice().reverse().map(e=>`
+      <div class="entry">
+        <div class="who">${esc(e.name)} · ${e.stars}/5</div>
+        <div class="meta">${esc(e.device)} · ${e.secs}s · ${new Date(e.at).toLocaleString()}</div>
+        ${e.tags.length?`<div class="meta">${esc(e.tags.join(', '))}</div>`:''}
+        ${e.note?`<div class="cmt">${esc(e.note)}</div>`:''}
+      </div>`).join('');
+  }
+  document.getElementById('log-sec').classList.add('show');
+  document.getElementById('log-sec').scrollIntoView({behavior:'smooth'});
+}
+async function copyAll(btn){
+  const all=readLog();
+  const txt=all.length?all.map(buildReport).join('\n\n--------\n\n'):'No feedback yet.';
+  btn.textContent = await writeClip(txt) ? 'Copied' : 'Copy failed';
+  setTimeout(()=>btn.textContent='Copy all as text',2000);
+}
+function clearLog(btn){
+  if(btn.dataset.armed!=='1'){
+    btn.dataset.armed='1'; btn.textContent='Tap again to erase';
+    setTimeout(()=>{btn.dataset.armed='';btn.textContent='Clear log';},4000);
+    return;
+  }
+  localStorage.removeItem('wtm-feedback'); btn.dataset.armed=''; btn.textContent='Clear log'; showLog();
+}
+if(location.hash==='#log')addEventListener('load',()=>setTimeout(showLog,200));
+let taps=0,tapTimer;
+document.getElementById('mark').addEventListener('click',()=>{
+  taps++; clearTimeout(tapTimer); tapTimer=setTimeout(()=>taps=0,1500);
+  if(taps>=5){taps=0;showLog();}
+});
+</script>

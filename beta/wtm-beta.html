@@ -1,0 +1,2439 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WTM · What's The Move</title>
+<style>
+__FONTS__
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* ── WTM tokens ───────────────────────────────────────────────
+   One accent: sodium-vapour amber, the colour of a Pittsburgh street
+   at night. It means "live / act now" and nothing else uses it.
+   Neutrals biased blue (wet asphalt under that lamp) so they read as
+   chosen rather than default grey. Two radii, assigned by element class.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --ink-900:#0B0E14;--ink-800:#12161F;--ink-700:#1A1F2B;--ink-600:#262C3A;
+  --paper-100:#E8EAF0;--paper-400:#8A93A6;--paper-600:#77849D;
+  --signal:#FF9E3D;--signal-ink:#0B0E14;
+  --ok:#3FB37F;--warn:#E0A44A;--stop:#E5544B;
+
+  /* legacy aliases: every component reads tokens, these map the old
+     names onto the new system so no rule carries a literal colour */
+  --bg:var(--ink-900);--bg2:var(--ink-800);--bg3:var(--ink-700);--bg4:var(--ink-600);--bg5:var(--ink-600);
+  --blaze:var(--signal);--blaze2:var(--signal);
+  --violet:var(--signal);--violet2:var(--signal);--violet3:var(--signal);
+  --scene:var(--paper-400);--justu:var(--paper-400);
+  --green:var(--ok);--red:var(--stop);--cyan:var(--paper-400);
+  --text1:var(--paper-100);--text2:var(--paper-400);--text3:var(--paper-600);
+  --border:var(--ink-600);--border2:var(--ink-600);
+
+  --tab-h:72px;--safe-b:0px;
+  --r-sm:6px;--r-md:14px;--card-r:var(--r-md);
+  --t:140ms cubic-bezier(.2,.7,.4,1);
+}
+:root[data-theme="light"]{
+  --ink-900:#F2F3F7;--ink-800:#FFFFFF;--ink-700:#E9EBF1;--ink-600:#D3D7E0;
+  --paper-100:#141821;--paper-400:#5A6375;--paper-600:#79839A;
+  --signal:#945C23;--signal-ink:#FFFFFF;
+  --ok:#1F7A52;--warn:#8A5A12;--stop:#B3352C;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --ink-900:#F2F3F7;--ink-800:#FFFFFF;--ink-700:#E9EBF1;--ink-600:#D3D7E0;
+    --paper-100:#141821;--paper-400:#5A6375;--paper-600:#79839A;
+    --signal:#945C23;--signal-ink:#FFFFFF;
+    --ok:#1F7A52;--warn:#8A5A12;--stop:#B3352C;
+  }
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Only adopt the safe-area value where env() is actually supported. Putting
+   env() straight into --safe-b invalidates every calc() that uses it on
+   browsers that don't support it, which silently drops `bottom` offsets. */
+@supports (padding:env(safe-area-inset-bottom)){
+  :root{--safe-b:env(safe-area-inset-bottom,0px)}
+}
+html,body{height:100%;background:var(--bg);color:var(--text1);font-family:'WTM Sans',system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{position:fixed;inset:0;width:100%;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+.scr{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.scr.active{display:flex}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
+@keyframes slideDown{from{transform:translateY(-120%)}to{transform:translateY(0)}}
+@keyframes fadeSwap{0%{opacity:0;transform:translateY(6px)}12%{opacity:1;transform:translateY(0)}88%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-6px)}}
+@keyframes popIn{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* ── WELCOME ── */
+#scr-welcome{background:var(--bg);align-items:center;justify-content:center}
+.wlc-canvas{position:absolute;inset:0;width:100%;height:100%}
+.wlc-body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:26px;padding:0 30px;text-align:center;width:100%;max-width:420px}
+.wlc-logo{font-family:'WTM Display','WTM Sans',sans-serif;font-size:64px;font-weight:900;letter-spacing:-4px;color:var(--paper-100);line-height:1}
+.wlc-sub{font-size:13px;font-weight:800;color:var(--violet2);letter-spacing:2px;text-transform:uppercase;margin-top:-16px}
+.wlc-tagline{font-size:16.5px;color:var(--text2);font-weight:500;line-height:1.6}
+.wlc-vibes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.wlc-vibe{padding:8px 16px;border-radius:50px;border:0.5px solid var(--border2);background:rgba(19,17,42,.7);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all var(--t);backdrop-filter:blur(8px)}
+.wlc-vibe.sel{background:var(--violet);border-color:var(--violet2);color:#fff;box-shadow:0 0 24px color-mix(in srgb,var(--signal) 45%,transparent)}
+.wlc-btn{background:var(--signal);border:none;color:#fff;font-size:17px;font-weight:800;padding:18px 60px;border-radius:50px;cursor:pointer;letter-spacing:-.2px;box-shadow:0 0 60px color-mix(in srgb,var(--signal) 50%,transparent),0 12px 32px rgba(0,0,0,.5);transition:transform var(--t)}
+.wlc-btn:active{transform:scale(.97)}
+.wlc-cities{font-size:12px;color:var(--text3);font-weight:600}
+
+/* ── LIVE BANNER (push) ── */
+#live-banner{position:fixed;top:0;left:0;right:0;z-index:250;transform:translateY(-120%);transition:transform .45s cubic-bezier(.2,.8,.35,1);padding:52px 14px 0;pointer-events:none}
+#live-banner.show{transform:translateY(0)}
+.lb-inner{background:rgba(13,11,26,.96);backdrop-filter:blur(28px);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);pointer-events:all;cursor:pointer}
+.lb-icon{width:38px;height:38px;border-radius:var(--r-md);background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.lb-text{flex:1;font-size:13.5px;font-weight:600;color:var(--text1);line-height:1.4}
+.lb-text b{font-weight:800}
+.lb-app{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 10px;flex-shrink:0}
+.topbar-left{display:flex;flex-direction:column;gap:1px}
+.topbar-loc{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:11px;font-weight:700;color:var(--blaze);letter-spacing:.8px;text-transform:uppercase}
+.topbar-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:26px;font-weight:900;letter-spacing:-1px}
+.topbar-right{display:flex;gap:9px}
+.icon-btn svg{width:19px;height:19px;fill:none;stroke:var(--paper-100);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn{width:42px;height:42px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;position:relative;transition:background var(--t)}
+.icon-btn:active{background:var(--bg4)}
+.notif-badge{position:absolute;top:6px;right:6px;min-width:16px;height:16px;background:var(--blaze);border-radius:var(--r-sm);border:2px solid var(--bg);font-size:9px;font-weight:900;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+/* ── LIVE TICKER ── */
+.live-bar{display:flex;align-items:center;gap:9px;margin:0 18px 12px;background:rgba(255,59,48,.07);border:0.5px solid rgba(255,59,48,.22);border-radius:var(--r-md);padding:9px 14px;flex-shrink:0;overflow:hidden}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.3s infinite;flex-shrink:0}
+.live-label{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:10px;font-weight:900;color:var(--red);letter-spacing:1px;flex-shrink:0}
+.live-text{font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;animation:fadeSwap 4s infinite}
+
+/* ── STORIES ── */
+.stories{display:flex;gap:14px;padding:2px 18px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex-shrink:0}
+.story-ring{width:62px;height:62px;border-radius:50%;padding:2.5px;background:var(--signal)}
+.story-ring.seen{background:var(--bg4)}
+.story-inner{width:100%;height:100%;border-radius:50%;border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:24px}
+.story-name{font-size:10.5px;font-weight:700;color:var(--text2);max-width:64px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── STORY VIEWER ── */
+#story-viewer{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:#000}
+#story-viewer.open{display:flex}
+.sv-progress{display:flex;gap:5px;padding:52px 14px 10px;flex-shrink:0;position:relative;z-index:5}
+.sv-seg{flex:1;height:3px;border-radius:var(--r-sm);background:rgba(255,255,255,.25);overflow:hidden}
+.sv-seg-fill{height:100%;width:0;background:#fff;border-radius:var(--r-sm)}
+.sv-head{display:flex;align-items:center;gap:10px;padding:0 16px 12px;position:relative;z-index:5}
+.sv-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;border:2px solid rgba(255,255,255,.4)}
+.sv-name{font-size:14px;font-weight:800;color:#fff}
+.sv-time{font-size:12px;color:rgba(255,255,255,.55);font-weight:600}
+.sv-close{margin-left:auto;font-size:22px;color:#fff;cursor:pointer;padding:6px}
+.sv-body{flex:1;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:0 32px;text-align:center}
+.sv-emoji{font-size:88px;filter:drop-shadow(0 8px 32px rgba(0,0,0,.5));animation:popIn .5s}
+.sv-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:30px;font-weight:900;letter-spacing:-1px;color:#fff;line-height:1.15;text-shadow:0 4px 24px rgba(0,0,0,.4)}
+.sv-sub{font-size:16px;font-weight:600;color:rgba(255,255,255,.85);line-height:1.55}
+.sv-cta{margin-top:8px;background:rgba(255,255,255,.95);color:#0A0814;border:none;font-size:15px;font-weight:800;padding:14px 36px;border-radius:50px;cursor:pointer;letter-spacing:-.2px}
+.sv-tap{position:absolute;top:0;bottom:0;width:50%;z-index:4}
+.sv-tap.left{left:0}.sv-tap.right{right:0}
+
+/* ── SEARCH / CATS ── */
+.search-bar{margin:0 18px 12px;display:flex;align-items:center;gap:10px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:0 16px;height:44px;flex-shrink:0}
+.search-icon{font-size:16px;opacity:.4}
+.search-input{flex:1;background:transparent;border:none;outline:none;font-size:16px;color:var(--text1);font-family:inherit;font-weight:500}
+.search-input::placeholder{color:var(--text3)}
+.search-clear{font-size:14px;color:var(--text3);cursor:pointer;display:none;padding:4px}
+.cats{display:flex;gap:8px;padding:0 18px 14px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:50px;border:0.5px solid var(--border2);background:var(--bg3);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all var(--t);flex-shrink:0}
+.cat span{font-size:15px}
+.cat.active{background:var(--violet);border-color:var(--violet2);color:#fff;box-shadow:0 0 20px color-mix(in srgb,var(--signal) 30%,transparent)}
+.cat[data-cat="justu"].active{background:var(--justu);border-color:var(--justu);box-shadow:0 0 20px rgba(245,158,11,.3)}
+.cat[data-cat="scene"].active{background:var(--scene);border-color:var(--scene);box-shadow:0 0 20px rgba(217,70,239,.3)}
+
+/* ── SECTIONS / FEED ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:4px 0 14px;margin-top:4px}
+.section-label{font-size:14px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:7px}
+.section-label .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--blaze);animation:pulse 1.8s infinite}
+.section-count{font-size:12px;font-weight:700;color:var(--text3)}
+.feed-wrap{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px;scrollbar-width:none}
+.feed-wrap::-webkit-scrollbar{display:none}
+.feed{display:flex;flex-direction:column;padding-bottom:calc(var(--tab-h) + var(--safe-b) + 24px)}
+.feed-empty{padding:48px 20px;text-align:center;color:var(--text3);font-size:16px;font-weight:600;line-height:1.7}
+.feed-empty-icon{font-size:36px;margin-bottom:10px}
+
+/* ── CARDS ── */
+.card{border-radius:var(--card-r);background:var(--bg2);border:0.5px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:22px;transition:transform var(--t);position:relative}
+.card:active{transform:scale(.985)}
+.card.hot{border-color:color-mix(in srgb,var(--signal) 30%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--signal) 10%,transparent),0 8px 40px color-mix(in srgb,var(--signal) 12%,transparent)}
+.card.private{border-color:rgba(245,158,11,.3)}
+.card.scene-card{border-color:rgba(217,70,239,.3)}
+.card-cover{height:220px;position:relative;overflow:hidden}
+.card-cover-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,5,13,.08) 0%,transparent 40%,rgba(6,5,13,.97) 100%)}
+.card-badges{position:absolute;top:14px;left:14px;display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:800;padding:5px 10px;border-radius:var(--r-md);letter-spacing:.2px;backdrop-filter:blur(16px)}
+.badge-hot{background:color-mix(in srgb,var(--signal) 90%,transparent);color:#fff}
+.badge-private{background:rgba(245,158,11,.85);color:#1A0A00}
+.badge-scene{background:rgba(217,70,239,.85);color:#fff}
+.badge-justu{background:rgba(245,158,11,.85);color:#1A0A00}
+.badge-cat{background:rgba(6,5,13,.65);color:var(--text2);border:0.5px solid rgba(238,234,250,.15)}
+.card-att{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:5px;background:rgba(6,5,13,.72);backdrop-filter:blur(16px);border-radius:var(--r-md);padding:5px 11px;font-size:12px;font-weight:700;color:var(--text1);transition:transform .3s}
+.card-att.bump{transform:scale(1.15)}
+.att-bar{width:32px;height:3px;background:rgba(238,234,250,.12);border-radius:var(--r-sm);overflow:hidden}
+.att-fill{height:100%;background:var(--violet);border-radius:var(--r-sm);transition:width .5s}
+.att-fill.full{background:var(--red)}
+.att-fill.warn{background:var(--justu)}
+.card-cover-bottom{position:absolute;bottom:14px;left:16px;right:14px}
+.card-time-tag{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.3px;margin-bottom:5px}
+.card-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:21px;font-weight:900;letter-spacing:-.5px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6);line-height:1.2}
+.card-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:13px}
+.card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.meta-pill{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:3px}
+.meta-sep{width:3px;height:3px;border-radius:50%;background:var(--text3)}
+.card-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ── FRIENDS ROW ── */
+.friends-row{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--signal) 6%,transparent);border-radius:var(--r-md);border:0.5px solid color-mix(in srgb,var(--signal) 18%,transparent);padding:9px 13px}
+.fr-avatars{display:flex;flex-shrink:0}
+.fr-av{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.fr-av:not(:first-child){margin-left:-8px}
+.av1{background:#5B7C9D}
+.av2{background:#4F7A6B}
+.av3{background:#8A6A9B}
+.av4{background:#A8734A}
+.av5{background:#6E7DA8}
+.av6{background:#5E8B8B}
+.fr-text{flex:1;min-width:0}
+.fr-names{font-size:12.5px;font-weight:800;color:var(--blaze);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fr-sub{font-size:11px;color:color-mix(in srgb,var(--signal) 50%,transparent);font-weight:600;margin-top:1px}
+
+/* ── RSVP / HYPE ── */
+.rsvp{font-size:14px;font-weight:800;padding:11px 20px;border-radius:50px;border:none;cursor:pointer;transition:all var(--t);flex-shrink:0}
+.rsvp-join{background:var(--violet);color:#fff;box-shadow:0 4px 16px color-mix(in srgb,var(--signal) 35%,transparent)}
+.rsvp-going{background:color-mix(in srgb,var(--signal) 15%,transparent);color:var(--violet2);border:0.5px solid color-mix(in srgb,var(--signal) 35%,transparent)}
+.rsvp-waitlist{background:rgba(245,158,11,.15);color:var(--justu);border:0.5px solid rgba(245,158,11,.3);font-size:13px}
+.rsvp-full{background:var(--bg4);color:var(--text3);border:0.5px solid var(--border2);font-size:13px}
+.hype-row{display:flex;align-items:center;gap:7px}
+.hype-btn{font-size:17px;padding:7px 9px;border-radius:var(--r-md);background:var(--bg3);border:0.5px solid var(--border);cursor:pointer;transition:transform var(--t),background var(--t)}
+.hype-btn.fired{background:color-mix(in srgb,var(--signal) 14%,transparent);border-color:color-mix(in srgb,var(--signal) 30%,transparent)}
+.hype-btn:active{transform:scale(1.25)}
+.hype-ct{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;color:var(--text2);min-width:14px}
+
+/* ── MAP ── */
+#scr-map{background:#F2EFE7;position:absolute;inset:0}
+/* full-bleed map: canvas fills the entire screen; chrome floats above it */
+#gl-map{position:absolute;inset:0;display:none}
+#gl-map.on{display:block}
+#map-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#map-canvas:active{cursor:grabbing}
+.map-topbar{position:absolute;top:0;left:0;right:0;z-index:10;padding:52px 20px 30px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,rgba(6,5,13,.72) 0%,rgba(6,5,13,.32) 60%,transparent 100%);pointer-events:none}
+.map-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:22px;font-weight:900;letter-spacing:-.8px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.map-live-pill{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px;background:rgba(6,5,13,.78);backdrop-filter:blur(16px);border:0.5px solid rgba(255,59,48,.4);border-radius:var(--r-md);padding:6px 12px;font-size:12px;font-weight:700;color:#FF6B5A;pointer-events:auto}
+.map-live-dot{width:6px;height:6px;border-radius:50%;background:#FF3B30;animation:pulse 1.4s infinite}
+#scr-map .tabbar{position:absolute;bottom:0;left:0;right:0}
+#map-hint{position:absolute;bottom:calc(var(--tab-h) + var(--safe-b) + 18px);left:50%;transform:translateX(-50%) translateY(12px);background:rgba(6,5,13,.92);backdrop-filter:blur(24px);border:0.5px solid rgba(238,234,250,.14);border-radius:var(--r-md);padding:10px 20px;font-size:13px;font-weight:700;color:var(--text2);opacity:0;transition:opacity .5s,transform .5s;pointer-events:none;z-index:15;white-space:nowrap;max-width:92%}
+#map-hint.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.map-ctrls{position:absolute;right:14px;bottom:calc(var(--tab-h) + var(--safe-b) + 72px);display:flex;flex-direction:column;gap:9px;z-index:16}
+.map-ctrl{width:46px;height:46px;border-radius:50%;background:#fff;border:none;box-shadow:0 3px 12px rgba(60,50,30,.28);font-size:21px;font-weight:800;color:#4A5364;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform var(--t)}
+.map-ctrl:active{transform:scale(.9)}
+
+
+/* ── ask ── */
+#scr-ask{background:var(--bg)}
+.ask-head{padding:52px 20px 14px;flex-shrink:0}
+.ask-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.ask-sub{font-size:14px;color:var(--text2);margin-top:4px;line-height:1.5}
+.ask-bar{margin:0 18px 14px;display:flex;gap:9px;align-items:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-sm);padding:0 14px;height:48px;flex-shrink:0}
+.ask-in{flex:1;background:transparent;border:none;outline:none;font-size:16px;color:var(--text1);font-family:inherit;font-weight:500}
+.ask-in::placeholder{color:var(--text3)}
+.ask-go{background:var(--signal);color:var(--signal-ink);border:none;border-radius:var(--r-sm);font:inherit;font-weight:700;font-size:13px;padding:9px 15px;cursor:pointer}
+.ask-chips{display:flex;gap:7px;padding:0 18px 14px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.ask-chips::-webkit-scrollbar{display:none}
+.ask-chip{white-space:nowrap;background:transparent;border:1px solid var(--border2);border-radius:var(--r-sm);padding:8px 13px;font:inherit;font-size:13px;color:var(--text2);cursor:pointer;flex-shrink:0}
+.ask-chip:active{border-color:var(--signal);color:var(--signal)}
+.ask-scroll{flex:1;overflow-y:auto;padding:0 18px calc(var(--tab-h) + var(--safe-b) + 24px);scrollbar-width:none}
+.ask-scroll::-webkit-scrollbar{display:none}
+.ask-count{font-family:'WTM Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:4px 0 12px}
+.ask-card{display:flex;gap:13px;align-items:flex-start;width:100%;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-md);padding:15px 16px;margin-bottom:10px;cursor:pointer;font:inherit;transition:border-color var(--t)}
+.ask-card:active{border-color:var(--signal)}
+.ask-card-emoji{font-size:24px;line-height:1;flex-shrink:0;margin-top:1px}
+.ask-card-body{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.ask-card-name{font-size:16px;font-weight:700;color:var(--text1);letter-spacing:-.2px}
+.ask-card-meta{font-family:'WTM Mono',ui-monospace,monospace;font-size:11.5px;color:var(--text2)}
+.ask-card-why{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.ask-why{font-size:11px;font-weight:700;color:var(--signal);background:color-mix(in srgb,var(--signal) 12%,transparent);border:1px solid color-mix(in srgb,var(--signal) 30%,transparent);border-radius:var(--r-sm);padding:3px 8px}
+.ask-empty{padding:8px 0}
+.ask-empty-h{font-size:16px;font-weight:700;margin-bottom:6px}
+.ask-empty p{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:6px}
+
+.ask-browse{display:flex;flex-wrap:wrap;gap:8px}
+.ask-browse-chip{display:inline-flex;align-items:center;gap:7px}
+.ask-browse-n{font-family:'WTM Mono',ui-monospace,monospace;font-size:11px;color:var(--text3)}
+
+/* real-tile map markers */
+.glpin{cursor:pointer;transform:translate(-50%,-100%)}
+.glpin-card{display:flex;align-items:center;gap:6px;background:#fff;border-radius:11px;
+  padding:6px 10px;box-shadow:0 3px 10px rgba(20,16,10,.28);white-space:nowrap;
+  font:700 12.5px/1 'WTM Sans',system-ui,sans-serif;color:#22262E;border:1.5px solid transparent}
+.glpin.hot .glpin-card{border-color:var(--signal)}
+.glpin-stem{width:2px;height:9px;background:rgba(20,16,10,.32);margin:0 auto}
+.glpin-dot{width:11px;height:11px;border-radius:50%;background:#63708A;border:2.5px solid #fff;
+  margin:0 auto;box-shadow:0 1px 4px rgba(20,16,10,.4)}
+.glpin.hot .glpin-dot{background:var(--signal)}
+.glpin-fr{width:8px;height:8px;border-radius:50%;background:var(--signal);flex:none}
+.glface{position:relative;width:42px;height:42px;border-radius:50%;background:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:21px;border:2.5px solid var(--ok);
+  cursor:pointer;box-shadow:0 3px 10px rgba(20,16,10,.3);transform:translate(-50%,-50%)}
+.glface-name{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:#fff;
+  color:#39424F;font:800 10px/1 'WTM Sans',system-ui,sans-serif;padding:3px 7px;border-radius:7px;white-space:nowrap}
+.glme{width:50px;height:50px;border-color:#4C6B8A;font-size:25px}
+
+/* ── spot submission + review ── */
+.sb-out{margin-top:16px;border-top:1px solid var(--border);padding-top:16px}
+.sb-verdict{font-family:'WTM Display','WTM Sans',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.sb-sub{font-size:14px;color:var(--text2);line-height:1.55;margin:5px 0 14px}
+.sb-checks{display:flex;flex-direction:column;gap:7px}
+.sb-check{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--text2)}
+.sb-check b{color:var(--text1);font-weight:700}
+.sb-detail{color:var(--text3)}
+.sb-mark{width:17px;height:17px;border-radius:var(--r-sm);flex:none;display:flex;
+  align-items:center;justify-content:center;font-size:10px;font-weight:800;margin-top:1px}
+.sb-pass .sb-mark{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.sb-review .sb-mark{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.sb-reject .sb-mark{background:color-mix(in srgb,var(--stop) 20%,transparent);color:var(--stop)}
+.rq-card{border:1px solid var(--border);border-radius:var(--r-md);padding:15px 16px;margin-bottom:12px;background:var(--bg2)}
+.rq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.rq-name{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.rq-meta{font-family:'WTM Mono',ui-monospace,monospace;font-size:11px;color:var(--text3);margin-top:2px}
+.rq-verdict{font-family:'WTM Mono',ui-monospace,monospace;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.1em;border:1px solid;border-radius:var(--r-sm);padding:3px 7px;flex:none}
+.rq-blurb{font-size:13.5px;color:var(--text2);line-height:1.5;margin-bottom:11px}
+.rq-actions{display:flex;gap:8px;margin-top:12px}
+.rq-btn{flex:1;border:1px solid var(--border2);background:transparent;color:var(--text1);
+  border-radius:var(--r-sm);padding:10px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.rq-yes{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+.ask-actions{display:flex;gap:8px;padding:0 18px 12px;flex-shrink:0}
+.ask-action{flex:1;border:1px solid var(--border2);background:transparent;color:var(--text2);
+  border-radius:var(--r-sm);padding:10px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+/* ── SHEET ── */
+.sheet-overlay{position:absolute;inset:0;background:rgba(3,2,9,.65);backdrop-filter:blur(6px);z-index:40;opacity:0;pointer-events:none;transition:opacity .3s}
+.sheet-overlay.open{opacity:1;pointer-events:all}
+.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--bg2);border-radius:var(--r-md) 28px 0 0;z-index:50;transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.35,1);max-height:90vh;display:flex;flex-direction:column;border-top:0.5px solid var(--border2)}
+.sheet.open{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:rgba(238,234,250,.16);border-radius:var(--r-sm);margin:12px auto 0;flex-shrink:0}
+.sheet-scroll{flex:1;overflow-y:auto;padding:18px 20px 40px;scrollbar-width:none}
+.sheet-scroll::-webkit-scrollbar{display:none}
+.sheet-cover{height:190px;border-radius:var(--r-md);overflow:hidden;margin-bottom:16px;position:relative;display:flex;align-items:center;justify-content:center;font-size:60px}
+.sheet-photos{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.sheet-photos::-webkit-scrollbar{display:none}
+.sheet-photo{width:86px;height:86px;border-radius:var(--r-md);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;border:0.5px solid var(--border2)}
+.sheet-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:25px;font-weight:900;letter-spacing:-.7px;line-height:1.15;margin-bottom:8px}
+.sheet-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.sheet-desc{font-size:15px;color:var(--text2);line-height:1.65;font-weight:500;margin-bottom:16px}
+.host-row{display:flex;align-items:center;gap:12px;background:var(--bg3);border-radius:var(--r-md);border:0.5px solid var(--border);padding:12px 14px;margin-bottom:18px}
+.host-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.host-name{font-size:14.5px;font-weight:800}
+.host-tag{font-size:11.5px;color:var(--text3);font-weight:600;margin-top:1px}
+.host-btn{margin-left:auto;background:var(--bg4);border:0.5px solid var(--border2);color:var(--text1);font-size:12px;font-weight:700;padding:8px 14px;border-radius:var(--r-md);cursor:pointer}
+.vibe-meter{margin-bottom:18px}
+.vibe-track{height:10px;border-radius:var(--r-sm);background:var(--bg4);overflow:hidden;margin-top:8px}
+.vibe-fill{height:100%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--violet),var(--scene),var(--blaze));background-size:200% 100%;animation:shimmer 2.5s linear infinite;transition:width .6s}
+.vibe-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;font-weight:700;color:var(--text3)}
+.sheet-sec{margin-bottom:20px}
+.sheet-sec-label{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:10.5px;font-weight:800;color:var(--text3);letter-spacing:.9px;text-transform:uppercase;margin-bottom:10px}
+.going-grid{display:flex;flex-wrap:wrap;gap:10px}
+.going-av{display:flex;flex-direction:column;align-items:center;gap:5px}
+.going-av-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;border:2px solid var(--bg3)}
+.going-av-name{font-size:10px;font-weight:700;color:var(--text2);max-width:50px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.going-more{width:46px;height:46px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text2)}
+.sheet-fr-row{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--signal) 6%,transparent);border-radius:var(--r-md);border:0.5px solid color-mix(in srgb,var(--signal) 20%,transparent);padding:12px 14px}
+.sheet-fr-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.sheet-fr-av:not(:first-child){margin-left:-10px}
+.sa-row{display:flex;gap:10px;margin-bottom:20px}
+.sa{flex:1;font-size:15px;font-weight:800;padding:15px;border-radius:var(--r-md);border:none;cursor:pointer;transition:all var(--t);text-align:center}
+.sa-going{background:var(--signal);color:#fff;box-shadow:0 4px 24px color-mix(in srgb,var(--signal) 35%,transparent)}
+.sa-going.is-going{background:color-mix(in srgb,var(--signal) 15%,transparent);color:var(--violet2);border:0.5px solid color-mix(in srgb,var(--signal) 30%,transparent);box-shadow:none}
+.sa-share{background:var(--bg3);color:var(--text1);border:0.5px solid var(--border2)}
+.sa-dir{flex:0 0 54px;background:var(--bg3);border:0.5px solid var(--border2);color:var(--text1);font-size:20px;border-radius:var(--r-md);cursor:pointer}
+
+/* ── CHAT ── */
+.msg-list{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.msg{display:flex;gap:10px;align-items:flex-start;animation:popIn .35s}
+.msg-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.msg-body{flex:1;min-width:0}
+.msg-who{font-size:11px;font-weight:800;color:var(--text2);margin-bottom:3px}
+.msg-text{font-size:14.5px;font-weight:500;line-height:1.5;background:var(--bg3);border-radius:var(--r-sm) 16px 16px 16px;padding:9px 13px;display:inline-block;max-width:90%;word-break:break-word}
+.chat-input-row{display:flex;gap:10px;align-items:center;background:var(--bg3);border-radius:var(--r-md);border:0.5px solid var(--border2);padding:10px 16px}
+.chat-in{flex:1;background:transparent;border:none;outline:none;font-size:16px;color:var(--text1);font-family:inherit;font-weight:500}
+.chat-in::placeholder{color:var(--text3)}
+.chat-send{font-size:20px;cursor:pointer;transition:transform .1s}
+.chat-send:active{transform:scale(1.2)}
+
+/* ── TABBAR / FAB ── */
+.tabbar{height:var(--tab-h);padding-bottom:var(--safe-b);padding-top:10px;background:color-mix(in srgb,var(--ink-900) 94%,transparent);backdrop-filter:blur(28px);border-top:0.5px solid var(--border2);display:flex;align-items:flex-start;justify-content:space-around;flex-shrink:0;z-index:30;position:relative}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 4px;border-radius:var(--r-sm);flex:1;min-width:0}
+.tab-icon{width:23px;height:23px;fill:none;stroke:var(--paper-600);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--t)}
+.tab-label{font-size:9.5px;white-space:nowrap;font-weight:700;letter-spacing:.3px;color:var(--text3);text-transform:uppercase}
+.tab.active .tab-label{color:var(--signal)}
+.tab.active .tab-icon{stroke:var(--signal)}
+.fab{position:absolute;bottom:calc(var(--tab-h) + var(--safe-b) + 20px);right:20px;width:56px;height:56px;border-radius:50%;background:var(--signal);border:none;color:#fff;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px color-mix(in srgb,var(--signal) 50%,transparent);transition:transform var(--t);z-index:29;line-height:1}
+.fab:active{transform:scale(.92)}
+
+/* ── NOTIF PANEL ── */
+.notif-panel{position:absolute;top:0;left:0;right:0;background:var(--bg2);border-radius:0 0 24px 24px;z-index:60;transform:translateY(-110%);transition:transform .38s cubic-bezier(.2,.8,.35,1);border-bottom:0.5px solid var(--border2);max-height:70vh;display:flex;flex-direction:column}
+.notif-panel.open{transform:translateY(0)}
+.notif-head{display:flex;align-items:center;justify-content:space-between;padding:52px 20px 16px;flex-shrink:0}
+.notif-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.6px}
+.notif-close{font-size:22px;cursor:pointer;color:var(--text2);padding:4px}
+.notif-list{overflow-y:auto;padding:0 16px 24px;flex:1;scrollbar-width:none;display:flex;flex-direction:column;gap:3px}
+.notif-list::-webkit-scrollbar{display:none}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:12px 10px;border-radius:var(--r-md);cursor:pointer}
+.notif-item:active{background:var(--bg3)}
+.notif-icon{font-size:22px;flex-shrink:0;width:42px;height:42px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.notif-content{flex:1;min-width:0}
+.notif-text{font-size:14px;font-weight:600;line-height:1.45}
+.notif-text b{font-weight:800}
+.notif-time{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;color:var(--text3);margin-top:3px}
+.notif-unread .notif-icon{background:color-mix(in srgb,var(--signal) 20%,transparent)}
+
+/* ── FRIENDS SCREEN ── */
+#scr-friends{background:var(--bg)}
+.friends-head{padding:52px 20px 16px;flex-shrink:0}
+.friends-head-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:26px;font-weight:900;letter-spacing:-1px}
+.friends-head-sub{font-size:14px;color:var(--text2);font-weight:500;margin-top:3px}
+.online-strip{display:flex;gap:16px;padding:0 20px 18px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.online-strip::-webkit-scrollbar{display:none}
+.online-av{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex-shrink:0}
+.online-av-wrap{position:relative}
+.online-circle{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff}
+.online-dot{position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;border:2.5px solid var(--bg)}
+.online-dot.on{background:var(--green)}
+.online-dot.off{background:var(--text3)}
+.online-name{font-size:11px;font-weight:700;color:var(--text2);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friends-scroll{flex:1;overflow-y:auto;padding:0 18px;scrollbar-width:none}
+.friends-scroll::-webkit-scrollbar{display:none}
+.friend-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:0.5px solid var(--border)}
+.friend-row:last-child{border:none}
+.friend-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;flex-shrink:0;position:relative}
+.friend-on-dot{position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg)}
+.friend-on-dot.on{background:var(--green)}
+.friend-on-dot.off{background:var(--text3)}
+.friend-info{flex:1}
+.friend-name{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.friend-status{font-size:13px;color:var(--text2);font-weight:500;margin-top:2px}
+.friend-going-tag{display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--signal) 8%,transparent);border:0.5px solid color-mix(in srgb,var(--signal) 20%,transparent);border-radius:var(--r-sm);padding:3px 8px;font-size:11px;font-weight:700;color:var(--blaze);cursor:pointer}
+
+/* ── PROFILE ── */
+#scr-profile{background:var(--bg);overflow-y:auto}
+.profile-hero{background:linear-gradient(180deg,var(--bg3) 0%,var(--bg) 100%);padding:52px 20px 24px;text-align:center;flex-shrink:0}
+.profile-av{width:84px;height:84px;border-radius:50%;background:var(--signal);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;color:#fff;margin:0 auto 14px;box-shadow:0 0 40px color-mix(in srgb,var(--signal) 40%,transparent)}
+.profile-name{font-family:'WTM Display','WTM Sans',sans-serif;font-size:24px;font-weight:900;letter-spacing:-.7px}
+.profile-handle{font-size:14px;color:var(--text2);margin-top:3px;font-weight:600}
+.streak-card{margin:20px auto 0;max-width:320px;background:linear-gradient(135deg,color-mix(in srgb,var(--signal) 14%,transparent),color-mix(in srgb,var(--signal) 14%,transparent));border:0.5px solid color-mix(in srgb,var(--signal) 30%,transparent);border-radius:var(--r-md);padding:14px 18px;display:flex;align-items:center;gap:14px}
+.streak-fire{font-size:32px}
+.streak-info{text-align:left;flex:1}
+.streak-n{font-family:'WTM Display','WTM Sans',sans-serif;font-size:18px;font-weight:900;letter-spacing:-.4px}
+.streak-l{font-size:12px;color:var(--text2);font-weight:600;margin-top:1px}
+.badges-row{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.pbadge{width:52px;height:52px;border-radius:var(--r-md);background:var(--bg3);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:24px}
+.pbadge.locked{opacity:.3;filter:grayscale(1)}
+.profile-stats{display:flex;margin-top:20px;border:0.5px solid var(--border2);border-radius:var(--r-md);overflow:hidden}
+.pstat{flex:1;padding:14px 8px;text-align:center;border-right:0.5px solid var(--border2)}
+.pstat:last-child{border-right:none}
+.pstat-n{font-family:'WTM Display','WTM Sans',sans-serif;font-size:22px;font-weight:900;letter-spacing:-.5px}
+.pstat-l{font-family:'WTM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-top:2px}
+.profile-section{padding:0 18px;margin-top:24px}
+.profile-sec-title{font-size:13px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px}
+.profile-move-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border)}
+.profile-move-row:last-child{border:none}
+.profile-move-icon{width:44px;height:44px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.profile-move-info{flex:1}
+.profile-move-title{font-size:15px;font-weight:700}
+.profile-move-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.profile-move-badge{background:color-mix(in srgb,var(--signal) 15%,transparent);color:var(--violet2);font-size:10px;font-weight:800;padding:3px 8px;border-radius:var(--r-sm);float:right}
+.profile-empty{padding:20px 0;color:var(--text3);font-size:15px;font-weight:600}
+
+/* ── CREATE / TOAST / CONFETTI ── */
+.create-panel{position:absolute;bottom:0;left:0;right:0;background:var(--bg2);border-radius:var(--r-md) 28px 0 0;z-index:70;transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.35,1);border-top:0.5px solid var(--border2);padding:12px 20px 40px;max-height:88vh;overflow-y:auto}
+.create-panel.open{transform:translateY(0)}
+.create-title{font-family:'WTM Display','WTM Sans',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.6px;margin:16px 0 20px}
+.create-field{margin-bottom:16px}
+.create-field label{display:block;font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px}
+.create-input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r-md);padding:12px 16px;font-size:16px;color:var(--text1);font-family:inherit;font-weight:500;outline:none}
+.create-input:focus{border-color:color-mix(in srgb,var(--signal) 50%,transparent)}
+.create-cats{display:flex;flex-wrap:wrap;gap:8px}
+.create-cat{padding:7px 14px;border-radius:50px;border:0.5px solid var(--border2);background:var(--bg3);font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all var(--t)}
+.create-cat.sel{background:var(--violet);border-color:var(--violet2);color:#fff}
+.create-submit{width:100%;margin-top:20px;background:var(--signal);border:none;color:#fff;font-size:16px;font-weight:800;padding:16px;border-radius:var(--r-md);cursor:pointer}
+#toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-b) + 24px);left:50%;transform:translateX(-50%) translateY(16px);background:rgba(13,11,26,.96);backdrop-filter:blur(24px);border:0.5px solid var(--border2);border-radius:50px;padding:12px 22px;font-size:14px;font-weight:700;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:200;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:400}
+</style>
+
+<!-- WELCOME -->
+<div id="scr-welcome" class="scr active">
+  <canvas id="wlc-bg" class="wlc-canvas"></canvas>
+  <div class="wlc-body">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div class="wlc-logo">WTM</div>
+      <div class="wlc-sub">What's The Move</div>
+    </div>
+    <div class="wlc-tagline">Find what's happening tonight.<br>See where your friends are at.<br>Lock in. No more group chat limbo.</div>
+    <div class="wlc-vibes" id="wlc-vibes"></div>
+    <button class="wlc-btn" onclick="enterApp()">See what's up</button>
+    <div class="wlc-cities">Pittsburgh · NYC · LA · Chicago · ATL</div>
+  </div>
+</div>
+
+<!-- MOVES -->
+<div id="scr-moves" class="scr">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-loc">📍 Pittsburgh, PA</div>
+      <div class="topbar-title">What's The Move</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" onclick="openNotif()" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg><span class="notif-badge" id="notif-badge">3</span></button>
+      <button class="icon-btn" onclick="switchTab('profile')" aria-label="Your profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg></button>
+    </div>
+  </div>
+  <div class="live-bar"><div class="live-dot"></div><div class="live-label">LIVE</div><div class="live-text" id="ticker-text">41 people locked in across Pittsburgh right now</div></div>
+  <div class="stories" id="stories"></div>
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search-in" placeholder="Search moves, venues, vibes…" oninput="onSearch(this.value)">
+    <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
+  </div>
+  <div class="cats" id="cat-row"></div>
+  <div class="feed-wrap"><div class="feed" id="feed"></div></div>
+  <button class="fab" onclick="openCreate()">+</button>
+  <div class="tabbar">
+    <div class="tab active" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
+    <div class="tab" onclick="switchTab('map')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><div class="tab-label">Map</div></div>
+    <div class="tab" onclick="switchTab('ask')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-4.2 1.8L9 15l4.2-1.8z"/></svg><div class="tab-label">Ask</div></div>
+    <div class="tab" onclick="switchTab('friends')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg><div class="tab-label">Friends</div></div>
+    <div class="tab" onclick="switchTab('profile')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg><div class="tab-label">You</div></div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="scr-map" class="scr">
+  <div id="gl-map"></div>
+  <div class="map-topbar">
+    <div class="map-title">Live Map</div>
+    <div class="map-live-pill"><div class="map-live-dot"></div><span id="map-live-count">8 moves live</span></div>
+  </div>
+  <canvas id="map-canvas"></canvas>
+  <div id="map-hint">Tap a pin · Drag · Pinch to zoom</div>
+  <div class="map-ctrls">
+    <button class="map-ctrl" onclick="zoomMap(1.35)">+</button>
+    <button class="map-ctrl" onclick="zoomMap(1/1.35)">−</button>
+    <button class="map-ctrl" onclick="resetMap()" style="font-size:15px">⌖</button>
+  </div>
+  <div class="tabbar">
+    <div class="tab" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
+    <div class="tab active" onclick="switchTab('map')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><div class="tab-label">Map</div></div>
+    <div class="tab" onclick="switchTab('ask')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-4.2 1.8L9 15l4.2-1.8z"/></svg><div class="tab-label">Ask</div></div>
+    <div class="tab" onclick="switchTab('friends')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg><div class="tab-label">Friends</div></div>
+    <div class="tab" onclick="switchTab('profile')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg><div class="tab-label">You</div></div>
+  </div>
+</div>
+
+
+<!-- ASK -->
+<div id="scr-ask" class="scr">
+  <div class="ask-head">
+    <div class="ask-title">Ask</div>
+    <div class="ask-sub">Say what you want to do. WTM finds the spot.</div>
+  </div>
+  <div class="ask-bar">
+    <input class="ask-in" id="ask-in" placeholder="find me a skate spot near me"
+           autocomplete="off" enterkeyhint="search"
+           onkeydown="if(event.key==='Enter')submitAsk()">
+    <button class="ask-go" onclick="submitAsk()">Find</button>
+  </div>
+  <div class="ask-chips" id="ask-examples"></div>
+  <div class="ask-actions">
+    <button class="ask-action" data-act="sb-open">Add a spot</button>
+    <button class="ask-action" data-act="rq-open">Review queue <span id="rq-n"></span></button>
+  </div>
+  <div class="ask-scroll"><div id="ask-results"></div></div>
+  <div class="tabbar">
+    <div class="tab" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
+    <div class="tab" onclick="switchTab('map')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><div class="tab-label">Map</div></div>
+    <div class="tab" onclick="switchTab('ask')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-4.2 1.8L9 15l4.2-1.8z"/></svg><div class="tab-label">Ask</div></div>
+    <div class="tab" onclick="switchTab('friends')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg><div class="tab-label">Friends</div></div>
+    <div class="tab" onclick="switchTab('profile')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg><div class="tab-label">You</div></div>
+  </div>
+</div>
+
+<!-- FRIENDS -->
+<div id="scr-friends" class="scr">
+  <div class="friends-head">
+    <div class="friends-head-title">Friends</div>
+    <div class="friends-head-sub">4 out right now · Tyler's working late</div>
+  </div>
+  <div class="online-strip" id="online-strip"></div>
+  <div class="friends-scroll" id="friends-list"></div>
+  <div class="tabbar">
+    <div class="tab" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
+    <div class="tab" onclick="switchTab('map')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><div class="tab-label">Map</div></div>
+    <div class="tab" onclick="switchTab('ask')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-4.2 1.8L9 15l4.2-1.8z"/></svg><div class="tab-label">Ask</div></div>
+    <div class="tab active" onclick="switchTab('friends')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg><div class="tab-label">Friends</div></div>
+    <div class="tab" onclick="switchTab('profile')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg><div class="tab-label">You</div></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="scr-profile" class="scr" style="overflow-y:auto">
+  <div class="profile-hero">
+    <div class="profile-av">J</div>
+    <div class="profile-name">Jordan K.</div>
+    <div class="profile-handle">@jordank · Pittsburgh, PA</div>
+    <div class="streak-card">
+      <div class="streak-fire">🔥</div>
+      <div class="streak-info">
+        <div class="streak-n">6-week streak</div>
+        <div class="streak-l">You've made a move every weekend since June</div>
+      </div>
+    </div>
+    <div class="badges-row">
+      <div class="pbadge" title="First Move">🚀</div>
+      <div class="pbadge" title="Social Butterfly">🦋</div>
+      <div class="pbadge" title="Night Owl">🦉</div>
+      <div class="pbadge locked" title="Locked">💎</div>
+      <div class="pbadge locked" title="Locked">👑</div>
+    </div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-n" id="ps-moves">24</div><div class="pstat-l">Moves</div></div>
+      <div class="pstat"><div class="pstat-n">8</div><div class="pstat-l">Friends</div></div>
+      <div class="pstat"><div class="pstat-n" id="ps-tonight">1</div><div class="pstat-l">Tonight</div></div>
+      <div class="pstat"><div class="pstat-n">31</div><div class="pstat-l">Fire given</div></div>
+    </div>
+  </div>
+  <div class="profile-section">
+    <div class="profile-sec-title">Your moves tonight</div>
+    <div id="profile-moves"></div>
+  </div>
+  <div class="profile-section">
+    <div class="profile-sec-title">Recent activity</div>
+    <div id="profile-activity"></div>
+  </div>
+  <div style="height:100px"></div>
+  <div class="tabbar" style="position:sticky;bottom:0">
+    <div class="tab" onclick="switchTab('moves')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M10 19v-5h4v5"/></svg><div class="tab-label">Moves</div></div>
+    <div class="tab" onclick="switchTab('map')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg><div class="tab-label">Map</div></div>
+    <div class="tab" onclick="switchTab('ask')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-4.2 1.8L9 15l4.2-1.8z"/></svg><div class="tab-label">Ask</div></div>
+    <div class="tab" onclick="switchTab('friends')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/></svg><div class="tab-label">Friends</div></div>
+    <div class="tab active" onclick="switchTab('profile')"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></svg><div class="tab-label">You</div></div>
+  </div>
+</div>
+
+<!-- OVERLAYS -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet"><div class="sheet-handle"></div><div class="sheet-scroll" id="sheet-body"></div></div>
+
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-head"><div class="notif-title">Notifications</div><div class="notif-close" onclick="closeNotif()">✕</div></div>
+  <div class="notif-list" id="notif-list"></div>
+</div>
+
+<div class="sheet-overlay" id="create-overlay" onclick="closeCreate()" style="z-index:65"></div>
+<div class="create-panel" id="create-panel">
+  <div class="sheet-handle"></div>
+  <div class="create-title">Drop a move</div>
+  <div class="create-field"><label>What's the move?</label><input class="create-input" id="ci-title" placeholder="e.g. Rooftop at Connor's spot"></div>
+  <div class="create-field"><label>Where?</label><input class="create-input" id="ci-loc" placeholder="Neighborhood or address"></div>
+  <div class="create-field"><label>Vibe</label><div class="create-cats" id="create-cats"></div></div>
+  <div class="create-field" style="display:flex;gap:12px">
+    <div style="flex:1"><label>Max people</label><input class="create-input" id="ci-max" type="number" value="10"></div>
+    <div style="flex:1"><label>Time</label><input class="create-input" id="ci-time" placeholder="10 PM"></div>
+  </div>
+  <button class="create-submit" onclick="submitCreate()">Post the move 🔥</button>
+</div>
+
+<!-- STORY VIEWER -->
+<div id="story-viewer">
+  <div class="sv-progress" id="sv-progress"></div>
+  <div class="sv-head">
+    <div class="sv-av" id="sv-av">🎉</div>
+    <div><div class="sv-name" id="sv-name"></div><div class="sv-time" id="sv-time"></div></div>
+    <div class="sv-close" onclick="closeStory()">✕</div>
+  </div>
+  <div class="sv-body" id="sv-body">
+    <div class="sv-tap left" onclick="storyPrev()"></div>
+    <div class="sv-tap right" onclick="storyNext()"></div>
+    <div class="sv-emoji" id="sv-emoji"></div>
+    <div class="sv-title" id="sv-title"></div>
+    <div class="sv-sub" id="sv-sub"></div>
+    <button class="sv-cta" id="sv-cta" style="position:relative;z-index:6">Check the move</button>
+  </div>
+</div>
+
+<!-- LIVE PUSH BANNER -->
+<div id="live-banner"><div class="lb-inner" id="lb-inner">
+  <div class="lb-icon" id="lb-icon">🔥</div>
+  <div><div class="lb-app">WTM · now</div><div class="lb-text" id="lb-text"></div></div>
+</div></div>
+
+<canvas id="confetti"></canvas>
+<div id="toast"></div>
+
+<script>
+// ══════════════════ DATA ══════════════════
+const MOVES=[
+ {id:'m1',title:'Mt. Washington Rooftop Session',cat:'music',emoji:'🎵',grad:['#2C4A63','#101822'],loc:'Mt. Washington',addr:'1435 Grandview Ave',time:'Tonight · 9 PM',lat:40.4392,lng:-80.0165,att:8,max:12,hot:true,host:'Alex M.',hostAv:'av1',desc:'Live beats over the whole skyline. Small group on purpose. No cover, just show up.'},
+ {id:'m2',title:'Strip District Night Market',cat:'food',emoji:'🍕',grad:['#5A4632','#1C1510'],loc:'Strip District',addr:'2100 Penn Ave',time:'Tonight · 7 PM',lat:40.4498,lng:-79.9765,att:22,max:80,hot:false,host:'Strip DIY Collective',hostAv:'av6',desc:'Local vendors, street food, outdoor pop-up. Free entry, bring cash.'},
+ {id:'m3',title:'Lawrenceville Bar Crawl',cat:'bars',emoji:'🍺',grad:['#2F4A42','#111A17'],loc:'Lawrenceville',addr:'3523 Butler St (start)',time:'Tonight · 10 PM',lat:40.4655,lng:-79.9605,att:41,max:100,hot:true,host:'Mia R.',hostAv:'av3',desc:'Start at Round Corner, end wherever. 5 stops, 1 wristband, $20 covers everything.'},
+ {id:'m4',title:'Frick Park Dawn Run',cat:'outdoor',emoji:'🌿',grad:['#3C4A31','#141A11'],loc:'Frick Park',addr:'2005 Beechwood Blvd',time:'Tomorrow · 7 AM',lat:40.4378,lng:-79.9015,att:14,max:30,hot:false,host:'Run PGH',hostAv:'av4',desc:'6 mile loop at sunrise, all paces welcome. Coffee at the trailhead after.'},
+ {id:'m5',title:'CMU Late Night Studio',cat:'art',emoji:'🎨',grad:['#463356','#16111C'],loc:'Oakland',addr:'5000 Forbes Ave, CFA Building',time:'Tonight · 11 PM',lat:40.4418,lng:-79.9430,att:6,max:8,hot:false,host:'Casey W.',hostAv:'av4',desc:'Open studio, bring your own project. Quiet creative energy, good playlist.'},
+ {id:'m6',title:'North Shore Pickup Hoops',cat:'sports',emoji:'🏀',grad:['#5A4030','#1B130E'],loc:'North Shore',addr:'400 North Shore Dr',time:'Tonight · 6 PM',lat:40.4468,lng:-80.0082,att:10,max:14,hot:false,host:'Devon T.',hostAv:'av2',desc:'Full court runs. All levels. Bring water.'},
+ {id:'m7',title:'Smoke & Mario Kart',cat:'justu',emoji:'🎮',grad:['#3A3730','#141310'],loc:'Polish Hill',addr:'Address drops when you lock in',time:'Tonight · 8 PM',lat:40.4562,lng:-79.9650,att:2,max:4,hot:false,private:true,host:'Alex M.',hostAv:'av1',desc:'Just the boys. Switch, snacks, no outside people. You know who you are.'},
+ {id:'m8',title:'Larimer Rooftop Party',cat:'scene',emoji:'🎉',grad:['#4A2F4E','#170F19'],loc:'Larimer',addr:'6510 Larimer Ave, rooftop',time:'Tonight · 11 PM',lat:40.4652,lng:-79.9205,att:34,max:60,hot:true,host:'DJ Nasty C',hostAv:'av5',desc:'DJ Nasty C on the 1s and 2s. Skyline views, open bar the first hour. This is the one.'},
+];
+const FRIENDS_GOING={m1:['Alex M.','Devon T.'],m3:['Alex M.','Mia R.'],m5:['Alex M.','Devon T.','Casey W.'],m6:['Mia R.'],m7:['Alex M.'],m8:['Devon T.','Casey W.']};
+const ALL_GOING={m1:['Alex M.','Devon T.','Zoe C.','Sam B.','Riley P.','Chris L.','Nat W.','Drew K.'],m3:['Jordan K.','Alex M.','Mia R.','Pat O.','+ 37 others'],m5:['Alex M.','Devon T.','Casey W.','Jay S.','Morgan L.','Jade F.'],m8:['Devon T.','Casey W.','Omar H.','Priya S.','Marcus T.','Leila A.','+ 28 others']};
+const CATS=[{id:'justu',emoji:'🤝',label:'Just Us'},{id:'scene',emoji:'🎉',label:'The Scene'},{id:'bars',emoji:'🍺',label:'Bars'},{id:'music',emoji:'🎵',label:'Music'},{id:'outdoor',emoji:'🌿',label:'Outdoor'},{id:'sports',emoji:'🏀',label:'Sports'},{id:'food',emoji:'🍕',label:'Food'},{id:'art',emoji:'🎨',label:'Art'}];
+const AV_CLS=['av1','av2','av3','av4','av5','av6'];
+const FRIENDS_LIST=[
+ {name:'Alex M.',init:'A',av:'av1',face:'😎',online:true,status:'Out tonight',going:['m1','m7'],lat:40.4390,lng:-80.0192},
+ {name:'Devon T.',init:'D',av:'av2',face:'🧢',online:true,status:'Ready to roll',going:['m8'],lat:40.4638,lng:-79.9218},
+ {name:'Mia R.',init:'M',av:'av3',face:'💅',online:true,status:'Heading out at 9',going:['m3'],lat:40.4648,lng:-79.9580},
+ {name:'Casey W.',init:'C',av:'av4',face:'🕺',online:true,status:'Pulling up at 10',going:['m8'],lat:40.4548,lng:-79.9342},
+ {name:'Tyler B.',init:'T',av:'av5',face:'😴',online:false,status:'Working late',going:[],lat:40.4412,lng:-79.9982},
+];
+const ME={face:'🤙',lat:40.4408,lng:-79.9995};
+const NOTIFS=[
+ {icon:'🔥',text:'<b>Alex M.</b> is going to Mt. Washington Rooftop Session',time:'2m ago',unread:true},
+ {icon:'⚡',text:'<b>Larimer Rooftop Party</b> is filling up. Only 26 spots left',time:'8m ago',unread:true},
+ {icon:'💬',text:'<b>Devon T.</b>: "DJ is already setting up 🔥" in Larimer Rooftop Party',time:'14m ago',unread:true},
+ {icon:'👥',text:'<b>Mia R.</b> and <b>Alex M.</b> are both going to Lawrenceville Bar Crawl',time:'31m ago',unread:false},
+ {icon:'🎉',text:'New move nearby: <b>Larimer Rooftop Party</b> is trending',time:'1h ago',unread:false},
+];
+const MSGS={
+ m1:[{who:'Alex M.',av:'av1',text:"Heading up now, who else?"},{who:'Devon T.',av:'av2',text:"Give me 20"}],
+ m3:[{who:'Mia R.',av:'av3',text:"This gonna go hard fr"},{who:'Alex M.',av:'av1',text:"Facts, see y'all at 10"}],
+ m8:[{who:'Devon T.',av:'av2',text:"DJ is already setting up 🔥"},{who:'Casey W.',av:'av4',text:"Can NOT wait"},{who:'Priya S.',av:'av6',text:"Be there 11:30 latest"}],
+};
+const SEED_RXN={m1:{fire:12,hype:7,there:4},m2:{fire:6,hype:3,there:8},m3:{fire:31,hype:18,there:22},m4:{fire:3,hype:5,there:9},m5:{fire:8,hype:4,there:3},m6:{fire:2,hype:6,there:5},m7:{fire:1,hype:0,there:2},m8:{fire:28,hype:41,there:19}};
+const STORIES=[
+ {id:'s1',name:'Larimer Party',emoji:'🎉',grad:['#7C0EBF','#1A0030'],moveId:'m8',slides:[
+   {title:'Rooftop is READY',sub:'DJ Nasty C soundchecking right now. Doors at 11.'},
+   {title:'Open bar first hour',sub:'11 PM – midnight. You know what to do.'},
+   {title:'26 spots left',sub:'34 already locked in. Skyline views all night.'}]},
+ {id:'s2',name:'Bar Crawl',emoji:'🍺',grad:['#10B981','#032018'],moveId:'m3',slides:[
+   {title:'5 stops. 1 wristband.',sub:'Round Corner → Spirit → Nova → Cattivo → wherever'},
+   {title:'41 people locked in',sub:'Biggest crawl of the summer. $20 covers everything.'}]},
+ {id:'s3',name:'Rooftop Set',emoji:'🎵',grad:['#2C4A63','#101822'],moveId:'m1',slides:[
+   {title:'Golden hour session',sub:'Live beats over the whole city skyline.'},
+   {title:'4 spots left',sub:'Small group on purpose. Alex and Devon are in.'}]},
+ {id:'s4',name:'Night Market',emoji:'🍕',grad:['#F59E0B','#6B2E00'],moveId:'m2',slides:[
+   {title:'20+ vendors tonight',sub:'Street food, vinyl, vintage. Free entry.'}]},
+];
+const NEIGHBORHOODS=[
+ {name:'Downtown',lat:40.4396,lng:-79.9990},{name:'Strip District',lat:40.4520,lng:-79.9720},
+ {name:'Lawrenceville',lat:40.4670,lng:-79.9560},{name:'Oakland',lat:40.4415,lng:-79.9560},
+ {name:'Mt. Washington',lat:40.4330,lng:-80.0140},{name:'North Shore',lat:40.4468,lng:-80.0110},
+ {name:'East Liberty',lat:40.4615,lng:-79.9250},{name:'Shadyside',lat:40.4535,lng:-79.9380},
+ {name:'South Side',lat:40.4270,lng:-79.9780},{name:'Bloomfield',lat:40.4618,lng:-79.9480},
+ {name:'Polish Hill',lat:40.4552,lng:-79.9680},{name:'Squirrel Hill',lat:40.4340,lng:-79.9230},
+ {name:'Larimer',lat:40.4665,lng:-79.9165},{name:'Hill District',lat:40.4448,lng:-79.9800},
+ {name:'Brookline',lat:40.3960,lng:-80.0230},{name:'Beechview',lat:40.4110,lng:-80.0290},
+ {name:'Carrick',lat:40.3970,lng:-79.9860},{name:'Greenfield',lat:40.4250,lng:-79.9380},
+ {name:'Hazelwood',lat:40.4090,lng:-79.9430},{name:'Point Breeze',lat:40.4470,lng:-79.9060},
+ {name:'Troy Hill',lat:40.4610,lng:-79.9880},{name:'Manchester',lat:40.4560,lng:-80.0230},
+ {name:'Regent Square',lat:40.4320,lng:-79.8930},{name:'Swissvale',lat:40.4210,lng:-79.8850},
+];
+const SIM_NAMES=['Priya S.','Marcus T.','Leila A.','Sam B.','Riley P.','Chris L.','Nat W.','Drew K.','Jade F.','Omar H.','Zoe C.','Malik J.'];
+const SIM_CHATS=[
+ {mid:'m8',who:'Priya S.',av:'av6',text:'line is moving fast, get here'},
+ {mid:'m8',who:'Marcus T.',av:'av2',text:'this view is INSANE 🌃'},
+ {mid:'m3',who:'Pat O.',av:'av5',text:'first stop packed already'},
+ {mid:'m8',who:'Leila A.',av:'av3',text:'open bar ends at midnight hurry'},
+ {mid:'m1',who:'Riley P.',av:'av4',text:'sound check done, this is gonna be special'},
+ {mid:'m3',who:'Sam B.',av:'av1',text:'wristbands almost gone fyi'},
+];
+const TICKER_POOL=[
+ '41 people locked in across Pittsburgh right now',
+ 'Larimer Rooftop Party trending in East End 🔥',
+ '4 of your friends are out tonight',
+ 'Lawrenceville Bar Crawl is 41% full and climbing',
+ 'New move just dropped in the Strip District',
+ 'Peak hours: moves fill fastest 9–11 PM',
+];
+
+
+// ══════════════════ SPOTS ══════════════════
+// Real Pittsburgh places. `tags` are what people actually say when they want
+// the place; the finder matches against these, not against the name.
+const SPOTS=[
+ {id:'sp1',name:'West Penn Skatepark',cat:'skate',emoji:'🛹',lat:40.4560,lng:-79.9718,
+  area:'Polish Hill',addr:'450 30th St',fires:41,crowd:'medium',best:'afternoon',lit:true,free:true,indoor:false,
+  tags:['skate','skateboard','bowl','ledges','rails','concrete','bmx','scooter'],
+  blurb:'Concrete bowl plus a street section. Lit until 11, so it runs late.'},
+ {id:'sp2',name:'Mellon Park Ledges',cat:'skate',emoji:'🛹',lat:40.4517,lng:-79.9208,
+  area:'Shadyside',addr:'1047 Shady Ave',fires:18,crowd:'low',best:'evening',lit:false,free:true,indoor:false,
+  tags:['skate','skateboard','ledges','stairs','street','flatground','quiet'],
+  blurb:'Smooth marble ledges and a three-stair. Nobody bothers you after dark.'},
+ {id:'sp3',name:'Grandview Overlook',cat:'view',emoji:'🌆',lat:40.4392,lng:-80.0165,
+  area:'Mt. Washington',addr:'Grandview Ave at Sweetbriar',fires:96,crowd:'high',best:'sunset',lit:true,free:true,indoor:false,
+  tags:['view','skyline','sunset','photo','city','overlook','date','golden hour'],
+  blurb:'The postcard shot of the whole city. Busy at sunset, empty by 1am.'},
+ {id:'sp4',name:'Carrie Blast Furnaces',cat:'urbex',emoji:'🏚',lat:40.4082,lng:-79.9018,
+  area:'Rankin',addr:'801 Carrie Furnace Blvd',fires:63,crowd:'low',best:'afternoon',lit:false,free:false,indoor:false,
+  tags:['urbex','abandoned','industrial','steel','ruins','photo','graffiti','history'],
+  blurb:'Two surviving blast furnaces from the mill era. Tours only, but the scale is unreal.'},
+ {id:'sp5',name:'Hot Metal Bridge Deck',cat:'photo',emoji:'📷',lat:40.4278,lng:-79.9632,
+  area:'South Side',addr:'Hot Metal St crossing',fires:52,crowd:'medium',best:'sunset',lit:true,free:true,indoor:false,
+  tags:['photo','bridge','river','skyline','sunset','walk','bike','golden hour'],
+  blurb:'Pedestrian deck over the Mon with the downtown skyline framed dead centre.'},
+ {id:'sp6',name:'Panther Hollow Bridge',cat:'photo',emoji:'📷',lat:40.4380,lng:-79.9470,
+  area:'Schenley Park',addr:'Schenley Dr at Panther Hollow',fires:34,crowd:'low',best:'morning',lit:false,free:true,indoor:false,
+  tags:['photo','bridge','park','green','quiet','fog','morning','trees'],
+  blurb:'Bronze panthers and a long green drop. Gets proper fog most mornings.'},
+ {id:'sp7',name:'Blue Slide Park',cat:'chill',emoji:'🛝',lat:40.4361,lng:-79.9095,
+  area:'Frick Park',addr:'Beechwood Blvd at Nicholson',fires:71,crowd:'medium',best:'afternoon',lit:false,free:true,indoor:false,
+  tags:['chill','park','hang','grass','picnic','friends','slide','nostalgia'],
+  blurb:'The concrete slide everyone grew up on. Bring cardboard, it still works.'},
+ {id:'sp8',name:'North Park Boathouse',cat:'swim',emoji:'🏊',lat:40.5978,lng:-80.0069,
+  area:'North Park',addr:'Pearce Mill Rd',fires:29,crowd:'medium',best:'afternoon',lit:false,free:true,indoor:false,
+  tags:['swim','lake','water','kayak','summer','dock','boat','picnic'],
+  blurb:'Boat rental and a long dock. The lake loop is 5 miles if you want it.'},
+ {id:'sp9',name:'Randyland',cat:'photo',emoji:'🎨',lat:40.4557,lng:-80.0090,
+  area:'Mexican War Streets',addr:'1501 Arch St',fires:38,crowd:'medium',best:'afternoon',lit:false,free:true,indoor:false,
+  tags:['photo','art','colour','mural','courtyard','weird','free','bright'],
+  blurb:'A whole courtyard painted every colour at once. Free, and Randy is usually there.'},
+ {id:'sp10',name:'Emerald View Overlook',cat:'sunset',emoji:'🌇',lat:40.4290,lng:-80.0216,
+  area:'Duquesne Heights',addr:'Emerald View Park trailhead',fires:24,crowd:'low',best:'sunset',lit:false,free:true,indoor:false,
+  tags:['sunset','view','quiet','hike','trail','skyline','date','secluded'],
+  blurb:'Same skyline as Grandview, ten minutes down the trail, a fraction of the people.'},
+ {id:'sp11',name:'Cathedral Lawn',cat:'chill',emoji:'🌳',lat:40.4443,lng:-79.9531,
+  area:'Oakland',addr:'4200 Fifth Ave',fires:44,crowd:'high',best:'afternoon',lit:true,free:true,indoor:false,
+  tags:['chill','study','grass','hang','students','central','picnic','free'],
+  blurb:'Open lawn under the Cathedral. Someone is always out here when the weather holds.'},
+ {id:'sp12',name:'Millvale Riverfront Trail',cat:'chill',emoji:'🚲',lat:40.4805,lng:-79.9736,
+  area:'Millvale',addr:'Riverfront Park trailhead',fires:21,crowd:'low',best:'morning',lit:false,free:true,indoor:false,
+  tags:['chill','bike','run','river','trail','quiet','flat','walk'],
+  blurb:'Flat paved trail right on the Allegheny. Quiet enough to hear the water.'},
+];
+const SPOT_CATS={skate:'Skate',view:'Views',urbex:'Urbex',photo:'Photo',chill:'Chill',swim:'Water',sunset:'Sunset'};
+
+// ══════════════════ STATE ══════════════════
+const S={screen:'scr-welcome',rsvps:new Set(['m3']),waitlists:new Set(),activeCat:null,search:'',myRxn:{},rxn:JSON.parse(JSON.stringify(SEED_RXN)),openMoveId:null,notifOpen:false,createCat:null,seenStories:new Set(),unread:3,vibes:new Set()};
+let mapState={scale:4.4,ox:0,oy:0};
+// Full metro frame: Cranberry down to McKeesport, the airport out to Monroeville
+const BOUNDS={minLat:40.28,maxLat:40.75,minLng:-80.32,maxLng:-79.68};
+const M_LAT=111320, M_LNG=84700; // meters per degree at 40.45°N (true aspect)
+const ZBASE=4;   // scale/ZBASE = 1 at the classic city-core view
+// ZMIN keeps the furthest zoom-out filling the screen with the metro rather
+// than shrinking it into empty space; ZMAX reaches street level.
+const ZMIN=1.35, ZMAX=22;
+
+// ══════════════════ NAV ══════════════════
+function goScreen(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  S.screen=id;
+  if(id==='scr-moves')buildFeed();
+  if(id==='scr-map'){setTimeout(initMap,60);tryRealMap();}
+  if(id==='scr-ask')buildAsk();
+  if(id==='scr-friends')buildFriends();
+  if(id==='scr-profile')buildProfile();
+}
+function switchTab(t){demoEvt('tab_'+t);goScreen({moves:'scr-moves',map:'scr-map',ask:'scr-ask',friends:'scr-friends',profile:'scr-profile'}[t]);}
+function enterApp(){demoEvt('entered');goScreen('scr-moves');startEngine();}
+// Notifies an embedding demo shell about interactions; no-op standalone
+function demoEvt(n){try{if(window.parent!==window)window.parent.postMessage({wtmEvt:n},'*');}catch(e){}}
+
+// ══════════════════ TOAST / CONFETTI ══════════════════
+let _tt;
+function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2600);}
+
+const confettiC=document.getElementById('confetti');
+const confettiCtx=confettiC.getContext('2d');
+let confParts=[];let confRunning=false;
+function sizeConfetti(){confettiC.width=innerWidth;confettiC.height=innerHeight;}
+sizeConfetti();window.addEventListener('resize',sizeConfetti);
+function confettiBurst(){
+  const colors=['#FF9E3D','#E8EAF0','#8A93A6','#FFB86B','#3FB37F','#77849D'];
+  const cx=innerWidth/2,cy=innerHeight*.6;
+  for(let i=0;i<90;i++){
+    const a=Math.random()*Math.PI*2,v=4+Math.random()*9;
+    confParts.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,r:3+Math.random()*4,c:colors[i%6],rot:Math.random()*6,vr:(Math.random()-.5)*.3,life:1});
+  }
+  if(!confRunning){confRunning=true;confettiTick();}
+}
+function confettiTick(){
+  confettiCtx.clearRect(0,0,confettiC.width,confettiC.height);
+  confParts=confParts.filter(p=>p.life>0);
+  if(!confParts.length){confRunning=false;return;}
+  confParts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.28;p.vx*=.99;p.rot+=p.vr;p.life-=.012;
+    confettiCtx.save();confettiCtx.translate(p.x,p.y);confettiCtx.rotate(p.rot);
+    confettiCtx.globalAlpha=Math.max(0,p.life);confettiCtx.fillStyle=p.c;
+    confettiCtx.fillRect(-p.r,-p.r/2,p.r*2,p.r);confettiCtx.restore();
+  });
+  requestAnimationFrame(confettiTick);
+}
+
+// ══════════════════ WELCOME BG + VIBES ══════════════════
+(function(){
+  const c=document.getElementById('wlc-bg'),ctx=c.getContext('2d');let pts=[];
+  function rs(){c.width=c.offsetWidth;c.height=c.offsetHeight;pts=Array.from({length:70},()=>({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.8+.5,a:Math.random()*.7+.1}));}
+  function dr(){const W=c.width,H=c.height;ctx.fillStyle='#0B0E14';ctx.fillRect(0,0,W,H);
+    const g=ctx.createRadialGradient(W*.35,H*.45,0,W*.35,H*.45,W*.6);g.addColorStop(0,'rgba(255,158,61,.14)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    const g2=ctx.createRadialGradient(W*.72,H*.62,0,W*.72,H*.62,W*.4);g2.addColorStop(0,'rgba(99,112,138,.16)');g2.addColorStop(1,'transparent');ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(232,234,240,${p.a*.55})`;ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});
+    requestAnimationFrame(dr);}
+  rs();dr();window.addEventListener('resize',rs);
+})();
+document.getElementById('wlc-vibes').innerHTML=CATS.slice(0,6).map(c=>`<div class="wlc-vibe" onclick="toggleVibe(this,'${c.id}')">${c.emoji} ${c.label}</div>`).join('');
+function toggleVibe(el,id){el.classList.toggle('sel');S.vibes.has(id)?S.vibes.delete(id):S.vibes.add(id);}
+
+// ══════════════════ LIVE ENGINE ══════════════════
+let engineOn=false,tickerIdx=0;
+function startEngine(){
+  if(engineOn)return;engineOn=true;
+  setInterval(engineTick,5200);
+  setInterval(()=>{
+    tickerIdx=(tickerIdx+1)%TICKER_POOL.length;
+    const t=document.getElementById('ticker-text');
+    t.style.animation='none';t.offsetHeight;t.style.animation='';
+    t.textContent=TICKER_POOL[tickerIdx];
+  },4000);
+}
+function engineTick(){
+  const roll=Math.random();
+  if(roll<.45)simJoin();
+  else if(roll<.7)simChat();
+  else if(roll<.88)simReaction();
+  else simPush();
+}
+function simJoin(){
+  const open=MOVES.filter(m=>m.att<m.max&&!m.private);
+  if(!open.length)return;
+  const m=open[Math.floor(Math.random()*open.length)];
+  const who=SIM_NAMES[Math.floor(Math.random()*SIM_NAMES.length)];
+  m.att++;
+  TICKER_POOL.push(`${who} just locked in ${m.title}`);
+  if(TICKER_POOL.length>14)TICKER_POOL.splice(0,1);
+  if(S.screen==='scr-moves'&&!S.openMoveId)buildFeed();
+  if(m.hot&&Math.random()<.5)showPush('🔥',`<b>${who}</b> just locked in <b>${m.title}</b>. ${m.max-m.att} spots left`);
+}
+function simChat(){
+  const c=SIM_CHATS[Math.floor(Math.random()*SIM_CHATS.length)];
+  (MSGS[c.mid]||(MSGS[c.mid]=[])).push({who:c.who,av:c.av,text:c.text});
+  if(MSGS[c.mid].length>8)MSGS[c.mid].splice(0,1);
+  if(S.openMoveId===c.mid){
+    const list=document.querySelector('#sheet-body .msg-list');
+    if(list){list.insertAdjacentHTML('beforeend',`<div class="msg"><div class="msg-av ${c.av}">${c.who[0]}</div><div class="msg-body"><div class="msg-who">${c.who}</div><div class="msg-text">${c.text}</div></div></div>`);}
+  }else if(Math.random()<.4){
+    showPush('💬',`<b>${c.who}</b> in ${MOVES.find(m=>m.id===c.mid)?.title||'a move'}: "${c.text}"`);
+  }
+}
+function simReaction(){
+  const m=MOVES[Math.floor(Math.random()*MOVES.length)];
+  const t=['fire','hype','there'][Math.floor(Math.random()*3)];
+  if(S.rxn[m.id]){S.rxn[m.id][t]++;if(S.screen==='scr-moves'&&!S.openMoveId)buildFeed();}
+}
+function simPush(){
+  const msgs=[
+   ['⚡','<b>Larimer Rooftop Party</b> hit 40 people and it\'s moving fast'],
+   ['👥','<b>Casey W.</b> just went live on the map'],
+   ['🎉','New move nearby: check the Strip District'],
+   ['🔥','Your streak is alive. 6 weekends straight'],
+  ];
+  const[icon,text]=msgs[Math.floor(Math.random()*msgs.length)];
+  showPush(icon,text);
+}
+let pushTimer;
+function showPush(icon,html){
+  document.getElementById('lb-icon').textContent=icon;
+  document.getElementById('lb-text').innerHTML=html;
+  const b=document.getElementById('live-banner');
+  b.classList.add('show');
+  S.unread++;updateBadge();
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(()=>b.classList.remove('show'),3800);
+}
+document.getElementById('lb-inner').onclick=()=>{document.getElementById('live-banner').classList.remove('show');openNotif();};
+function updateBadge(){const b=document.getElementById('notif-badge');b.textContent=Math.min(9,S.unread);b.style.display=S.unread?'flex':'none';}
+
+// ══════════════════ STORIES ══════════════════
+function buildStories(){
+  document.getElementById('stories').innerHTML=STORIES.map(s=>`
+    <div class="story" onclick="openStory('${s.id}')">
+      <div class="story-ring${S.seenStories.has(s.id)?' seen':''}"><div class="story-inner" style="background:linear-gradient(145deg,${s.grad[0]},${s.grad[1]})">${s.emoji}</div></div>
+      <div class="story-name">${s.name}</div>
+    </div>`).join('');
+}
+let curStory=null,curSlide=0,storyTimer=null;
+function openStory(sid){
+  curStory=STORIES.find(s=>s.id===sid);if(!curStory)return;
+  demoEvt('watched_story');
+  curSlide=0;S.seenStories.add(sid);
+  document.getElementById('story-viewer').classList.add('open');
+  document.getElementById('sv-av').textContent=curStory.emoji;
+  document.getElementById('sv-av').style.background=`linear-gradient(145deg,${curStory.grad[0]},${curStory.grad[1]})`;
+  document.getElementById('sv-name').textContent=curStory.name;
+  document.getElementById('sv-time').textContent='tonight';
+  document.getElementById('sv-cta').onclick=()=>{closeStory();openSheet(curStory.moveId);};
+  renderSlide();
+  buildStories();
+}
+function renderSlide(){
+  const sl=curStory.slides[curSlide];
+  document.getElementById('sv-body').style.background=`linear-gradient(160deg,${curStory.grad[0]},${curStory.grad[1]})`;
+  document.getElementById('sv-emoji').textContent=curStory.emoji;
+  document.getElementById('sv-title').textContent=sl.title;
+  document.getElementById('sv-sub').textContent=sl.sub;
+  // progress
+  document.getElementById('sv-progress').innerHTML=curStory.slides.map((_,i)=>
+    `<div class="sv-seg"><div class="sv-seg-fill" style="width:${i<curSlide?'100%':'0'}" id="seg-${i}"></div></div>`).join('');
+  clearInterval(storyTimer);
+  let p=0;
+  const fill=document.getElementById('seg-'+curSlide);
+  storyTimer=setInterval(()=>{p+=1.25;if(fill)fill.style.width=p+'%';if(p>=100)storyNext();},50);
+  // re-anim emoji
+  const em=document.getElementById('sv-emoji');em.style.animation='none';em.offsetHeight;em.style.animation='';
+}
+function storyNext(){
+  if(!curStory)return;
+  if(curSlide<curStory.slides.length-1){curSlide++;renderSlide();}
+  else closeStory();
+}
+function storyPrev(){if(!curStory)return;if(curSlide>0){curSlide--;renderSlide();}}
+function closeStory(){clearInterval(storyTimer);curStory=null;document.getElementById('story-viewer').classList.remove('open');}
+
+// ══════════════════ NOTIF ══════════════════
+function openNotif(){
+  document.getElementById('notif-list').innerHTML=NOTIFS.map(n=>`
+    <div class="notif-item${n.unread?' notif-unread':''}"><div class="notif-icon">${n.icon}</div>
+    <div class="notif-content"><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div></div>`).join('');
+  document.getElementById('notif-panel').classList.add('open');
+  S.notifOpen=true;S.unread=0;updateBadge();
+}
+function closeNotif(){document.getElementById('notif-panel').classList.remove('open');S.notifOpen=false;}
+
+// ══════════════════ CREATE ══════════════════
+function openCreate(){
+  document.getElementById('create-cats').innerHTML=CATS.map(c=>`<div class="create-cat${S.createCat===c.id?' sel':''}" onclick="selCreateCat(this,'${c.id}')">${c.emoji} ${c.label}</div>`).join('');
+  document.getElementById('create-overlay').classList.add('open');
+  document.getElementById('create-panel').classList.add('open');
+}
+function closeCreate(){document.getElementById('create-overlay').classList.remove('open');document.getElementById('create-panel').classList.remove('open');}
+function selCreateCat(el,id){S.createCat=id;document.querySelectorAll('.create-cat').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}
+function submitCreate(){
+  const title=document.getElementById('ci-title').value.trim();
+  if(!title){toast('Give the move a name first');return;}
+  const cat=S.createCat||'other';
+  const catData=CATS.find(c=>c.id===cat);
+  const nm={id:'m'+Date.now(),title,cat,emoji:catData?.emoji||'✨',grad:['#3A4356','#1A1F2B'],
+    loc:document.getElementById('ci-loc').value.trim()||'Pittsburgh',
+    time:'Tonight · '+(document.getElementById('ci-time').value||'TBD'),
+    lat:40.432+Math.random()*.03,lng:-79.995+Math.random()*.05,
+    att:1,max:parseInt(document.getElementById('ci-max').value)||10,hot:false,
+    host:'Jordan K.',hostAv:'av1',addr:'Address in the group chat',desc:'Fresh move, just dropped. Be early.'};
+  MOVES.unshift(nm);S.rsvps.add(nm.id);S.rxn[nm.id]={fire:0,hype:0,there:0};
+  demoEvt('created_move');
+  closeCreate();buildFeed();confettiBurst();
+  toast('Move posted 🔥 Your friends can see it now');
+  document.getElementById('ci-title').value='';document.getElementById('ci-loc').value='';
+}
+
+// ══════════════════ SEARCH / CAT ══════════════════
+function onSearch(v){S.search=v.toLowerCase();document.getElementById('search-clear').style.display=v?'block':'none';buildFeed();}
+function clearSearch(){document.getElementById('search-in').value='';onSearch('');}
+function setCat(id){S.activeCat=S.activeCat===id?null:id;buildFeed();}
+
+// ══════════════════ RSVP ══════════════════
+function rsvpState(mid){const m=MOVES.find(x=>x.id===mid);if(S.rsvps.has(mid))return'going';if(S.waitlists.has(mid))return'waitlisted';if(m&&m.att>=m.max)return'full';return'open';}
+function rsvpLabel(mid){const s=rsvpState(mid);return s==='going'?'Going ✓':s==='waitlisted'?'Waitlisted':s==='full'?'Join waitlist':"I'm in";}
+function rsvpClass(mid){const s=rsvpState(mid);return'rsvp '+(s==='going'?'rsvp-going':s==='waitlisted'?'rsvp-waitlist':s==='full'?'rsvp-full':'rsvp-join');}
+function doRsvp(mid){
+  const m=MOVES.find(x=>x.id===mid),st=rsvpState(mid);
+  if(st==='going'){S.rsvps.delete(mid);m.att--;toast('Removed from your moves');}
+  else if(st==='waitlisted'){S.waitlists.delete(mid);toast('Off the waitlist');}
+  else if(st==='full'){S.waitlists.add(mid);toast("You're on the waitlist");}
+  else{S.rsvps.add(mid);m.att++;confettiBurst();toast("Locked in 🔥");demoEvt('joined_move');}
+  buildFeed();
+  if(S.openMoveId===mid)openSheet(mid);
+}
+
+// ══════════════════ FRIENDS HELPERS ══════════════════
+function friendsForMove(mid){return FRIENDS_GOING[mid]||[];}
+function frAvatars(names,size=26,cls='fr-av'){return names.slice(0,4).map((n,i)=>`<div class="${cls} ${AV_CLS[i]}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.45)}px">${n[0]}</div>`).join('');}
+function friendsRowHTML(mid){
+  const names=friendsForMove(mid);if(!names.length)return'';
+  const label=names.length===1?`${names[0]} is going`:names.length===2?`${names[0]} & ${names[1]} are going`:`${names[0]}, ${names[1]} +${names.length-2} more`;
+  return`<div class="friends-row"><div class="fr-avatars">${frAvatars(names)}</div><div class="fr-text"><div class="fr-names">${label}</div><div class="fr-sub">Your friends are there</div></div></div>`;
+}
+
+// ══════════════════ FEED ══════════════════
+function buildFeed(){
+  document.getElementById('cat-row').innerHTML=CATS.map(c=>`<div class="cat${S.activeCat===c.id?' active':''}" data-cat="${c.id}" onclick="setCat('${c.id}')"><span>${c.emoji}</span>${c.label}</div>`).join('');
+  let moves=[...MOVES];
+  if(S.activeCat)moves=moves.filter(m=>m.cat===S.activeCat);
+  if(S.search)moves=moves.filter(m=>m.title.toLowerCase().includes(S.search)||m.loc.toLowerCase().includes(S.search)||(CATS.find(c=>c.id===m.cat)?.label||'').toLowerCase().includes(S.search));
+  const feed=document.getElementById('feed');
+  if(!moves.length){feed.innerHTML=`<div class="feed-empty"><div class="feed-empty-icon">${S.search?'🔍':'🏙'}</div>${S.search?`Nothing matching "${S.search}" right now`:'Nothing in this category tonight'}</div>`;return;}
+  const hot=moves.filter(m=>m.hot),other=moves.filter(m=>!m.hot);
+  let html='';
+  if(hot.length){html+=`<div class="section-header"><div class="section-label"><span class="pulse-dot"></span>Trending now</div><div class="section-count">${hot.length} moves</div></div>`+hot.map(buildCard).join('');}
+  if(other.length){html+=`<div class="section-header"><div class="section-label">Tonight</div><div class="section-count">${other.length} moves</div></div>`+other.map(buildCard).join('');}
+  feed.innerHTML=html;
+}
+function buildCard(m){
+  const pct=Math.min(100,Math.round(m.att/m.max*100));
+  const fill=pct>=90?'full':pct>=70?'warn':'';
+  const rxn=S.rxn[m.id]||{fire:0,hype:0,there:0};
+  const myR=S.myRxn[m.id]||{};
+  const cat=CATS.find(c=>c.id===m.cat);
+  const badges=[];
+  if(m.hot)badges.push(`<span class="badge badge-hot">🔥 Trending</span>`);
+  if(m.private)badges.push(`<span class="badge badge-private">🔒 Private</span>`);
+  if(m.cat==='scene')badges.push(`<span class="badge badge-scene">The Scene</span>`);
+  if(m.cat==='justu')badges.push(`<span class="badge badge-justu">Just Us</span>`);
+  badges.push(`<span class="badge badge-cat">${cat?.emoji||'✨'} ${cat?.label||'Move'}</span>`);
+  return`<div class="card${m.hot?' hot':''}${m.private?' private':''}${m.cat==='scene'?' scene-card':''}" data-act="open" data-arg="${m.id}">
+    <div class="card-cover" style="background:linear-gradient(145deg,${m.grad[0]},${m.grad[1]})">
+      <div class="card-cover-grad"></div>
+      <div class="card-badges">${badges.join('')}</div>
+      <div class="card-att"><div class="att-bar"><div class="att-fill ${fill}" style="width:${pct}%"></div></div>${m.att}/${m.max}</div>
+      <div class="card-cover-bottom"><div class="card-time-tag">${m.time}</div><div class="card-title">${m.title}</div></div>
+    </div>
+    <div class="card-body">
+      <div class="card-meta"><span class="meta-pill">📍 ${m.loc}</span><span class="meta-sep"></span><span class="meta-pill" style="color:${pct>=90?'var(--red)':pct>=70?'var(--justu)':'inherit'}">${pct}% full</span></div>
+      ${friendsRowHTML(m.id)}
+      <div class="card-actions">
+        <div class="hype-row">
+          <button class="hype-btn${myR.fire?' fired':''}" data-act="rxn" data-arg="${m.id}-fire">🔥</button><span class="hype-ct">${rxn.fire}</span>
+          <button class="hype-btn${myR.hype?' fired':''}" data-act="rxn" data-arg="${m.id}-hype">⚡</button><span class="hype-ct">${rxn.hype}</span>
+          <button class="hype-btn${myR.there?' fired':''}" data-act="rxn" data-arg="${m.id}-there">👀</button><span class="hype-ct">${rxn.there}</span>
+        </div>
+        <button class="${rsvpClass(m.id)}" data-act="rsvp" data-arg="${m.id}">${rsvpLabel(m.id)}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════ SHEET ══════════════════
+function openSheet(mid){
+  S.openMoveId=mid;
+  const m=MOVES.find(x=>x.id===mid);if(!m)return;
+  const pct=Math.min(100,Math.round(m.att/m.max*100));
+  const rxn=S.rxn[mid]||{fire:0,hype:0,there:0};
+  const myR=S.myRxn[mid]||{};
+  const frNames=friendsForMove(mid);
+  const allGoing=ALL_GOING[mid]||[];
+  const energy=Math.min(100,Math.round((rxn.fire+rxn.hype+rxn.there)/1.1));
+  const msgs=(MSGS[mid]||[]).map(msg=>`<div class="msg"><div class="msg-av ${msg.av}">${msg.who[0]}</div><div class="msg-body"><div class="msg-who">${msg.who}</div><div class="msg-text">${msg.text}</div></div></div>`).join('');
+
+  const goingHTML=allGoing.length?(()=>{
+    const real=allGoing.filter(n=>!n.startsWith('+'));
+    const extra=allGoing.find(n=>n.startsWith('+'));
+    return`<div class="sheet-sec"><div class="sheet-sec-label">Who's going (${m.att})</div><div class="going-grid">${
+      real.map((n,i)=>`<div class="going-av"><div class="going-av-circle ${AV_CLS[i%6]}">${n[0]}</div><div class="going-av-name">${n.split(' ')[0]}</div></div>`).join('')
+    }${extra?`<div class="going-av"><div class="going-more">${extra}</div><div class="going-av-name">more</div></div>`:''}</div></div>`;
+  })():'';
+
+  const frSection=frNames.length?`<div class="sheet-sec"><div class="sheet-sec-label">Your friends</div>
+    <div class="sheet-fr-row"><div style="display:flex">${frAvatars(frNames,32,'sheet-fr-av')}</div>
+    <div style="flex:1;margin-left:10px"><div style="font-size:13px;font-weight:800;color:var(--blaze)">${frNames.join(', ')}</div>
+    <div style="font-size:11px;color:color-mix(in srgb,var(--signal) 50%,transparent);font-weight:600;margin-top:2px">already locked in</div></div></div></div>`:'';
+
+  const photos=['🌃','🎶','🥂','📸'].map((e,i)=>`<div class="sheet-photo" style="background:linear-gradient(${135+i*40}deg,${m.grad[0]}66,${m.grad[1]})">${e}</div>`).join('');
+
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-cover" style="background:linear-gradient(145deg,${m.grad[0]},${m.grad[1]})">${m.emoji}</div>
+    <div class="sheet-title">${m.title}</div>
+    <div class="sheet-meta">
+      <span class="meta-pill">📍 ${m.loc}</span><span class="meta-sep"></span>
+      <span class="meta-pill">🕘 ${m.time}</span><span class="meta-sep"></span>
+      <span class="meta-pill" style="color:${pct>=90?'var(--red)':pct>=70?'var(--justu)':'var(--text2)'}">${m.att}/${m.max} going</span>
+    </div>
+    ${m.addr?`<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:14px">
+      <span style="font-size:15px">🧭</span>
+      <span style="font-size:13.5px;font-weight:700;color:var(--text1);letter-spacing:-.1px">${m.private&&!S.rsvps.has(mid)?'Address drops when you lock in':m.addr}</span>
+    </div>`:''}
+    <div class="sheet-desc">${m.desc}</div>
+    <div class="host-row">
+      <div class="host-av ${m.hostAv||'av1'}">${(m.host||'?')[0]}</div>
+      <div><div class="host-name">${m.host||'Unknown'}</div><div class="host-tag">Hosting · usually goes all out</div></div>
+      <button class="host-btn" data-act="follow" data-arg="${mid}">Follow</button>
+    </div>
+    <div class="sa-row">
+      <button class="sa sa-going${S.rsvps.has(mid)?' is-going':''}" data-act="rsvp" data-arg="${mid}">${rsvpLabel(mid)}</button>
+      <button class="sa sa-share" data-act="share" data-arg="${mid}">Tell friends</button>
+      <button class="sa-dir" data-act="dir" data-arg="${mid}">🧭</button>
+    </div>
+    <div class="vibe-meter">
+      <div class="sheet-sec-label" style="margin-bottom:0">Vibe check</div>
+      <div class="vibe-track"><div class="vibe-fill" style="width:${energy}%"></div></div>
+      <div class="vibe-labels"><span>chill</span><span>${energy>=75?'ELECTRIC ⚡':energy>=45?'buzzing':'warming up'}</span><span>unhinged</span></div>
+    </div>
+    <div class="sheet-sec"><div class="sheet-sec-label">The scene</div><div class="sheet-photos">${photos}</div></div>
+    ${frSection}
+    ${goingHTML}
+    <div class="sheet-sec">
+      <div class="sheet-sec-label">Reactions</div>
+      <div class="hype-row">
+        <button class="hype-btn${myR.fire?' fired':''}" data-act="rxn" data-arg="${mid}-fire" style="font-size:22px;padding:10px 12px">🔥</button><span class="hype-ct" style="font-size:14px">${rxn.fire}</span>
+        <button class="hype-btn${myR.hype?' fired':''}" data-act="rxn" data-arg="${mid}-hype" style="font-size:22px;padding:10px 12px">⚡</button><span class="hype-ct" style="font-size:14px">${rxn.hype}</span>
+        <button class="hype-btn${myR.there?' fired':''}" data-act="rxn" data-arg="${mid}-there" style="font-size:22px;padding:10px 12px">👀</button><span class="hype-ct" style="font-size:14px">${rxn.there}</span>
+      </div>
+    </div>
+    <div class="sheet-sec">
+      <div class="sheet-sec-label">Group chat · live</div>
+      <div class="msg-list">${msgs}</div>
+      <div class="chat-input-row"><input class="chat-in" id="chat-in-${mid}" placeholder="Say something…"><div class="chat-send" data-act="chat-send" data-arg="${mid}">➤</div></div>
+    </div>`;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){S.openMoveId=null;document.getElementById('sheet-overlay').classList.remove('open');document.getElementById('sheet').classList.remove('open');}
+
+// ══════════════════ FRIENDS SCREEN ══════════════════
+function buildFriends(){
+  document.getElementById('online-strip').innerHTML=FRIENDS_LIST.map(f=>`
+    <div class="online-av"><div class="online-av-wrap"><div class="online-circle ${f.av}">${f.init}</div><div class="online-dot ${f.online?'on':'off'}"></div></div><div class="online-name">${f.name.split(' ')[0]}</div></div>`).join('');
+  document.getElementById('friends-list').innerHTML=`<div style="padding-bottom:calc(var(--tab-h) + 24px)">`+FRIENDS_LIST.map(f=>{
+    const gm=f.going.map(mid=>MOVES.find(m=>m.id===mid)).filter(Boolean);
+    return`<div class="friend-row">
+      <div class="friend-av ${f.av}">${f.init}<div class="friend-on-dot ${f.online?'on':'off'}"></div></div>
+      <div class="friend-info">
+        <div class="friend-name">${f.name}</div>
+        <div class="friend-status">${f.online?'🟢':'⚫'} ${f.status}</div>
+        ${gm.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${gm.map(m=>`<div class="friend-going-tag" data-act="open" data-arg="${m.id}">${m.emoji} ${m.title.length>24?m.title.slice(0,22)+'…':m.title}</div>`).join('')}</div>`:''}
+      </div>
+    </div>`;}).join('')+`</div>`;
+}
+
+// ══════════════════ PROFILE ══════════════════
+function buildProfile(){
+  const myMoves=[...S.rsvps].map(mid=>MOVES.find(m=>m.id===mid)).filter(Boolean);
+  document.getElementById('ps-moves').textContent=24+myMoves.length;
+  document.getElementById('ps-tonight').textContent=myMoves.length;
+  document.getElementById('profile-moves').innerHTML=myMoves.length?myMoves.map(m=>`
+    <div class="profile-move-row">
+      <div class="profile-move-icon" style="background:linear-gradient(135deg,${m.grad[0]},${m.grad[1]})">${m.emoji}</div>
+      <div class="profile-move-info"><div class="profile-move-title">${m.title}<span class="profile-move-badge">Going ✓</span></div><div class="profile-move-meta">📍 ${m.loc} · ${m.time}</div></div>
+    </div>`).join(''):`<div class="profile-empty">Nothing locked in yet. Go find a move</div>`;
+  document.getElementById('profile-activity').innerHTML=`
+    <div class="profile-move-row"><div class="profile-move-icon" style="background:var(--bg3);font-size:16px">🔥</div><div class="profile-move-info"><div class="profile-move-title">Reacted to Larimer Rooftop Party</div><div class="profile-move-meta">14 minutes ago</div></div></div>
+    <div class="profile-move-row"><div class="profile-move-icon" style="background:var(--bg3);font-size:16px">💬</div><div class="profile-move-info"><div class="profile-move-title">Chatted in Larimer Rooftop Party</div><div class="profile-move-meta">31 minutes ago</div></div></div>
+    <div class="profile-move-row"><div class="profile-move-icon" style="background:var(--bg3);font-size:16px">✓</div><div class="profile-move-info"><div class="profile-move-title">Locked in Lawrenceville Bar Crawl</div><div class="profile-move-meta">2 hours ago</div></div></div>`;
+}
+
+// ══════════════════ EVENTS ══════════════════
+document.addEventListener('click',e=>{
+  if(S.notifOpen&&!document.getElementById('notif-panel').contains(e.target)){closeNotif();return;}
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const act=el.dataset.act,arg=el.dataset.arg;
+  if(act==='open')openSheet(arg);
+  else if(act==='rsvp'){doRsvp(arg);e.stopPropagation();}
+  else if(act==='rxn'){
+    const[mid,type]=arg.split('-');
+    const myR=S.myRxn[mid]||{};
+    if(myR[type]){S.rxn[mid][type]--;delete myR[type];}
+    else{S.rxn[mid][type]=(S.rxn[mid][type]||0)+1;myR[type]=true;}
+    S.myRxn[mid]=myR;buildFeed();
+    if(S.openMoveId===mid)openSheet(mid);
+    e.stopPropagation();
+  }
+  else if(act==='sb-open'){openSubmitSpot();}
+  else if(act==='rq-open'){openReviewQueue();}
+  else if(act==='sb-check'){runSubmitCheck();}
+  else if(act==='sb-cat'){
+    S.submitCat=arg;
+    document.querySelectorAll('#sb-cats .create-cat').forEach(x=>
+      x.classList.toggle('sel',x.dataset.arg===arg));
+  }
+  else if(act==='rq-act'){actOnQueue(arg);}
+  else if(act==='ask-eg'){submitAsk(arg);}
+  else if(act==='ask-open'){openSpot(arg);}
+  else if(act==='spot-map'){
+    const sp=SPOTS.find(x=>x.id===arg);
+    if(sp){closeSheet();mapState.scale=9;centerOn(sp.lat,sp.lng);goScreen('scr-map');toast(sp.name);}
+    e.stopPropagation();
+  }
+  else if(act==='spot-move'){
+    const sp=SPOTS.find(x=>x.id===arg);
+    if(sp){
+      closeSheet();openCreate();
+      const t=document.getElementById('ci-title'),l=document.getElementById('ci-loc');
+      if(t)t.value='Meet at '+sp.name;
+      if(l)l.value=sp.area;
+      toast('Prefilled from '+sp.name);
+    }
+    e.stopPropagation();
+  }
+  else if(act==='share'){toast('Link copied 🔗 Send it to the group chat');e.stopPropagation();}
+  else if(act==='dir'){
+    const mv=MOVES.find(x=>x.id===arg);
+    if(mv&&mv.private&&!S.rsvps.has(arg))toast('Lock in first to get the address');
+    else toast('Directions to '+((mv&&mv.addr)||'the move')+' 🧭');
+    e.stopPropagation();
+  }
+  else if(act==='follow'){el.textContent='Following ✓';el.style.color='var(--violet2)';toast('You\'ll get notified when they drop moves');e.stopPropagation();}
+  else if(act==='chat-send'){
+    const inp=document.getElementById(`chat-in-${arg}`);
+    if(inp?.value.trim()){
+      (MSGS[arg]||(MSGS[arg]=[])).push({who:'Jordan K.',av:'av1',text:inp.value.trim()});
+      const list=document.querySelector('#sheet-body .msg-list');
+      if(list)list.insertAdjacentHTML('beforeend',`<div class="msg"><div class="msg-av av1">J</div><div class="msg-body"><div class="msg-who">Jordan K.</div><div class="msg-text">${inp.value.trim().replace(/</g,'&lt;')}</div></div></div>`);
+      inp.value='';demoEvt('sent_chat');
+    }
+    e.stopPropagation();
+  }
+});
+
+// ══════════════════ MAP ══════════════════
+// ── REAL PITTSBURGH GEOGRAPHY ──
+// Rivers: the Allegheny (NE) and Monongahela (SE) meet at Point State Park
+// (40.4416,-80.0106) to form the Ohio (NW). Traced from actual river courses.
+const RIVER_ALLEGHENY=[
+ [40.4416,-80.0106],[40.4432,-80.0040],[40.4440,-79.9980],[40.4450,-79.9920],
+ [40.4462,-79.9860],[40.4482,-79.9800],[40.4510,-79.9745],[40.4548,-79.9700],
+ [40.4590,-79.9660],[40.4640,-79.9625],[40.4690,-79.9580],[40.4726,-79.9520],
+ [40.4748,-79.9450],[40.4760,-79.9370],[40.4785,-79.9290],[40.4820,-79.9220],
+ [40.4870,-79.9160],[40.4930,-79.9120],[40.4950,-79.9020],[40.4930,-79.8890],
+ [40.4890,-79.8760],[40.4900,-79.8610],[40.4990,-79.8460],[40.5100,-79.8360],
+ [40.5220,-79.8310],[40.5330,-79.8210],[40.5390,-79.8060],[40.5450,-79.7900]];
+const RIVER_MON=[
+ [40.4416,-80.0106],[40.4378,-80.0058],[40.4342,-80.0010],[40.4316,-79.9950],
+ [40.4300,-79.9880],[40.4295,-79.9800],[40.4300,-79.9720],[40.4312,-79.9640],
+ [40.4322,-79.9560],[40.4310,-79.9480],[40.4280,-79.9420],[40.4240,-79.9380],
+ [40.4190,-79.9350],[40.4140,-79.9300],[40.4100,-79.9230],[40.4080,-79.9100],
+ [40.4070,-79.8950],[40.4110,-79.8800],[40.4180,-79.8700],[40.4230,-79.8580],
+ [40.4200,-79.8450],[40.4080,-79.8350],[40.3950,-79.8310],[40.3820,-79.8380],
+ [40.3700,-79.8450],[40.3550,-79.8480]];
+const RIVER_OHIO=[
+ [40.4416,-80.0106],[40.4438,-80.0160],[40.4462,-80.0210],[40.4498,-80.0265],
+ [40.4545,-80.0320],[40.4600,-80.0370],[40.4660,-80.0420],[40.4760,-80.0560],
+ [40.4900,-80.0700],[40.5050,-80.0850],[40.5180,-80.1010],[40.5300,-80.1250],
+ [40.5380,-80.1500],[40.5400,-80.1750],[40.5360,-80.1950],[40.5500,-80.2150],
+ [40.5700,-80.2300],[40.5890,-80.2350]];
+const RIVERS=[RIVER_ALLEGHENY,RIVER_MON,RIVER_OHIO];
+
+// Real bridges, real positions
+const BRIDGES=[
+ {n:'Fort Pitt',pts:[[40.4378,-80.0112],[40.4416,-80.0096]]},
+ {n:'Fort Duquesne',pts:[[40.4422,-80.0092],[40.4460,-80.0108]]},
+ {n:'West End',pts:[[40.4478,-80.0238],[40.4432,-80.0258]]},
+ {n:'Clemente (6th)',pts:[[40.4432,-79.9990],[40.4470,-80.0002]]},
+ {n:'Warhol (7th)',pts:[[40.4438,-79.9968],[40.4476,-79.9980]]},
+ {n:'Rachel Carson (9th)',pts:[[40.4444,-79.9942],[40.4482,-79.9954]]},
+ {n:'16th St',pts:[[40.4472,-79.9838],[40.4512,-79.9862]]},
+ {n:'31st St',pts:[[40.4545,-79.9682],[40.4592,-79.9705]]},
+ {n:'40th St',pts:[[40.4648,-79.9612],[40.4700,-79.9635]]},
+ {n:'Smithfield St',pts:[[40.4344,-79.9972],[40.4304,-79.9935]]},
+ {n:'Liberty',pts:[[40.4364,-79.9912],[40.4312,-79.9868]]},
+ {n:'Birmingham',pts:[[40.4335,-79.9762],[40.4288,-79.9742]]},
+ {n:'Hot Metal',pts:[[40.4295,-79.9645],[40.4262,-79.9620]]}];
+
+// Real streets
+const ROADS={
+ fw:[ // I-376 Parkway East, I-279, I-579, Rt 28
+  [[40.4402,-80.0150],[40.4388,-80.0062],[40.4360,-79.9975],[40.4350,-79.9885],[40.4358,-79.9805],[40.4372,-79.9725],[40.4382,-79.9645],[40.4368,-79.9555],[40.4340,-79.9465],[40.4312,-79.9385],[40.4292,-79.9285],[40.4302,-79.9185],[40.4322,-79.9085]],
+  [[40.4452,-80.0128],[40.4492,-80.0118],[40.4552,-80.0100],[40.4622,-80.0082],[40.4702,-80.0072],[40.4802,-80.0092]],
+  [[40.4352,-79.9932],[40.4402,-79.9912],[40.4442,-79.9902],[40.4472,-79.9892]],
+  [[40.4522,-79.9902],[40.4562,-79.9822],[40.4612,-79.9742],[40.4682,-79.9662],[40.4742,-79.9562],[40.4782,-79.9462]]],
+ ar:[ // Penn, Liberty, Fifth, Forbes, Carson, Butler, Blvd of Allies, Bigelow, Baum, E Ohio, Grandview
+  [[40.4415,-80.0080],[40.4429,-80.0020],[40.4440,-79.9965],[40.4452,-79.9905],[40.4470,-79.9820],[40.4490,-79.9720],[40.4525,-79.9600],[40.4570,-79.9480],[40.4600,-79.9380],[40.4620,-79.9280],[40.4630,-79.9200]],
+  [[40.4410,-80.0040],[40.4425,-79.9985],[40.4438,-79.9925],[40.4450,-79.9860],[40.4468,-79.9780],[40.4500,-79.9660],[40.4530,-79.9560],[40.4560,-79.9460],[40.4590,-79.9380]],
+  [[40.4408,-80.0005],[40.4410,-79.9940],[40.4415,-79.9870],[40.4425,-79.9790],[40.4440,-79.9700],[40.4450,-79.9620],[40.4478,-79.9530],[40.4510,-79.9440],[40.4530,-79.9350],[40.4540,-79.9260]],
+  [[40.4396,-80.0000],[40.4398,-79.9930],[40.4402,-79.9860],[40.4412,-79.9780],[40.4425,-79.9700],[40.4438,-79.9620],[40.4445,-79.9530],[40.4420,-79.9440],[40.4400,-79.9350]],
+  [[40.4300,-80.0050],[40.4288,-79.9960],[40.4282,-79.9860],[40.4285,-79.9760],[40.4295,-79.9660],[40.4300,-79.9580],[40.4285,-79.9500]],
+  [[40.4640,-79.9720],[40.4652,-79.9660],[40.4665,-79.9590],[40.4680,-79.9510],[40.4700,-79.9430],[40.4715,-79.9360]],
+  [[40.4380,-80.0010],[40.4372,-79.9920],[40.4368,-79.9830],[40.4370,-79.9740]],
+  [[40.4440,-79.9960],[40.4460,-79.9880],[40.4480,-79.9800],[40.4470,-79.9700],[40.4455,-79.9640]],
+  [[40.4520,-79.9500],[40.4550,-79.9420],[40.4570,-79.9340],[40.4590,-79.9260]],
+  [[40.4530,-80.0080],[40.4535,-80.0000],[40.4540,-79.9920],[40.4550,-79.9840]],
+  [[40.4340,-80.0250],[40.4368,-80.0192],[40.4392,-80.0132],[40.4400,-80.0082]]],
+ lo:[ // Grant, Smithfield, Wood, downtown cross grid, Murray, Highland, Walnut, Federal, Negley, 40th/44th
+  [[40.4378,-79.9958],[40.4420,-79.9948],[40.4448,-79.9942]],
+  [[40.4348,-79.9978],[40.4432,-79.9968]],
+  [[40.4360,-80.0000],[40.4428,-79.9992]],
+  [[40.4400,-80.0028],[40.4436,-80.0012]],
+  [[40.4380,-79.9230],[40.4330,-79.9242],[40.4280,-79.9252]],
+  [[40.4620,-79.9242],[40.4680,-79.9232],[40.4740,-79.9222]],
+  [[40.4515,-79.9352],[40.4520,-79.9282],[40.4525,-79.9212]],
+  [[40.4468,-80.0062],[40.4520,-80.0062],[40.4570,-80.0072]],
+  [[40.4500,-79.9330],[40.4560,-79.9340],[40.4620,-79.9350]],
+  [[40.4648,-79.9612],[40.4620,-79.9560],[40.4590,-79.9510]],
+  [[40.4665,-79.9560],[40.4635,-79.9510],[40.4600,-79.9460]],
+  [[40.4498,-79.9770],[40.4520,-79.9760],[40.4545,-79.9745]]],
+};
+// Fill out the rest of the city so no district reads as blank land
+ROADS.ar.push(
+ [[40.4290,-80.0180],[40.4250,-80.0230],[40.4200,-80.0290],[40.4150,-80.0350],[40.4090,-80.0400]], // W Liberty Ave
+ [[40.4310,-80.0100],[40.4240,-80.0120],[40.4170,-80.0160],[40.4100,-80.0210],[40.4030,-80.0250]], // Saw Mill Run
+ [[40.4200,-79.9880],[40.4160,-79.9800],[40.4130,-79.9700],[40.4120,-79.9600]],                     // Carrick / Brownsville
+ [[40.4390,-80.0300],[40.4420,-80.0400],[40.4460,-80.0500],[40.4500,-80.0600]],                     // Steuben / West End
+ [[40.4530,-80.0200],[40.4560,-80.0120],[40.4590,-80.0040],[40.4620,-79.9960]],                     // Brighton Rd
+ [[40.4560,-79.9880],[40.4600,-79.9820],[40.4650,-79.9760],[40.4700,-79.9700]],                     // Troy Hill / Spring Garden
+ [[40.4360,-79.9420],[40.4330,-79.9330],[40.4300,-79.9240],[40.4280,-79.9150],[40.4270,-79.9050]],  // Beechwood / Greenfield
+ [[40.4180,-79.9500],[40.4230,-79.9420],[40.4280,-79.9350],[40.4330,-79.9280]],                     // Saline / Hazelwood
+ [[40.4440,-79.9160],[40.4420,-79.9060],[40.4400,-79.8960],[40.4390,-79.8860]],                     // Penn Ave to Wilkinsburg
+ [[40.4620,-79.9060],[40.4580,-79.8960],[40.4540,-79.8860],[40.4500,-79.8760]],                     // Frankstown Rd
+ [[40.4270,-79.9000],[40.4230,-79.8920],[40.4180,-79.8850],[40.4120,-79.8790]]                      // Braddock Ave
+);
+ROADS.lo.push(
+ [[40.4260,-80.0240],[40.4210,-80.0210],[40.4160,-80.0180]],
+ [[40.4180,-80.0330],[40.4150,-80.0260],[40.4120,-80.0190]],
+ [[40.4230,-79.9950],[40.4190,-79.9880],[40.4160,-79.9810]],
+ [[40.4480,-80.0300],[40.4520,-80.0260],[40.4560,-80.0220]],
+ [[40.4600,-79.9900],[40.4640,-79.9860],[40.4680,-79.9820]],
+ [[40.4340,-79.9280],[40.4300,-79.9200],[40.4270,-79.9120]],
+ [[40.4400,-79.9280],[40.4370,-79.9200],[40.4350,-79.9120]],
+ [[40.4520,-79.9160],[40.4560,-79.9100],[40.4600,-79.9040]],
+ [[40.4460,-79.8900],[40.4420,-79.8830],[40.4380,-79.8760]],
+ [[40.4700,-79.9440],[40.4740,-79.9380],[40.4780,-79.9320]]
+);
+
+// Street name labels {t, lat, lng, rot(deg)} — shown when zoomed in
+const STREET_LABELS=[
+ {t:'PENN AVE',lat:40.4478,lng:-79.9790,r:-24},
+ {t:'PENN AVE',lat:40.4602,lng:-79.9345,r:-18},
+ {t:'LIBERTY AVE',lat:40.4482,lng:-79.9720,r:-26},
+ {t:'FIFTH AVE',lat:40.4428,lng:-79.9745,r:-4},
+ {t:'FORBES AVE',lat:40.4405,lng:-79.9820,r:-2},
+ {t:'E CARSON ST',lat:40.4283,lng:-79.9810,r:-2},
+ {t:'BUTLER ST',lat:40.4672,lng:-79.9550,r:-22},
+ {t:'BIGELOW BLVD',lat:40.4478,lng:-79.9755,r:-38},
+ {t:'BAUM BLVD',lat:40.4552,lng:-79.9415,r:-22},
+ {t:'E OHIO ST',lat:40.4537,lng:-79.9960,r:-2},
+ {t:'GRANDVIEW AVE',lat:40.4375,lng:-80.0165,r:-38},
+ {t:'MURRAY AVE',lat:40.4330,lng:-79.9243,r:88},
+ {t:'HIGHLAND AVE',lat:40.4682,lng:-79.9230,r:88},
+ {t:'WALNUT ST',lat:40.4519,lng:-79.9282,r:88},
+ {t:'GRANT ST',lat:40.4400,lng:-79.9952,r:78}];
+const FW_SHIELDS=[
+ {t:'376',lat:40.4352,lng:-79.9700},{t:'279',lat:40.4620,lng:-80.0082},
+ {t:'28',lat:40.4650,lng:-79.9700},{t:'579',lat:40.4430,lng:-79.9905}];
+
+// ── METRO LAYER (visible when zoomed out) ──
+const METRO_FW=[
+ // I-79 north-south (Cranberry corridor)
+ [[40.3000,-80.1050],[40.3400,-80.1100],[40.3800,-80.1080],[40.4200,-80.1150],[40.4600,-80.1200],[40.5000,-80.1120],[40.5400,-80.1060],[40.5800,-80.1010],[40.6200,-80.1030],[40.6600,-80.1060],[40.7100,-80.1080]],
+ // I-76 PA Turnpike east-west
+ [[40.6750,-80.2600],[40.6780,-80.2000],[40.6800,-80.1400],[40.6790,-80.0900],[40.6740,-80.0300],[40.6640,-79.9700],[40.6540,-79.9100],[40.6440,-79.8500],[40.6290,-79.7900],[40.6100,-79.7300]],
+ // I-279 north to I-79
+ [[40.4802,-80.0092],[40.5100,-80.0200],[40.5400,-80.0400],[40.5700,-80.0620],[40.5950,-80.0850],[40.6080,-80.1010]],
+ // US-19 through Wexford to Cranberry
+ [[40.4700,-80.0160],[40.5000,-80.0020],[40.5300,-79.9960],[40.5600,-80.0110],[40.5900,-80.0400],[40.6240,-80.0560],[40.6550,-80.0800],[40.6850,-80.0980]],
+ // I-376 west to the airport
+ [[40.4402,-80.0150],[40.4350,-80.0300],[40.4300,-80.0520],[40.4350,-80.0820],[40.4400,-80.1120],[40.4450,-80.1520],[40.4530,-80.1920],[40.4700,-80.2200],[40.4880,-80.2330]],
+ // I-376 east to Monroeville
+ [[40.4322,-79.9085],[40.4340,-79.8900],[40.4310,-79.8700],[40.4290,-79.8500],[40.4330,-79.8300],[40.4380,-79.8100],[40.4400,-79.7820]],
+ // Rt 28 up the Allegheny valley
+ [[40.4782,-79.9462],[40.4850,-79.9350],[40.4930,-79.9150],[40.4990,-79.8950],[40.5110,-79.8710],[40.5260,-79.8510],[40.5420,-79.8310]],
+ // Rt 65 Ohio River Blvd to Sewickley
+ [[40.4560,-80.0250],[40.4750,-80.0500],[40.4950,-80.0750],[40.5180,-80.1010],[40.5330,-80.1400],[40.5380,-80.1750]],
+ // Rt 51 from the South Hills
+ [[40.3750,-80.0550],[40.4000,-80.0260],[40.4200,-80.0110],[40.4310,-80.0060]]];
+const METRO_SHIELDS=[
+ {t:'79',lat:40.6350,lng:-80.1045},{t:'79',lat:40.3600,lng:-80.1090},
+ {t:'76',lat:40.6770,lng:-80.0250},{t:'76',lat:40.6480,lng:-79.8700},
+ {t:'279',lat:40.5550,lng:-80.0510},{t:'19',lat:40.6050,lng:-80.0480},
+ {t:'376',lat:40.4420,lng:-80.1320},{t:'376',lat:40.4310,lng:-79.8200},
+ {t:'28',lat:40.5060,lng:-79.8830},{t:'65',lat:40.5060,lng:-80.0860},
+ {t:'51',lat:40.3960,lng:-80.0300}];
+const METRO_TOWNS=[
+ {n:'Cranberry Twp',lat:40.6850,lng:-80.1070},{n:'Wexford',lat:40.6240,lng:-80.0560},
+ {n:'McCandless',lat:40.5800,lng:-80.0300},{n:'Ross Twp',lat:40.5250,lng:-80.0250},
+ {n:'Sewickley',lat:40.5360,lng:-80.1840},{n:'Moon Twp',lat:40.5080,lng:-80.2060},
+ {n:'Robinson',lat:40.4550,lng:-80.1300},{n:'Carnegie',lat:40.4080,lng:-80.0900},
+ {n:'Mt. Lebanon',lat:40.3750,lng:-80.0490},{n:'Bethel Park',lat:40.3280,lng:-80.0360},
+ {n:'Dormont',lat:40.3930,lng:-80.0330},{n:'Homestead',lat:40.4060,lng:-79.9070},
+ {n:'West Mifflin',lat:40.3630,lng:-79.8660},{n:'McKeesport',lat:40.3480,lng:-79.8420},
+ {n:'Monroeville',lat:40.4320,lng:-79.7890},{n:'Penn Hills',lat:40.4670,lng:-79.8390},
+ {n:'Wilkinsburg',lat:40.4420,lng:-79.8820},{n:'Fox Chapel',lat:40.5130,lng:-79.8800},
+ {n:'Oakmont',lat:40.5220,lng:-79.8330},{n:'Etna',lat:40.4960,lng:-79.9480},
+ {n:'Millvale',lat:40.4600,lng:-79.9780},{n:'Sharpsburg',lat:40.4940,lng:-79.9260},
+ {n:'Bellevue',lat:40.4940,lng:-80.0530},{n:'West View',lat:40.5220,lng:-80.0340}];
+const AIRPORT={lat:40.4915,lng:-80.2329};
+const METRO_PARKS=[
+ {n:'NORTH PARK',lbl:[40.5940,-80.0020],poly:[[40.6100,-80.0150],[40.6080,-79.9930],[40.5900,-79.9850],[40.5780,-80.0000],[40.5850,-80.0180]]},
+ {n:'SOUTH PARK',lbl:[40.2990,-79.9950],poly:[[40.3120,-80.0050],[40.3080,-79.9850],[40.2920,-79.9820],[40.2860,-79.9990],[40.2980,-80.0100]]},
+ {n:'SETTLERS CABIN',lbl:[40.4490,-80.1480],poly:[[40.4600,-80.1600],[40.4560,-80.1350],[40.4380,-80.1380],[40.4400,-80.1620]]},
+ {n:'BOYCE PARK',lbl:[40.4470,-79.7520],poly:[[40.4560,-79.7620],[40.4540,-79.7400],[40.4380,-79.7420],[40.4400,-79.7640]]},
+ {n:'HARTWOOD ACRES',lbl:[40.5520,-79.9080],poly:[[40.5620,-79.9180],[40.5580,-79.8950],[40.5420,-79.9000],[40.5460,-79.9200]]}];
+
+// Real parks as polygons
+const PARKS=[
+ {n:'SCHENLEY PARK',lbl:[40.4356,-79.9390],poly:[[40.4390,-79.9470],[40.4402,-79.9390],[40.4380,-79.9310],[40.4330,-79.9290],[40.4300,-79.9360],[40.4315,-79.9440],[40.4355,-79.9475]]},
+ {n:'FRICK PARK',lbl:[40.4375,-79.9010],poly:[[40.4430,-79.9080],[40.4440,-79.8990],[40.4400,-79.8950],[40.4340,-79.8965],[40.4315,-79.9030],[40.4360,-79.9085]]},
+ {n:'POINT STATE PARK',lbl:null,poly:[[40.4416,-80.0108],[40.4432,-80.0082],[40.4412,-80.0068],[40.4398,-80.0090]]},
+ {n:'HIGHLAND PARK',lbl:[40.4795,-79.9200],poly:[[40.4820,-79.9260],[40.4835,-79.9180],[40.4800,-79.9130],[40.4755,-79.9160],[40.4760,-79.9240]]},
+ {n:'WEST PARK',lbl:null,poly:[[40.4525,-80.0135],[40.4542,-80.0075],[40.4505,-80.0052],[40.4488,-80.0110]]},
+ {n:'ARSENAL PARK',lbl:null,poly:[[40.4672,-79.9605],[40.4682,-79.9572],[40.4658,-79.9558],[40.4648,-79.9592]]}];
+
+// Heat blobs anchored to real nightlife zones
+const HEAT_ZONES=[
+ {lat:40.4652,lng:-79.9205,r:60,hot:true},   // Larimer party
+ {lat:40.4660,lng:-79.9590,r:66,hot:true},   // Butler St crawl
+ {lat:40.4283,lng:-79.9790,r:58,hot:true},   // E Carson St strip
+ {lat:40.4408,lng:-79.9990,r:48,hot:false},  // Downtown
+ {lat:40.4500,lng:-79.9760,r:42,hot:false},  // Strip District
+ {lat:40.4392,lng:-80.0165,r:34,hot:false}]; // Grandview overlook
+
+// Canvas cannot read CSS custom properties, so the map's palette is mirrored
+// here from the same tokens. Keep in sync with :root.
+const SIGNAL='#FF9E3D', SIGNAL_GLOW='rgba(255,158,61,.30)', SIGNAL_EDGE='rgba(255,158,61,.55)';
+const SLATE='#63708A', SLATE_EDGE='rgba(99,112,138,.45)';
+const ME_RING='#4C6B8A', ME_HALO='rgba(76,107,138,.20)';
+let mapInited=false,pins=[];
+let dragStart=null,lastTouch=null,lastPinchDist=null;
+
+function initMap(){
+  if(mapInited){drawMap();return;}
+  mapInited=true;
+  const canvas=document.getElementById('map-canvas');
+  const scr=document.getElementById('scr-map');
+  function resize(){
+    const w=canvas.clientWidth||scr.offsetWidth;
+    const h=canvas.clientHeight;
+    if(w<2||h<2)return; // not laid out yet
+    if(canvas.width===w&&canvas.height===h)return;
+    canvas.width=w;canvas.height=h;
+    drawMap();
+  }
+  // canvas is flex:1 — let CSS size it, then match the backing store to it
+  if(window.ResizeObserver){new ResizeObserver(resize).observe(canvas);}
+  window.addEventListener('resize',resize);
+  window.addEventListener('orientationchange',()=>setTimeout(resize,120));
+  requestAnimationFrame(()=>{resize();centerOn(40.4445,-79.9720);drawMap();});
+  const hint=document.getElementById('map-hint');
+  setTimeout(()=>hint.classList.add('visible'),700);
+  setTimeout(()=>hint.classList.remove('visible'),4500);
+
+  canvas.addEventListener('mousedown',e=>{dragStart={x:e.clientX,y:e.clientY,ox:mapState.ox,oy:mapState.oy};});
+  canvas.addEventListener('mousemove',e=>{if(!dragStart)return;const sc=mapState.scale;mapState.ox=dragStart.ox+(e.clientX-dragStart.x)/sc;mapState.oy=dragStart.oy+(e.clientY-dragStart.y)/sc;drawMap();});
+  canvas.addEventListener('mouseup',e=>{
+    if(dragStart&&Math.abs(e.clientX-dragStart.x)<6&&Math.abs(e.clientY-dragStart.y)<6){const r=canvas.getBoundingClientRect();tryTap(e.clientX-r.left,e.clientY-r.top);}
+    dragStart=null;});
+  canvas.addEventListener('mouseleave',()=>{dragStart=null;});
+  canvas.addEventListener('wheel',e=>{e.preventDefault();mapState.scale=Math.max(ZMIN,Math.min(ZMAX,mapState.scale*(1-e.deltaY*.001)));drawMap();},{passive:false});
+  canvas.addEventListener('touchstart',e=>{
+    if(e.touches.length===1){lastTouch={x:e.touches[0].clientX,y:e.touches[0].clientY,ox:mapState.ox,oy:mapState.oy};lastPinchDist=null;}
+    else if(e.touches.length===2){lastPinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}},{passive:true});
+  canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===1&&lastTouch){const sc=mapState.scale;mapState.ox=lastTouch.ox+(e.touches[0].clientX-lastTouch.x)/sc;mapState.oy=lastTouch.oy+(e.touches[0].clientY-lastTouch.y)/sc;drawMap();}
+    else if(e.touches.length===2&&lastPinchDist){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);mapState.scale=Math.max(ZMIN,Math.min(ZMAX,mapState.scale*(d/lastPinchDist)));lastPinchDist=d;drawMap();}},{passive:false});
+  canvas.addEventListener('touchend',e=>{
+    if(e.changedTouches.length===1&&lastTouch){const t=e.changedTouches[0],r=canvas.getBoundingClientRect();
+      if(Math.abs(t.clientX-lastTouch.x)<10&&Math.abs(t.clientY-lastTouch.y)<10)tryTap(t.clientX-r.left,t.clientY-r.top);}
+    lastTouch=null;lastPinchDist=null;},{passive:true});
+}
+
+// Equirectangular projection scaled in meters — true aspect ratio, no stretch
+const C_LAT=(BOUNDS.minLat+BOUNDS.maxLat)/2, C_LNG=(BOUNDS.minLng+BOUNDS.maxLng)/2;
+function pxPerMeter(W){return W/((BOUNDS.maxLng-BOUNDS.minLng)*M_LNG);}
+function ll2xy(lat,lng,W,H){
+  const sc=mapState.scale, k=pxPerMeter(W)*sc;
+  return{
+    x:W/2+(lng-C_LNG)*M_LNG*k+mapState.ox*sc,
+    y:H/2+(C_LAT-lat)*M_LAT*k+mapState.oy*sc
+  };
+}
+function polyline(ctx,pts,W,H){if(!pts.length)return;ctx.beginPath();pts.forEach((p,i)=>{const{x,y}=ll2xy(p[0],p[1],W,H);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();}
+
+const AV_COLORS={av1:'#5B7C9D',av2:'#4F7A6B',av3:'#8A6A9B',av4:'#A8734A',av5:'#6E7DA8',av6:'#5E8B8B'};
+
+function roundedRect(ctx,lx,ty,w,h,rx){
+  ctx.beginPath();
+  if(ctx.roundRect){ctx.roundRect(lx,ty,w,h,rx);return;}
+  ctx.moveTo(lx+rx,ty);ctx.lineTo(lx+w-rx,ty);ctx.arcTo(lx+w,ty,lx+w,ty+rx,rx);
+  ctx.lineTo(lx+w,ty+h-rx);ctx.arcTo(lx+w,ty+h,lx+w-rx,ty+h,rx);
+  ctx.lineTo(lx+rx,ty+h);ctx.arcTo(lx,ty+h,lx,ty+h-rx,rx);
+  ctx.lineTo(lx,ty+rx);ctx.arcTo(lx,ty,lx+rx,ty,rx);
+}
+
+function drawMap(){
+  if(glMap)return; // real tiles took over
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas||!canvas.width)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const sc=mapState.scale/ZBASE;               // normalized: 1.55 = classic city view
+  const us=Math.max(.85,Math.min(1.2,sc));     // UI sizes (pins/avatars) stay readable at any zoom
+  pins=[];
+
+  const k=pxPerMeter(W)*mapState.scale; // px per meter — real-world widths
+  // ── Snap Map light base ──
+  ctx.fillStyle='#F2EFE7';ctx.fillRect(0,0,W,H);
+
+  function drawPoly(poly,fill,stroke){
+    ctx.beginPath();
+    poly.forEach((pt,i)=>{const{x,y}=ll2xy(pt[0],pt[1],W,H);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+    ctx.closePath();
+    ctx.fillStyle=fill;ctx.fill();
+    ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();
+  }
+  // parks — real polygons (city + county)
+  METRO_PARKS.forEach(p=>drawPoly(p.poly,'#D2E7C0','#C0DAAB'));
+  PARKS.forEach(p=>drawPoly(p.poly,'#C8E2B0','#B4D49A'));
+
+  // rivers — ~340m wide, drawn at true scale
+  const riverW=Math.max(9,340*k);
+  RIVERS.forEach(r=>{
+    ctx.strokeStyle='#BBDCF4';ctx.lineWidth=riverW+4;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);
+  });
+  RIVERS.forEach(r=>{
+    ctx.strokeStyle='#A5CEEE';ctx.lineWidth=riverW;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);
+  });
+
+  // metro highways — always visible, min 2.5px so the network reads at any zoom
+  const fwW=Math.max(2.6,7.5*sc), fwI=Math.max(1.6,4.8*sc);
+  METRO_FW.forEach(r=>{
+    ctx.strokeStyle='#E8D9A8';ctx.lineWidth=fwW;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);
+    ctx.strokeStyle='#FDF6DE';ctx.lineWidth=fwI;polyline(ctx,r,W,H);
+  });
+  // city roads — LOD: locals appear as you zoom in
+  if(sc>=.55){
+    if(sc>=.85)ROADS.lo.forEach(r=>{ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2.2*sc;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);});
+    ROADS.ar.forEach(r=>{
+      ctx.strokeStyle='#E2DDCF';ctx.lineWidth=5*sc;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);
+      ctx.strokeStyle='#FFFFFF';ctx.lineWidth=3.2*sc;polyline(ctx,r,W,H);
+    });
+  }
+  ROADS.fw.forEach(r=>{
+    ctx.strokeStyle='#E8D9A8';ctx.lineWidth=fwW;ctx.lineCap='round';ctx.lineJoin='round';polyline(ctx,r,W,H);
+    ctx.strokeStyle='#FDF6DE';ctx.lineWidth=fwI;polyline(ctx,r,W,H);
+  });
+  // bridges — cased spans over the water
+  if(sc>=.5)BRIDGES.forEach(b=>{
+    ctx.strokeStyle='#C9BC9A';ctx.lineWidth=5*sc;ctx.lineCap='round';polyline(ctx,b.pts,W,H);
+    ctx.strokeStyle='#FFFDF6';ctx.lineWidth=3*sc;polyline(ctx,b.pts,W,H);
+  });
+
+  // ── heat blobs over real nightlife zones ──
+  const t=Date.now()*.001;
+  HEAT_ZONES.forEach(z=>{
+    const{x,y}=ll2xy(z.lat,z.lng,W,H);
+    const r=(z.r+Math.sin(t*1.5+x)*7)*Math.max(sc,.55);
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    if(z.hot){
+      g.addColorStop(0,'rgba(255,59,48,.40)');
+      g.addColorStop(.35,'rgba(255,120,40,.30)');
+      g.addColorStop(.7,'rgba(255,205,60,.18)');
+      g.addColorStop(1,'rgba(255,225,90,0)');
+    }else{
+      g.addColorStop(0,'rgba(255,205,60,.28)');
+      g.addColorStop(.6,'rgba(255,225,100,.15)');
+      g.addColorStop(1,'rgba(255,235,130,0)');
+    }
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  });
+
+  // river names along the water
+  ctx.textAlign='center';
+  ctx.font=`600 italic ${Math.max(9,9.5*us)}px 'WTM Sans',system-ui,sans-serif`;
+  ctx.fillStyle='rgba(90,130,175,.75)';
+  [['Allegheny River',40.4570,-79.9690,-38],['Monongahela River',40.4295,-79.9770,-4],['Ohio River',40.4700,-80.0500,-42]].forEach(rl=>{
+    const{x,y}=ll2xy(rl[1],rl[2],W,H);
+    ctx.save();ctx.translate(x,y);ctx.rotate(rl[3]*Math.PI/180);
+    ctx.fillText(rl[0],0,0);ctx.restore();
+  });
+
+  // metro town labels (zoomed out / mid zoom)
+  if(sc<=2.2){
+    ctx.font=`700 ${Math.max(8.5,9*us)}px 'WTM Sans',system-ui,sans-serif`;
+    METRO_TOWNS.forEach(tn=>{
+      const{x,y}=ll2xy(tn.lat,tn.lng,W,H);
+      if(x<-40||x>W+40||y<-20||y>H+20)return;
+      ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2.5;ctx.strokeText(tn.n,x,y);
+      ctx.fillStyle='#8A93A2';ctx.fillText(tn.n,x,y);
+    });
+  }
+  // airport
+  {
+    const{x,y}=ll2xy(AIRPORT.lat,AIRPORT.lng,W,H);
+    ctx.font=`${Math.max(13,13*us)}px 'WTM Sans',system-ui,sans-serif`;
+    ctx.fillText('✈️',x,y);
+    ctx.font=`800 ${Math.max(8,8.5*us)}px 'WTM Sans',system-ui,sans-serif`;
+    ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2.5;ctx.strokeText('PIT',x,y+13);
+    ctx.fillStyle='#8A93A2';ctx.fillText('PIT',x,y+13);
+  }
+  // metro interstate shields
+  METRO_SHIELDS.forEach(s=>{
+    const{x,y}=ll2xy(s.lat,s.lng,W,H);
+    if(x<-30||x>W+30||y<-30||y>H+30)return;
+    const m=Math.min(us,1.3),w=(s.t.length>2?24:20)*m,h=14*m;
+    ctx.fillStyle='#5B7FBF';roundedRect(ctx,x-w/2,y-h/2,w,h,4);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.2;roundedRect(ctx,x-w/2,y-h/2,w,h,4);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font=`800 ${8.5*m}px 'WTM Sans',system-ui,sans-serif`;
+    ctx.fillText(s.t,x,y+3*m);
+  });
+
+  // street labels (zoomed in only)
+  if(sc>=1.25){
+    ctx.font=`700 ${8.5*Math.min(sc,1.9)}px 'WTM Sans',system-ui,sans-serif`;
+    STREET_LABELS.forEach(s=>{
+      const{x,y}=ll2xy(s.lat,s.lng,W,H);
+      ctx.save();ctx.translate(x,y);ctx.rotate(s.r*Math.PI/180);
+      ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2.5*sc;ctx.strokeText(s.t,0,0);
+      ctx.fillStyle='#9A93A8';ctx.fillText(s.t,0,0);
+      ctx.restore();
+    });
+  }
+  // city interstate shields (only when city detail is visible)
+  if(sc>=.5)FW_SHIELDS.forEach(s=>{
+    const{x,y}=ll2xy(s.lat,s.lng,W,H);
+    const m=Math.min(us,1.3),w=(s.t.length>2?24:20)*m,h=14*m;
+    ctx.fillStyle='#5B7FBF';
+    roundedRect(ctx,x-w/2,y-h/2,w,h,4);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.2;roundedRect(ctx,x-w/2,y-h/2,w,h,4);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font=`800 ${8.5*m}px 'WTM Sans',system-ui,sans-serif`;
+    ctx.fillText(s.t,x,y+3*m);
+  });
+
+  // neighborhood + park labels with white halo (city zoom only)
+  if(sc>=.8){
+    ctx.font=`800 ${Math.max(9,10*us)}px 'WTM Sans',system-ui,sans-serif`;
+    NEIGHBORHOODS.forEach(n=>{
+      const{x,y}=ll2xy(n.lat,n.lng,W,H);
+      ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=3;
+      ctx.strokeText(n.name.toUpperCase(),x,y);
+      ctx.fillStyle='#7C8698';ctx.fillText(n.name.toUpperCase(),x,y);
+    });
+    ctx.font=`700 ${Math.max(8,8.5*us)}px 'WTM Sans',system-ui,sans-serif`;
+    PARKS.filter(p=>p.lbl).forEach(p=>{
+      const{x,y}=ll2xy(p.lbl[0],p.lbl[1],W,H);
+      ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2.5;ctx.strokeText(p.n,x,y);
+      ctx.fillStyle='#6E9B54';ctx.fillText(p.n,x,y);
+    });
+  }
+  // county park labels always
+  ctx.font=`700 ${Math.max(8,8.5*us)}px 'WTM Sans',system-ui,sans-serif`;
+  METRO_PARKS.forEach(p=>{
+    const{x,y}=ll2xy(p.lbl[0],p.lbl[1],W,H);
+    if(x<-60||x>W+60||y<-20||y>H+20)return;
+    ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2.5;ctx.strokeText(p.n,x,y);
+    ctx.fillStyle='#6E9B54';ctx.fillText(p.n,x,y);
+  });
+  ctx.textAlign='left';
+
+  // ── move pins: white Snap-style label cards with collision declutter ──
+  // Hot and fuller moves get label priority; colliding labels collapse to dots
+  // and reappear as you zoom in, like a real map app.
+  const placed=[];
+  const ordered=[...MOVES].sort((a,b)=>(b.hot?1:0)-(a.hot?1:0)||(b.att/b.max)-(a.att/a.max));
+  ordered.forEach(m=>{
+    const{x,y}=ll2xy(m.lat,m.lng,W,H);
+    if(x<-120||x>W+120||y<-80||y>H+80)return;
+    const hot=m.hot,isScene=m.cat==='scene',isJustu=m.cat==='justu';
+    const pinColor=hot?SIGNAL:SLATE;
+    if(hot){
+      const pr=(.5+.5*Math.sin(t*2))*20*us;
+      const gp=ctx.createRadialGradient(x,y,0,x,y,pr+8*us);
+      gp.addColorStop(0,SIGNAL_GLOW);gp.addColorStop(1,'transparent');
+      ctx.fillStyle=gp;ctx.beginPath();ctx.arc(x,y,pr+8*us,0,Math.PI*2);ctx.fill();
+    }
+    // location dot
+    ctx.beginPath();ctx.arc(x,y,6*us,0,Math.PI*2);
+    ctx.fillStyle=pinColor;ctx.fill();
+    ctx.strokeStyle='#FFFFFF';ctx.lineWidth=2*us;ctx.stroke();
+
+    // measure label card
+    ctx.font=`800 ${11.5*us}px 'WTM Sans',system-ui,sans-serif`;
+    const label=`${m.emoji} ${m.title.length>20?m.title.slice(0,18)+'…':m.title}`;
+    const tw=ctx.measureText(label).width;
+    const pad=9*us,cardH=27*us,cardW=tw+pad*2;
+    // keep the card fully on screen instead of letting it clip off the edge
+    const lx=Math.max(6,Math.min(W-cardW-6,x-cardW/2)),ly=y-22*us;
+    const rect={x:lx-4,y:ly-cardH-4,w:cardW+8,h:cardH+8};
+    const collides=placed.some(r=>rect.x<r.x+r.w&&rect.x+rect.w>r.x&&rect.y<r.y+r.h&&rect.y+rect.h>r.y);
+
+    if(collides&&sc<2.6){
+      // dot-only: label returns on zoom
+      pins.push({x,y,r:30,id:m.id});
+      return;
+    }
+    placed.push(rect);
+
+    ctx.save();
+    ctx.shadowColor='rgba(60,50,30,.25)';ctx.shadowBlur=10*us;ctx.shadowOffsetY=3*us;
+    ctx.fillStyle='rgba(255,255,255,.97)';
+    roundedRect(ctx,lx,ly-cardH,cardW,cardH,13*us);
+    ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle=hot?SIGNAL_EDGE:SLATE_EDGE;
+    ctx.lineWidth=1.4*us;
+    roundedRect(ctx,lx,ly-cardH,cardW,cardH,13*us);
+    ctx.stroke();
+    // friends-going dot
+    if(friendsForMove(m.id).length){
+      ctx.beginPath();ctx.arc(lx+cardW-2*us,ly-cardH+2*us,4.5*us,0,Math.PI*2);
+      ctx.fillStyle=SIGNAL;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5*us;ctx.stroke();
+    }
+    ctx.fillStyle='#2A2533';ctx.fillText(label,lx+pad,ly-9*us);
+    // stem, kept attached to the card even when the card was nudged inward
+    const stemX=Math.max(lx+12,Math.min(lx+cardW-12,x));
+    ctx.beginPath();ctx.moveTo(x,y-6*us);ctx.lineTo(stemX,ly);
+    ctx.strokeStyle='rgba(60,50,30,.25)';ctx.lineWidth=1.2*us;ctx.stroke();
+    pins.push({x:lx+cardW/2,y:ly-cardH/2,r:Math.max(46,cardW*.5),id:m.id});
+  });
+
+  // ── friends as Snap-style avatar heads ──
+  FRIENDS_LIST.filter(f=>f.online).forEach(f=>{
+    const{x,y}=ll2xy(f.lat,f.lng,W,H);
+    if(x<-60||x>W+60||y<-60||y>H+60)return;
+    const rad=15*us;
+    const bob=Math.sin(t*2.2+x*.05)*1.6*us;
+    const yy=y+bob;
+    ctx.save();
+    ctx.shadowColor='rgba(60,50,30,.3)';ctx.shadowBlur=8*us;ctx.shadowOffsetY=3*us;
+    ctx.beginPath();ctx.arc(x,yy,rad,0,Math.PI*2);
+    ctx.fillStyle='#FFFFFF';ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle='#10B981';ctx.lineWidth=2.5*us;
+    ctx.beginPath();ctx.arc(x,yy,rad,0,Math.PI*2);ctx.stroke();
+    ctx.font=`${17*us}px 'WTM Sans',system-ui,sans-serif`;ctx.textAlign='center';
+    ctx.fillText(f.face||'🙂',x,yy+6*us);
+    // name tag
+    ctx.font=`800 ${9*us}px 'WTM Sans',system-ui,sans-serif`;
+    const nm=f.name.split(' ')[0];
+    const nw=ctx.measureText(nm).width+10*us;
+    ctx.fillStyle='rgba(255,255,255,.95)';
+    roundedRect(ctx,x-nw/2,yy+rad+3*us,nw,14*us,7*us);ctx.fill();
+    ctx.fillStyle='#4A5364';ctx.fillText(nm,x,yy+rad+13*us);
+    ctx.textAlign='left';
+    pins.push({x,y:yy,r:26,friend:f.name});
+  });
+
+  // ── you (bigger, blue ring) ──
+  {
+    const{x,y}=ll2xy(ME.lat,ME.lng,W,H);
+    const rad=18*us;
+    const ringPulse=(.5+.5*Math.sin(t*2))*6*us;
+    ctx.beginPath();ctx.arc(x,y,rad+ringPulse+4*us,0,Math.PI*2);
+    ctx.fillStyle=ME_HALO;ctx.fill();
+    ctx.save();
+    ctx.shadowColor='rgba(60,50,30,.35)';ctx.shadowBlur=10*us;ctx.shadowOffsetY=3*us;
+    ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);
+    ctx.fillStyle='#FFFFFF';ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle=ME_RING;ctx.lineWidth=3*us;
+    ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.stroke();
+    ctx.font=`${21*us}px 'WTM Sans',system-ui,sans-serif`;ctx.textAlign='center';
+    ctx.fillText(ME.face,x,y+7*us);
+    ctx.font=`800 ${9.5*us}px 'WTM Sans',system-ui,sans-serif`;
+    const nw=ctx.measureText('YOU').width+12*us;
+    ctx.fillStyle=ME_RING;
+    roundedRect(ctx,x-nw/2,y+rad+4*us,nw,15*us,7.5*us);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillText('YOU',x,y+rad+15*us);
+    ctx.textAlign='left';
+  }
+
+  if(S.screen==='scr-map'&&!glMap)scheduleDraw();
+}
+// Single-flight render loop: no matter how many pan/zoom events call drawMap
+// directly, only ONE animation chain ever runs.
+let drawQueued=false;
+function scheduleDraw(){
+  if(drawQueued)return;
+  drawQueued=true;
+  requestAnimationFrame(()=>{drawQueued=false;if(S.screen==='scr-map')drawMap();});
+}
+function tryTap(px,py){
+  for(const p of pins){
+    if((px-p.x)**2+(py-p.y)**2<=p.r*p.r){
+      if(p.id)openSheet(p.id);
+      else if(p.friend)toast(`${p.friend} is out right now 🟢`);
+      return;
+    }
+  }
+}
+function zoomMap(f){
+  if(glMap){ f>1?glMap.zoomIn({duration:220}):glMap.zoomOut({duration:220}); return; }
+  mapState.scale=Math.max(ZMIN,Math.min(ZMAX,mapState.scale*f));drawMap();
+}
+function centerOn(lat,lng){
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas||!canvas.width)return;
+  const p0=pxPerMeter(canvas.width);
+  mapState.ox=-(lng-C_LNG)*M_LNG*p0;
+  mapState.oy=-(C_LAT-lat)*M_LAT*p0;
+}
+function resetMap(){
+  if(glMap){ glMap.flyTo({center:[-79.9720,40.4445],zoom:12.2,duration:600}); return; }
+  mapState.scale=4.4;centerOn(40.4445,-79.9720);drawMap();
+}
+
+
+
+// ══════════════════ SPOT SUBMISSION & TRIAGE ══════════════════
+// How the spot list grows: users submit, and every submission runs a
+// deterministic triage before a human ever sees it. This is all on-device
+// arithmetic and pattern matching, so it costs nothing per submission.
+//
+// The verdicts are deliberately three-way, not two:
+//   reject   - fails a hard rule, never reaches a queue
+//   review   - plausible but carries real-world risk, a person decides
+//   approve  - safe category, complete, from a trusted submitter
+//
+// An auto-approved spot still is not searchable until other people confirm it
+// on the ground. That community step, not the triage, is what actually keeps
+// the list honest: it is much harder to fake three people standing somewhere
+// than to write a convincing description.
+
+const SUBMIT_RULES={
+  // Physical-risk categories. A 17-year-old can act on these, so a machine
+  // does not get the final say.
+  riskCats:['urbex','swim'],
+  // Someone's home dressed up as a hangout is the main abuse vector here.
+  homeWords:/\b(my|his|her|their|folks?|parents?|moms?|dads?)\s+(house|place|crib|apartment|apt|spot|basement|garage)\b/i,
+  possessive:/\b[A-Z][a-z]{2,}'s\b/,
+  streetAddress:/\b\d{2,5}\s+[A-Z][a-z]+\s+(st|street|ave|avenue|rd|road|dr|drive|ln|lane|ct|court|way|blvd|pl|place)\b/i,
+  contact:/(\+?\d[\d\-\s().]{7,}\d)|([\w.+-]+@[\w-]+\.[a-z]{2,})|(@[A-Za-z0-9_]{3,})/,
+  banned:/\b(kill|shoot|jump\s+from|overdose|fight\s+club|steal|break\s?in)\b/i,
+  minBlurb:25,
+  dupeMetres:70,
+};
+
+function triageSpot(sub, opts){
+  opts=opts||{};
+  const trusted=!!opts.trusted;
+  const checks=[]; let worst='approve';
+  const raise=(level,label,detail)=>{
+    checks.push({level,label,detail});
+    if(level==='reject') worst='reject';
+    else if(level==='review'&&worst!=='reject') worst='review';
+  };
+  const pass=(label)=>checks.push({level:'pass',label});
+
+  const text=`${sub.name||''} ${sub.blurb||''}`.trim();
+
+  // 1. Inside the city we actually cover.
+  const km=kmBetween(ME.lat,ME.lng,sub.lat,sub.lng);
+  if(km>60) raise('reject','Outside coverage',`${km.toFixed(0)} km from Pittsburgh`);
+  else pass('Inside coverage');
+
+  // 2. Duplicate of somewhere already listed.
+  let dupe=null;
+  for(const sp of SPOTS){
+    const d=kmBetween(sp.lat,sp.lng,sub.lat,sub.lng)*1000;
+    if(d<=SUBMIT_RULES.dupeMetres){ dupe=sp; break; }
+  }
+  if(dupe) raise('reject','Already listed',`${Math.round(kmBetween(dupe.lat,dupe.lng,sub.lat,sub.lng)*1000)}m from ${dupe.name}`);
+  else pass('Not a duplicate');
+
+  // 3. Content that should never be published.
+  if(SUBMIT_RULES.banned.test(text)) raise('reject','Unsafe content','Describes harm or a crime');
+  else pass('No unsafe content');
+
+  // 4. Is this somebody's home? Highest-value check in the whole pipeline.
+  if(SUBMIT_RULES.homeWords.test(text)) raise('review','Possibly a private home','Reads like a residence, not a public place');
+  else if(SUBMIT_RULES.possessive.test(sub.name||'')) raise('review','Named after a person',"Could be someone's address");
+  else if(SUBMIT_RULES.streetAddress.test(text)) raise('review','Street address in the text','Verify it is a public place');
+  else pass('Reads as a public place');
+
+  // 5. Personal contact details.
+  if(SUBMIT_RULES.contact.test(text)) raise('review','Contact details included','Strip before publishing');
+  else pass('No contact details');
+
+  // 6. Categories where being wrong hurts someone.
+  if(SUBMIT_RULES.riskCats.includes(sub.cat))
+    raise('review','Risk category',sub.cat==='urbex'?'Trespass and structural risk':'Open water risk');
+  else pass('Low-risk category');
+
+  // 7. Enough substance to be useful.
+  if((sub.blurb||'').trim().length<SUBMIT_RULES.minBlurb) raise('review','Thin description','Under 25 characters');
+  else pass('Described properly');
+
+  // 8. Track record. Trust raises the ceiling, it never lowers the floor:
+  //    a trusted submitter still cannot auto-approve a risk category.
+  if(trusted) pass('Trusted submitter');
+  else if(worst==='approve') raise('review','First submission','No approved spots yet');
+
+  return {verdict:worst,checks,confirmsNeeded:worst==='approve'?3:0};
+}
+
+// Submissions live here until they clear. Nothing enters SPOTS unconfirmed.
+const SPOT_QUEUE=[
+  {id:'q1',name:"Connor's rooftop",cat:'view',lat:40.4471,lng:-79.9612,
+   blurb:'my boy has roof access, we go up after work all the time',by:'Devon T.',trusted:false},
+  {id:'q2',name:'Panhandle Trail Tunnel',cat:'urbex',lat:40.4102,lng:-80.0921,
+   blurb:'Old railway tunnel off the Panhandle Trail, walkable and covered in graffiti.',by:'Mia R.',trusted:true},
+  {id:'q3',name:'Riverview Park Overlook',cat:'view',lat:40.4790,lng:-80.0180,
+   blurb:'Quiet overlook above the observatory, you can see the whole North Side from here.',by:'Alex M.',trusted:true},
+];
+
+// ══════════════════ SPOT FINDER ══════════════════
+// Natural language in, ranked spots out, entirely on-device. No API call, no
+// key, no per-query cost, and it works with no signal.
+//
+// Three stages:
+//   1. parseAsk()  turns the sentence into a structured intent
+//   2. scoreSpot() scores every spot against that intent and records WHY
+//   3. runAsk()    ranks, thresholds, and explains
+//
+// The interesting part is stage 1. Rather than matching the words someone
+// typed against a spot's name, it matches them against how people actually
+// ask: "somewhere to skate" and "ledges" and "bowl" all resolve to skate.
+
+// What people say -> what they mean.
+const ASK_LEX={
+  skate:['skate','skating','skateboard','skateboarding','skatepark','board','bowl','ledge','ledges','rail','rails','grind','halfpipe','ramp','bmx','scooter','street spot'],
+  view:['view','views','overlook','skyline','lookout','vista','see the city','city view','high up'],
+  sunset:['sunset','sundown','golden hour','dusk','sunrise','evening light'],
+  urbex:['urbex','abandoned','abandon','ruins','ruin','industrial','derelict','explore','exploring','creepy','old mill','factory'],
+  photo:['photo','photos','photograph','photography','shoot','shot','pictures','pics','instagram','insta','camera','film'],
+  chill:['chill','hang','hangout','relax','sit','kick back','lowkey','low key','picnic','study','vibe out'],
+  swim:['swim','swimming','water','lake','river swim','dip','kayak','paddle','beach'],
+};
+// Modifiers that change ranking rather than category.
+const ASK_MOD={
+  quiet:['quiet','empty','alone','nobody','secluded','private','peaceful','chill out','no crowds','not busy','not crowded','dead'],
+  busy:['busy','people','crowded','packed','lively','social','popular','buzzing'],
+  near:['near','nearby','close','closest','walk','walking','around here','right here','near me'],
+  far:['anywhere','drive','far','worth the drive','out of town','road trip'],
+  free:['free','no cover','cheap','broke','no money'],
+  night:['night','tonight','late','after dark','dark','midnight','right now','now'],
+  day:['day','morning','daytime','afternoon','early','sunrise'],
+};
+
+function normAsk(q){ return ' '+String(q).toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()+' '; }
+
+function parseAsk(q){
+  const t=normAsk(q);
+  const intent={cats:[],mods:new Set(),terms:[],raw:q.trim()};
+  // Negation first: "not busy" must not register as "busy".
+  const negated=new Set();
+  (t.match(/\b(?:not|no|without|avoid)\s+(\w+)/g)||[]).forEach(m=>negated.add(m.split(/\s+/).pop()));
+
+  for(const [cat,words] of Object.entries(ASK_LEX))
+    if(words.some(w=>t.includes(' '+w) || t.includes(w+' '))) intent.cats.push(cat);
+
+  for(const [mod,words] of Object.entries(ASK_MOD))
+    if(words.some(w=>t.includes(w) && !negated.has(w.split(' ')[0]))) intent.mods.add(mod);
+
+  // "not busy" means quiet, not "no preference".
+  if(negated.has('busy')||negated.has('crowded')||negated.has('people')) intent.mods.add('quiet');
+  if(intent.mods.has('quiet')) intent.mods.delete('busy');
+
+  // Leftover meaningful words get fuzzy-matched against tags and blurbs.
+  const stop=new Set(['a','an','the','me','i','find','want','somewhere','some','place','places','spot','spots','to','for','go','good','can','with','my','is','are','it','on','at','and','or','of','in','where','whats','what','something','like','near','get','do']);
+  intent.terms=t.split(' ').filter(w=>w.length>2 && !stop.has(w));
+  return intent;
+}
+
+// Haversine, kilometres.
+function kmBetween(a,b,c,d){
+  const R=6371,p=Math.PI/180;
+  const dLat=(c-a)*p,dLng=(d-b)*p;
+  const h=Math.sin(dLat/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function scoreSpot(spot,intent,hour){
+  let score=0; const why=[];
+  // Relevance is tracked separately from score. Distance, popularity and
+  // time-of-day are tie-breakers, not reasons to surface a spot: without this,
+  // a query like "pierogi" would return the nearest popular place and look
+  // like it understood something it didn't.
+  let relevant=false;
+
+  // Category is the strongest signal by design: asking for a skate spot and
+  // getting a swimming hole is the failure everyone remembers.
+  if(intent.cats.length){
+    if(intent.cats.includes(spot.cat)){ score+=45; relevant=true; why.push(SPOT_CATS[spot.cat]||spot.cat); }
+    else if(intent.cats.some(c=>spot.tags.includes(c))){ score+=22; relevant=true; why.push('related'); }
+    else score-=18; // wrong category, still allowed to surface if everything else fits
+  }
+
+  // Free-text overlap against tags and blurb.
+  let hits=0;
+  intent.terms.forEach(term=>{
+    if(spot.tags.some(tag=>tag.includes(term)||term.includes(tag))) hits++;
+    else if(spot.blurb.toLowerCase().includes(term)) hits+=0.5;
+    else if(spot.area.toLowerCase().includes(term)){ hits++; why.push('in '+spot.area); }
+  });
+  if(hits>0) relevant=true;
+  score+=Math.min(hits,4)*9;
+
+  // Distance from the user, with a decay rather than a hard cutoff.
+  const km=kmBetween(ME.lat,ME.lng,spot.lat,spot.lng);
+  const mi=km*0.621371;
+  const nearWanted=intent.mods.has('near');
+  const reach=nearWanted?2.5:intent.mods.has('far')?45:14;
+  score+=Math.max(0,22*(1-Math.min(km,reach)/reach));
+  if(nearWanted&&mi<=1.2) why.push(mi<0.6?'a few blocks away':'walkable');
+
+  // Time of day.
+  const isNight=hour>=20||hour<5, isSunset=hour>=18&&hour<21, isMorning=hour>=5&&hour<11;
+  if(intent.mods.has('night')||isNight){
+    if(spot.lit){ score+=14; why.push('lit after dark'); }
+    else if(intent.mods.has('night')) score-=6;
+  }
+  if((intent.cats.includes('sunset')||isSunset)&&spot.best==='sunset'){ score+=12; why.push('best at sunset'); }
+  if((intent.mods.has('day')||isMorning)&&spot.best==='morning'){ score+=8; why.push('good in the morning'); }
+
+  // Crowd preference.
+  if(intent.mods.has('quiet')){
+    if(spot.crowd==='low'){ score+=16; why.push('usually quiet'); }
+    else if(spot.crowd==='high') score-=12;
+  }
+  if(intent.mods.has('busy')){
+    if(spot.crowd==='high'){ score+=14; why.push('always people here'); }
+    else if(spot.crowd==='low') score-=8;
+  }
+  if(intent.mods.has('free')&&spot.free){ score+=8; why.push('free'); }
+  if(intent.mods.has('free')&&!spot.free) score-=14;
+
+  // Community signal, compressed so one popular spot cannot dominate.
+  score+=Math.min(10,spot.fires/10);
+  if(spot.fires>=50) why.push(spot.fires+' saves');
+
+  return {score:relevant?score:0,relevant,why:[...new Set(why)].slice(0,3),mi};
+}
+
+function runAsk(query){
+  const intent=parseAsk(query);
+  const hour=new Date().getHours();
+  if(!intent.cats.length && !intent.terms.length) return {intent,results:[],reason:'empty'};
+  const ranked=SPOTS.map(sp=>({sp,...scoreSpot(sp,intent,hour)}))
+                    .sort((a,b)=>b.score-a.score);
+  // Only surface things that actually clear a bar. Six weak results are worse
+  // than an honest "nothing matches".
+  const results=ranked.filter(r=>r.relevant && r.score>=25).slice(0,5);
+  const best=ranked.find(r=>r.relevant) || null;
+  return {intent,results,reason:results.length?'ok':'no-match',best};
+}
+
+
+// ── Submit + review UI ──
+function openSubmitSpot(){
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-title" style="margin-top:4px">Add a spot</div>
+    <div class="sheet-desc" style="margin-bottom:16px">
+      Somewhere worth knowing about. It gets checked, then confirmed by people who go there.
+    </div>
+    <div class="create-field"><label for="sb-name">Name</label>
+      <input class="create-input" id="sb-name" placeholder="What do people call it?"></div>
+    <div class="create-field"><label for="sb-blurb">What is it</label>
+      <textarea class="create-input" id="sb-blurb" rows="3"
+        placeholder="What you do there, when it's good, anything worth knowing."></textarea></div>
+    <div class="create-field"><label>Type</label>
+      <div class="create-cats" id="sb-cats"></div></div>
+    <div class="create-field"><label for="sb-area">Neighbourhood</label>
+      <input class="create-input" id="sb-area" placeholder="Polish Hill"></div>
+    <button class="sa sa-going" style="width:100%" data-act="sb-check">Submit for review</button>
+    <div id="sb-result"></div>`;
+  document.getElementById('sb-cats').innerHTML=Object.entries(SPOT_CATS)
+    .map(([id,label])=>`<div class="create-cat" data-act="sb-cat" data-arg="${id}">${label}</div>`).join('');
+  S.submitCat=null;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function runSubmitCheck(){
+  const name=(document.getElementById('sb-name').value||'').trim();
+  const blurb=(document.getElementById('sb-blurb').value||'').trim();
+  const area=(document.getElementById('sb-area').value||'').trim()||'Pittsburgh';
+  if(!name){ toast('Give it a name first'); return; }
+  if(!S.submitCat){ toast('Pick a type'); return; }
+  // In the real app this comes from the map pin the user dropped.
+  const sub={name,blurb,cat:S.submitCat,area,
+    lat:ME.lat+(Math.random()-.5)*.05, lng:ME.lng+(Math.random()-.5)*.06};
+  const {verdict,checks,confirmsNeeded}=triageSpot(sub,{trusted:false});
+  const head = verdict==='reject' ? {t:"Can't publish this",c:'var(--stop)'}
+             : verdict==='review' ? {t:'Sent for review',c:'var(--warn)'}
+             : {t:'Cleared the checks',c:'var(--ok)'};
+  const sub2 = verdict==='reject'
+    ? 'It failed a hard rule, so it stops here.'
+    : verdict==='review'
+      ? 'A person looks at this one before it goes live. Usually same day.'
+      : `Live once ${confirmsNeeded} people confirm it on the ground.`;
+  document.getElementById('sb-result').innerHTML=`
+    <div class="sb-out">
+      <div class="sb-verdict" style="color:${head.c}">${head.t}</div>
+      <div class="sb-sub">${sub2}</div>
+      <div class="sb-checks">${checks.map(c=>`
+        <div class="sb-check sb-${c.level}">
+          <span class="sb-mark">${c.level==='pass'?'✓':c.level==='review'?'!':'✕'}</span>
+          <span><b>${c.label}</b>${c.detail?` <span class="sb-detail">${c.detail}</span>`:''}</span>
+        </div>`).join('')}</div>
+    </div>`;
+  demoEvt('submitted_spot');
+}
+
+function openReviewQueue(){
+  const rows=SPOT_QUEUE.map(q=>{
+    const {verdict,checks}=triageSpot(q,{trusted:q.trusted});
+    const flags=checks.filter(c=>c.level!=='pass');
+    const tone=verdict==='reject'?'var(--stop)':verdict==='review'?'var(--warn)':'var(--ok)';
+    return `<div class="rq-card">
+      <div class="rq-top">
+        <div>
+          <div class="rq-name">${q.name}</div>
+          <div class="rq-meta">${SPOT_CATS[q.cat]||q.cat} · by ${q.by}${q.trusted?' · trusted':''}</div>
+        </div>
+        <span class="rq-verdict" style="color:${tone};border-color:${tone}">${verdict}</span>
+      </div>
+      <div class="rq-blurb">${q.blurb}</div>
+      ${flags.length?`<div class="sb-checks">${flags.map(c=>`
+        <div class="sb-check sb-${c.level}">
+          <span class="sb-mark">${c.level==='review'?'!':'✕'}</span>
+          <span><b>${c.label}</b>${c.detail?` <span class="sb-detail">${c.detail}</span>`:''}</span>
+        </div>`).join('')}</div>`:'<div class="sb-check sb-pass"><span class="sb-mark">✓</span><span>Passed every check</span></div>'}
+      <div class="rq-actions">
+        <button class="rq-btn rq-yes" data-act="rq-act" data-arg="${q.id}|approve">Publish</button>
+        <button class="rq-btn" data-act="rq-act" data-arg="${q.id}|reject">Decline</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-title" style="margin-top:4px">Review queue</div>
+    <div class="sheet-desc" style="margin-bottom:16px">
+      ${SPOT_QUEUE.length} waiting. Triage has already run; these are the ones it would not decide alone.
+    </div>${rows}`;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function actOnQueue(arg){
+  const [id,action]=arg.split('|');
+  const i=SPOT_QUEUE.findIndex(q=>q.id===id);
+  if(i<0)return;
+  const q=SPOT_QUEUE[i];
+  if(action==='approve'){
+    SPOTS.push({id:'sp'+Date.now(),name:q.name,cat:q.cat,emoji:'📍',lat:q.lat,lng:q.lng,
+      area:q.blurb.split(',')[0].slice(0,24),addr:'Added by '+q.by,fires:1,crowd:'low',
+      best:'afternoon',lit:false,free:true,indoor:false,
+      tags:[q.cat],blurb:q.blurb});
+    toast(q.name+' is live');
+  } else toast(q.name+' declined');
+  SPOT_QUEUE.splice(i,1);
+  openReviewQueue();
+  buildAsk();
+}
+
+// ── Ask screen ──
+const ASK_EXAMPLES=['skate spot near me','quiet place to watch the sunset',
+                    'somewhere abandoned to photograph','chill spot to sit with friends',
+                    'water, worth the drive'];
+
+function buildAsk(){
+  const n=document.getElementById('rq-n');
+  if(n)n.textContent=SPOT_QUEUE.length?`(${SPOT_QUEUE.length})`:'';
+  document.getElementById('ask-examples').innerHTML=
+    ASK_EXAMPLES.map(e=>`<button class="ask-chip" data-act="ask-eg" data-arg="${e}">${e}</button>`).join('');
+  // Before the first search, show what there is to search. An empty screen
+  // reads as broken; a category count reads as a map of the collection.
+  const box=document.getElementById('ask-results');
+  if(box && !box.innerHTML.trim()){
+    const counts={};
+    SPOTS.forEach(sp=>{counts[sp.cat]=(counts[sp.cat]||0)+1;});
+    box.innerHTML=`<div class="ask-count">${SPOTS.length} spots around Pittsburgh</div>`
+      + `<div class="ask-browse">`
+      + Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([cat,n])=>{
+          const sample=SPOTS.find(sp=>sp.cat===cat);
+          return `<button class="ask-chip ask-browse-chip" data-act="ask-eg" data-arg="${cat}">`
+               + `<span>${sample.emoji}</span>${SPOT_CATS[cat]||cat}`
+               + `<span class="ask-browse-n">${n}</span></button>`;
+        }).join('')
+      + `</div>`;
+  }
+}
+
+function submitAsk(q){
+  const query=(q!==undefined?q:document.getElementById('ask-in').value).trim();
+  const box=document.getElementById('ask-results');
+  if(!query){ box.innerHTML=''; buildAsk(); return; }
+  document.getElementById('ask-in').value=query;
+  demoEvt('asked');
+  const {results,reason,best}=runAsk(query);
+
+  if(reason!=='ok'){
+    // Say so plainly, and offer the nearest thing rather than nothing.
+    box.innerHTML=`<div class="ask-empty">
+      <p class="ask-empty-h">Nothing matches that yet.</p>
+      <p>WTM knows ${SPOTS.length} spots around Pittsburgh so far. Try naming what you want to
+      do rather than a place: skate, swim, shoot photos, watch the sunset, or just sit somewhere quiet.</p>
+      ${best?`<p class="ask-empty-h" style="margin-top:16px">Closest thing I have</p>
+        ${askCard(best)}`:''}
+    </div>`;
+    return;
+  }
+  box.innerHTML=`<div class="ask-count">${results.length} spot${results.length>1?'s':''}</div>`
+    + results.map(askCard).join('');
+}
+
+function askCard(r){
+  const s=r.sp;
+  return `<button class="ask-card" data-act="ask-open" data-arg="${s.id}">
+    <span class="ask-card-emoji">${s.emoji}</span>
+    <span class="ask-card-body">
+      <span class="ask-card-name">${s.name}</span>
+      <span class="ask-card-meta">${s.area} · ${r.mi.toFixed(1)} mi</span>
+      <span class="ask-card-why">${r.why.map(w=>`<span class="ask-why">${w}</span>`).join('')}</span>
+    </span>
+  </button>`;
+}
+
+function openSpot(id){
+  const s=SPOTS.find(x=>x.id===id); if(!s)return;
+  const km=kmBetween(ME.lat,ME.lng,s.lat,s.lng), mi=(km*0.621371).toFixed(1);
+  document.getElementById('sheet-body').innerHTML=`
+    <div class="sheet-cover" style="background:linear-gradient(145deg,#3A4356,#1A1F2B)">${s.emoji}</div>
+    <div class="sheet-title">${s.name}</div>
+    <div class="sheet-meta">
+      <span class="meta-pill">${s.area}</span><span class="meta-sep"></span>
+      <span class="meta-pill">${mi} mi away</span><span class="meta-sep"></span>
+      <span class="meta-pill">${s.fires} saves</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:14px">
+      <span style="font-size:15px">🧭</span>
+      <span style="font-size:13.5px;font-weight:700">${s.addr}</span>
+    </div>
+    <div class="sheet-desc">${s.blurb}</div>
+    <div class="sheet-sec">
+      <div class="sheet-sec-label">Good to know</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        <span class="ask-why">${SPOT_CATS[s.cat]||s.cat}</span>
+        <span class="ask-why">${s.crowd==='low'?'usually quiet':s.crowd==='high'?'usually busy':'moderate crowd'}</span>
+        <span class="ask-why">best ${s.best}</span>
+        ${s.lit?'<span class="ask-why">lit after dark</span>':''}
+        ${s.free?'<span class="ask-why">free</span>':'<span class="ask-why">paid entry</span>'}
+      </div>
+    </div>
+    <div class="sa-row">
+      <button class="sa sa-going" data-act="spot-map" data-arg="${s.id}">Show on map</button>
+      <button class="sa sa-share" data-act="spot-move" data-arg="${s.id}">Start a move here</button>
+    </div>`;
+  document.getElementById('sheet-overlay').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+
+// ══════════════════ REAL VECTOR TILES (progressive upgrade) ══════════════════
+// The canvas map is hand-drawn and always works, including offline and inside
+// the artifact sandbox where all external hosts are blocked. When the page IS
+// allowed to reach the network (opened locally, or hosted anywhere), it upgrades
+// itself to real OpenStreetMap vector tiles via MapLibre, which is the same
+// approach Snap Map takes with Mapbox.
+//
+// Every failure path falls back to the canvas silently. Nothing here can break
+// the demo; it can only improve it.
+const TILE_PROVIDERS=[
+  'https://tiles.openfreemap.org/styles/liberty',
+  'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+];
+const GL_PAINT={land:'#F2EFE7',water:'#A9D2F0',park:'#C8E2B0',road:'#FFFFFF',
+  roadCase:'#E2DDCF',major:'#FDF6DE',majorCase:'#E8D9A8',building:'#E5E1D6',
+  label:'#7C8698',halo:'#FFFFFF'};
+let glMap=null, glTried=false;
+
+async function tryRealMap(){
+  if(glTried)return; glTried=true;
+  let maplibregl;
+  try{
+    // Style + library both live off-origin, so this throws under a strict CSP.
+    maplibregl=(await import('https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/+esm')).default;
+    window.__maplibregl=maplibregl;
+    if(!document.getElementById('maplibre-css')){
+      const l=document.createElement('link');
+      l.id='maplibre-css'; l.rel='stylesheet';
+      l.href='https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      document.head.appendChild(l);
+    }
+  }catch(err){ return; } // no network: keep the canvas
+
+  let idx=0, ready=false;
+  glMap=new maplibregl.Map({
+    container:'gl-map', style:TILE_PROVIDERS[0],
+    center:[-79.9720,40.4445], zoom:12.2, attributionControl:{compact:true},
+  });
+  glMap.on('error',()=>{
+    if(ready)return;
+    idx++;
+    if(idx<TILE_PROVIDERS.length) glMap.setStyle(TILE_PROVIDERS[idx]);
+    else { try{glMap.remove();}catch(e){} glMap=null; } // give up, canvas stays
+  });
+  glMap.on('style.load',()=>{
+    ready=true;
+    restyleGL();
+    addGLHeat();
+    document.getElementById('gl-map').classList.add('on');
+    const cv=document.getElementById('map-canvas'); if(cv)cv.style.display='none';
+    const hint=document.getElementById('map-hint'); if(hint)hint.textContent='Real map · pinch, drag, tap a pin';
+  });
+  glMap.once('load',addGLMarkers);
+}
+
+// Recolour the provider's own layers rather than hand-authoring a style, so
+// anything unmatched keeps the provider's colour instead of disappearing.
+function restyleGL(){
+  const layers=glMap.getStyle().layers||[];
+  for(const L of layers){
+    const id=(L.id||'').toLowerCase(), sl=(L['source-layer']||'').toLowerCase(), k=id+sl;
+    try{
+      if(L.type==='background') glMap.setPaintProperty(L.id,'background-color',GL_PAINT.land);
+      else if(/water|ocean|sea|river|lake/.test(k)&&L.type==='fill') glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.water);
+      else if(/water|river|stream|canal/.test(k)&&L.type==='line') glMap.setPaintProperty(L.id,'line-color',GL_PAINT.water);
+      else if(/park|wood|forest|grass|golf|pitch|garden|landcover|landuse/.test(k)&&L.type==='fill'){
+        glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.park);
+        glMap.setPaintProperty(L.id,'fill-opacity',.75);
+      }
+      else if(/building/.test(k)){
+        if(L.type==='fill'){glMap.setPaintProperty(L.id,'fill-color',GL_PAINT.building);glMap.setPaintProperty(L.id,'fill-opacity',.85);}
+        else if(L.type==='fill-extrusion') glMap.setPaintProperty(L.id,'fill-extrusion-color',GL_PAINT.building);
+      }
+      else if(L.type==='line'&&/motorway|trunk|primary/.test(id))
+        glMap.setPaintProperty(L.id,'line-color',/case|outline|casing/.test(id)?GL_PAINT.majorCase:GL_PAINT.major);
+      else if(L.type==='line'&&/road|street|highway|transport|bridge|tunnel/.test(k))
+        glMap.setPaintProperty(L.id,'line-color',/case|outline|casing/.test(id)?GL_PAINT.roadCase:GL_PAINT.road);
+      else if(L.type==='symbol'){
+        if(L.layout&&L.layout['text-field']){
+          glMap.setPaintProperty(L.id,'text-color',GL_PAINT.label);
+          glMap.setPaintProperty(L.id,'text-halo-color',GL_PAINT.halo);
+          glMap.setPaintProperty(L.id,'text-halo-width',1.4);
+        }
+        // Keep POI clutter down so WTM's own pins read first, same as Snap.
+        if(/poi|shop|amenity/.test(k)) glMap.setLayoutProperty(L.id,'visibility','none');
+      }
+    }catch(e){ /* provider lacks this property */ }
+  }
+}
+
+function addGLHeat(){
+  if(glMap.getSource('wtm-heat'))return;
+  glMap.addSource('wtm-heat',{type:'geojson',data:{type:'FeatureCollection',
+    features:MOVES.map(m=>({type:'Feature',
+      properties:{w:m.att/m.max+(m.hot?.6:0)},
+      geometry:{type:'Point',coordinates:[m.lng,m.lat]}}))}});
+  glMap.addLayer({id:'wtm-heat',type:'heatmap',source:'wtm-heat',paint:{
+    'heatmap-weight':['get','w'],'heatmap-intensity':1.1,
+    'heatmap-radius':['interpolate',['linear'],['zoom'],10,34,15,90],
+    'heatmap-opacity':.55,
+    'heatmap-color':['interpolate',['linear'],['heatmap-density'],
+      0,'rgba(255,225,120,0)',0.25,'rgba(255,214,90,.35)',0.55,'rgba(255,158,61,.5)',
+      0.8,'rgba(255,110,45,.6)',1,'rgba(255,64,40,.7)']}});
+}
+
+function glEl(html){const d=document.createElement('div');d.innerHTML=html.trim();return d.firstElementChild;}
+
+function addGLMarkers(){
+  const M=window.__maplibregl; if(!M)return;
+  MOVES.forEach(m=>{
+    const fr=friendsForMove(m.id).length;
+    const node=glEl(`<div class="glpin${m.hot?' hot':''}">
+      <div class="glpin-card">${fr?'<span class="glpin-fr"></span>':''}<span>${m.emoji}</span>`
+      +`<span>${m.title.length>20?m.title.slice(0,18)+'…':m.title}</span></div>`
+      +`<div class="glpin-stem"></div><div class="glpin-dot"></div></div>`);
+    node.addEventListener('click',ev=>{ev.stopPropagation();openSheet(m.id);});
+    new M.Marker({element:node,anchor:'bottom'}).setLngLat([m.lng,m.lat]).addTo(glMap);
+  });
+  FRIENDS_LIST.filter(f=>f.online).forEach(f=>{
+    const node=glEl(`<div class="glface">${f.face}<span class="glface-name">${f.name.split(' ')[0]}</span></div>`);
+    node.addEventListener('click',ev=>{ev.stopPropagation();toast(f.name+' is out right now');});
+    new M.Marker({element:node}).setLngLat([f.lng,f.lat]).addTo(glMap);
+  });
+  const me=glEl(`<div class="glface glme">${ME.face}<span class="glface-name">You</span></div>`);
+  new M.Marker({element:me}).setLngLat([ME.lng,ME.lat]).addTo(glMap);
+}
+
+// ══════════════════ INIT ══════════════════
+buildFeed();buildStories();buildFriends();buildAsk();updateBadge();
+document.getElementById('create-cats').innerHTML=CATS.map(c=>`<div class="create-cat" onclick="selCreateCat(this,'${c.id}')">${c.emoji} ${c.label}</div>`).join('');
+</script>
