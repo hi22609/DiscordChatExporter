@@ -1,5 +1,8 @@
 # 06 — ADVERSARIAL PASS
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
 Re-reading tonight's work as a hostile reviewer. I am the most likely source of new slop in
 this repo, so this hunts my own output against the Wave 2 Track A list and the Wave 3 tells.
 

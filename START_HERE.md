@@ -60,14 +60,22 @@ worth fixing before you go further.
 
 ## Where to read next
 
-Everything is in `WTM_REPORTS/`. In order of usefulness to you right now:
+Everything is in `WTM_REPORTS/`. **Two of those files are kept current. The rest are dated
+snapshots** of what was known the night they were written, and several have been overtaken —
+each one carries a banner saying so. Read the current two first:
 
-1. **`DECISIONS_FOR_MICHAEL.md`** — everything still open, with the reasoning and the cost
-   attached. This is the most useful file in the repo. Read it before proposing anything.
-2. **`00_ORIENTATION.md`** — where the code is and how it got there.
-3. **`07_VERIFICATION.md`** — what has actually been executed versus what is still just claimed.
+1. **`STATE.md`** — what is true right now. Start here. Where any other report disagrees with
+   it, this one is right.
+2. **`DECISIONS_FOR_MICHAEL.md`** — everything still open, with the reasoning and the cost
+   attached. Read it before proposing anything.
+
+Then, as background:
+
+3. **`00_ORIENTATION.md`** — where the code is and how it got there.
+4. **`07_VERIFICATION.md`** — what has been executed versus what is still only claimed.
    Anything marked `[UNVERIFIED]` is exactly that.
-4. **`02_AUDIT.md`** — the security and correctness findings.
+5. **`02_AUDIT.md`** — the security and correctness findings. Its headline is out of date; the
+   individual findings are not.
 
 ## Two rules that are not negotiable
 

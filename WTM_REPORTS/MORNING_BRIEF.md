@@ -1,5 +1,11 @@
 # MORNING BRIEF
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
+> Specifically: section 1 says the migration fixes were never run against a database.
+> They have been now, and three further bugs surfaced. See `STATE.md`.
+
 One page. Everything else is detail.
 
 ---

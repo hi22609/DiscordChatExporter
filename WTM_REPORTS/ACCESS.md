@@ -1,5 +1,8 @@
 # ACCESS
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
 Assume you just woke up. This is everything you need.
 
 ## The branch

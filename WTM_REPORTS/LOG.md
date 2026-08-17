@@ -1,4 +1,7 @@
 # WTM Overnight Run — Append-Only Log
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
 Run start: 2026-08-12T05:09:35Z
 Operator: autonomous (Michael asleep)
 Branch: `overnight/2026-08-12` (based on `origin/claude/wtm-app-concept-rci97r`)

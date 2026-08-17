@@ -1,5 +1,11 @@
 # 02 — AUDIT
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
+> Specifically: the headline below is answered. The database has since been run — 19
+> migrations apply clean and 41 assertions pass. See `07_VERIFICATION.md`.
+
 Adversarial pass over both builds. Every finding carries `file:line`, a concrete failure
 scenario, and a free-tier fix. Findings I personally re-verified are marked **[V]**.
 

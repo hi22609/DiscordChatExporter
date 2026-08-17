@@ -1,5 +1,11 @@
 # 01 — DRIFT: BETA vs RAW
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
+> Specifically: items 2 and 4 below are fixed. Trending, crew-going and waitlist now reach
+> the feed, and both categories exist in RAW's enum.
+
 The two builds have diverged into different products. This is the reconciliation list.
 
 ## In BETA, absent from RAW

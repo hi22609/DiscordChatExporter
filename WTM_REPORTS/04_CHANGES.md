@@ -1,5 +1,8 @@
 # 04 — CHANGES
 
+
+> **Dated snapshot — 2026-08-12.** Parts of this have since been overtaken. `STATE.md` is the current picture; where the two disagree, STATE.md is right.
+
 Every change, what it fixes, how it was verified, and what it might have broken.
 Five commits on `overnight/2026-08-12`.
 
